@@ -11,6 +11,7 @@ export default function withPicodom<State, Actions>(container = document.body): 
   return app => props => app({
     ...props,
     init() {
+      // fix duplicate node in hmr
       container.innerHTML = ''
       return props.init()
     },

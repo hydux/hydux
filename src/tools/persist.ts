@@ -6,8 +6,10 @@ export default function withPersist<State, Actions>({
   store = localStorage,
   serialize = JSON.stringify,
   deserialize = JSON.parse,
+  debounce = 50,
   key = 'hydux-persist',
 } = {}): (app: App<State, Actions>) => App<State, Actions> {
+  let timer
   return (app: App<State, Actions>) => (props: AppProps<State, Actions>) => {
     return app({
       ...props,
@@ -23,10 +25,10 @@ export default function withPersist<State, Actions>({
         return [result[0], result[1]]
       },
       onUpdate: (prevAppState, nextAppState, msg, actionName, path) => {
-        if (props.onUpdate) {
-          props.onUpdate(prevAppState, nextAppState, msg, actionName, path)
-        }
-        store.setItem(key, serialize(nextAppState))
+        props.onUpdate && props.onUpdate(prevAppState, nextAppState, msg, actionName, path)
+        timer && clearTimeout(timer)
+        const persist = () => store.setItem(key, serialize(nextAppState))
+        timer = setTimeout(persist, debounce)
       },
     })
   }

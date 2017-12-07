@@ -31,3 +31,5 @@ export function get(path, from) {
 export function isFunction(data): data is Function {
   return 'function' === typeof data
 }
+
+export const noop = f => f

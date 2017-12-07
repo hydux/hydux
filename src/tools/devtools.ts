@@ -10,9 +10,11 @@ export default function withDevtools<State, Actions>(options): (app: App<State, 
     port: 443,
     secure: true,
     getActionType: f => f,
+    debounce: 10,
     ...options
   }
   const connection = connectViaExtension(options)
+  let timer
   return (app: App<State, Actions>) => (props: AppProps<State, Actions>) => {
     const ctx = app({
       ...props,
@@ -23,10 +25,13 @@ export default function withDevtools<State, Actions>(options): (app: App<State, 
         return result
       },
       onUpdate: (prevAppState, nextAppState, msg, actionName, path) => {
-        if (props.onUpdate) {
-          props.onUpdate(prevAppState, nextAppState, msg, actionName, path)
-        }
-        connection.send({ type: 'update', msg: { data: msg, type: path.concat(actionName).join('.') } }, nextAppState)
+        props.onUpdate && props.onUpdate(prevAppState, nextAppState, msg, actionName, path)
+        const send = () => connection.send({
+          type: 'update',
+          msg: { data: msg, type: path.concat(actionName).join('.') },
+        }, nextAppState)
+        timer && clearTimeout(timer)
+        timer = setTimeout(send, options.debounce)
       },
       subscribe: (model) => {
         function sub(actions) {

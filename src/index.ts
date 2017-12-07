@@ -1,16 +1,21 @@
-import { ActionResult, ActionState, ActionStateWithCmd, MyAction, MyActions } from './types'
+import { ActionResult, ActionState, ActionStateWithCmd, ActionType, ActionsType } from './types'
 import Cmd, { CmdType } from './cmd'
-import { set, merge, setDeep, get, isFunction } from './utils'
+import { set, merge, setDeep, get, isFunction, noop } from './utils'
 
-export type AppProps<State = any, Actions = any> = {
-  init: () => State | [State, CmdType<State, Actions>] ,
-  view: (appState: State) => ((actions: Actions) => any)
-  actions: MyActions<State, Actions>,
-  subscribe?: (state: State) => CmdType<State, Actions>,
+export type Init<S, A> = () => S | [S, CmdType<S, A>]
+export type View<S, A> = (appState: S) => ((actions: A) => any)
+export type Subscribe<S, A> = (state: S) => CmdType<S, A>
+export type OnUpdate<S, A> = <M>(prevState: S, nextState: S, msg: M, actionName: string, path: string[]) => void
+
+export type AppProps<State, Actions> = {
+  init: Init<State, Actions>,
+  view: View<State, Actions>
+  actions: ActionsType<State, Actions>,
+  subscribe?: Subscribe<State, Actions>,
   // middlewares: ((action: MyAction<any, State, Actions>, key: string, path: string[]) => MyAction<any, State, Actions>)[],
   render?: (view: any) => void,
   onError?: (err: Error) => void,
-  onUpdate?: <M>(prevState: State, nextState: State, msg: M, actionName: string, path: string[]) => void,
+  onUpdate?: OnUpdate<State, Actions>,
 }
 
 function normalizeActionResult<State, Actions>(result, state): ActionStateWithCmd<State, Actions> {
@@ -28,10 +33,10 @@ export type App<State, Actions> = (props: AppProps<State, Actions>) => any
 
 export default function app<State, Actions>(props: AppProps<State, Actions>) {
   // const appEvents = props.events || {}
-  const appActions = {} as MyActions<State, Actions>
+  const appActions = {} as ActionsType<State, Actions>
   const appSubscribe = props.subscribe || (_ => Cmd.none)
   const render = props.render || console.log
-  const onError = props.onError || console.error
+  const onError = props.onError || noop
   // const appMiddlewares = props.middlewares || []
   let [appState, cmd] = normalizeActionResult(props.init(), void 0) as [State, CmdType<State, Actions>]
 
@@ -58,14 +63,15 @@ export default function app<State, Actions>(props: AppProps<State, Actions>) {
     try {
       render(view)
     } catch (err) {
+      console.error(err)
       onError(err)
     }
   }
 
-  function init(state, actions, from: MyActions<State, Actions> | MyAction<any, State, Actions>, path: string[]) {
+  function init(state, actions, from: ActionsType<State, Actions> | ActionType<any, State, Actions>, path: string[]) {
     for (const key in from) {
       isFunction(from[key])
-        ? ((key, action: MyAction<any, State, Actions>) => {
+        ? ((key, action: ActionType<any, State, Actions>) => {
           actions[key] = function(msg) {
             state = get(path, appState)
             // action = appMiddlewares.reduce((action, fn) => fn(action, key, path), action)
@@ -75,6 +81,7 @@ export default function app<State, Actions>(props: AppProps<State, Actions>) {
             try {
               [nextState, cmd] = normalizeActionResult(action(msg), state)
             } catch (error) {
+              console.error(error)
               onError(error)
             }
 
@@ -84,7 +91,9 @@ export default function app<State, Actions>(props: AppProps<State, Actions>) {
             }
 
             if (nextState !== state) {
-              appState = nextAppState !== appState ? nextAppState : setDeep(path, merge(state, nextState), appState)
+              appState = nextAppState !== appState
+                ? nextAppState
+                : setDeep(path, merge(state, nextState), appState)
               appRender(appState)
               cmd.forEach(sub => sub(appActions))
             }

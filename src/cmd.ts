@@ -1,11 +1,11 @@
 import { CmdType } from './cmd'
-import { ActionResult, MyAction, MyActions } from './types'
+import { ActionResult, ActionType, ActionsType } from './types'
 
-export type Sub<State, Actions> = (actions: MyActions<State, Actions>) => void | null
+export type Sub<State, Actions> = (actions: ActionsType<State, Actions>) => void | null
 export type CmdType<State, Actions> = Sub<State, Actions>[]
 export default {
   none: ([] as Array<Sub<any, any>>),
-  ofPromise<A, T, State, Actions>(task: (args: A) => Promise<T>, args: A, succeedAction: MyAction<T, State, Actions>, failedAction: MyAction<Error, State, Actions>): CmdType<State, Actions> {
+  ofPromise<A, T, State, Actions>(task: (args: A) => Promise<T>, args: A, succeedAction: ActionType<T, State, Actions>, failedAction: ActionType<Error, State, Actions>): CmdType<State, Actions> {
     return [
       _ => {
         task(args)
@@ -14,7 +14,7 @@ export default {
       }
     ]
   },
-  ofFn<A, T, State, Actions>(task: (args: A) => T, args: A, succeedAction: MyAction<T, State, Actions>, failedAction: MyAction<Error, State, Actions>): CmdType<State, Actions> {
+  ofFn<A, T, State, Actions>(task: (args: A) => T, args: A, succeedAction: ActionType<T, State, Actions>, failedAction: ActionType<Error, State, Actions>): CmdType<State, Actions> {
     return [
       _ => {
         try {
@@ -31,7 +31,7 @@ export default {
   batch<State, Actions>(...cmds: CmdType<State, Actions>[]) {
     return Array.prototype.concat.apply([], cmds)
   },
-  map<State, Actions, SubActions>(map: (action: MyActions<State, Actions>) => MyActions<State, SubActions>, cmd: CmdType<State, SubActions>): CmdType<State, Actions> {
+  map<State, Actions, SubActions>(map: (action: ActionsType<State, Actions>) => ActionsType<State, SubActions>, cmd: CmdType<State, SubActions>): CmdType<State, Actions> {
     return cmd.map(sub => actions => sub(map(actions)))
   }
 }

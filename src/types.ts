@@ -3,7 +3,7 @@ import { CmdType } from './cmd'
 export type ActionState<State> = Partial<State> | null | void
 export type ActionStateWithCmd<State, Actions> = [ActionState<State>, CmdType<State, Actions>]
 export type ActionResult<State, Actions> = ActionState<State> | ActionStateWithCmd<State, Actions>
-export type MyAction<Data, State, Actions> = (
+export type ActionType<Data, State, Actions> = (
   data: Data
 ) =>
   | ((state: State) => ActionResult<State, Actions>)
@@ -14,6 +14,6 @@ export type MyAction<Data, State, Actions> = (
  *
  * @memberOf [App]
  */
-export type MyActions<State, Actions> = {
-  [P in keyof Actions]: MyAction<any, State, Actions> | MyActions<any, Actions[P]>
+export type ActionsType<State, Actions> = {
+  [P in keyof Actions]: ActionType<any, State, Actions> | ActionsType<any, Actions[P]>
 }
