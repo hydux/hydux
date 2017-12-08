@@ -24,12 +24,12 @@ export default function withDevtools<State, Actions>(options): (app: App<State, 
         connection.init(state)
         return result
       },
-      onUpdate: (prevAppState, nextAppState, msg, actionName, path) => {
-        props.onUpdate && props.onUpdate(prevAppState, nextAppState, msg, actionName, path)
+      onUpdate: (data) => {
+        props.onUpdate && props.onUpdate(data)
         const send = () => connection.send({
           type: 'update',
-          msg: { data: msg, type: path.concat(actionName).join('.') },
-        }, nextAppState)
+          msg: { data: data.msgData, type: data.action },
+        }, data.nextAppState)
         timer && clearTimeout(timer)
         timer = setTimeout(send, options.debounce)
       },

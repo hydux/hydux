@@ -5,7 +5,9 @@ import { set, merge, setDeep, get, isFunction, noop } from './utils'
 export type Init<S, A> = () => S | [S, CmdType<S, A>]
 export type View<S, A> = (appState: S) => ((actions: A) => any)
 export type Subscribe<S, A> = (state: S) => CmdType<S, A>
-export type OnUpdate<S, A> = <M>(prevState: S, nextState: S, msg: M, actionName: string, path: string[]) => void
+export type OnUpdate<S, A> = <M>(data: { prevAppState: S, nextAppState: S, msgData: M, action: string }) => void
+
+export { Cmd }
 
 export type AppProps<State, Actions> = {
   init: Init<State, Actions>,
@@ -52,7 +54,7 @@ export default function app<State, Actions>(props: AppProps<State, Actions>) {
     render: appRender
   }
 
-  function appRender(state = appState) {
+  function appRender(state) {
     if (state !== appState) {
       appState = state
     }
@@ -61,7 +63,7 @@ export default function app<State, Actions>(props: AppProps<State, Actions>) {
       view = view(appActions)
     }
     try {
-      render(view)
+      return render(view)
     } catch (err) {
       console.error(err)
       onError(err)
@@ -72,14 +74,14 @@ export default function app<State, Actions>(props: AppProps<State, Actions>) {
     for (const key in from) {
       isFunction(from[key])
         ? ((key, action: ActionType<any, State, Actions>) => {
-          actions[key] = function(msg) {
+          actions[key] = function(msgData) {
             state = get(path, appState)
             // action = appMiddlewares.reduce((action, fn) => fn(action, key, path), action)
             let nextState = state
             let nextAppState = appState
             let cmd = Cmd.none
             try {
-              [nextState, cmd] = normalizeActionResult(action(msg), state)
+              [nextState, cmd] = normalizeActionResult(action(msgData), state)
             } catch (error) {
               console.error(error)
               onError(error)
@@ -87,7 +89,7 @@ export default function app<State, Actions>(props: AppProps<State, Actions>) {
 
             if (props.onUpdate) {
               nextAppState = setDeep(path, merge(state, nextState), appState)
-              props.onUpdate(appState, nextAppState, msg, key, path)
+              props.onUpdate({ prevAppState: appState, nextAppState, msgData, action: path.concat(key).join('.') })
             }
 
             if (nextState !== state) {
@@ -98,7 +100,7 @@ export default function app<State, Actions>(props: AppProps<State, Actions>) {
               cmd.forEach(sub => sub(appActions))
             }
 
-            return msg
+            return msgData
           }
         })(key, from[key])
         : init(

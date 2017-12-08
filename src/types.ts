@@ -1,8 +1,11 @@
 import { CmdType } from './cmd'
 
 export type ActionState<State> = Partial<State> | null | void
+
 export type ActionStateWithCmd<State, Actions> = [ActionState<State>, CmdType<State, Actions>]
+
 export type ActionResult<State, Actions> = ActionState<State> | ActionStateWithCmd<State, Actions>
+
 export type ActionType<Data, State, Actions> = (
   data: Data
 ) =>

@@ -12,9 +12,9 @@ export default function withHmr<State, Actions>(options): (app: App<State, Actio
       }
       return [globalState || result[0], result[1]]
     },
-    render(state) {
-      globalState = state
-      return props.render && props.render(state)
+    onUpdate(data) {
+      props.onUpdate && props.onUpdate(data)
+      globalState = data.nextAppState
     },
   })
 }

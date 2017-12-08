@@ -24,10 +24,10 @@ export default function withPersist<State, Actions>({
         }
         return [result[0], result[1]]
       },
-      onUpdate: (prevAppState, nextAppState, msg, actionName, path) => {
-        props.onUpdate && props.onUpdate(prevAppState, nextAppState, msg, actionName, path)
+      onUpdate: (data) => {
+        props.onUpdate && props.onUpdate(data)
         timer && clearTimeout(timer)
-        const persist = () => store.setItem(key, serialize(nextAppState))
+        const persist = () => store.setItem(key, serialize(data.nextAppState))
         timer = setTimeout(persist, debounce)
       },
     })

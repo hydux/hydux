@@ -1,5 +1,5 @@
-import { patch, h } from 'picodom'
-import { App } from './index'
+import { patch, h, Component, VNode } from 'picodom'
+import { App } from '../index'
 
 const React = { createElement: h }
 

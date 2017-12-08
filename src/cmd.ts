@@ -5,7 +5,12 @@ export type Sub<State, Actions> = (actions: ActionsType<State, Actions>) => void
 export type CmdType<State, Actions> = Sub<State, Actions>[]
 export default {
   none: ([] as Array<Sub<any, any>>),
-  ofPromise<A, T, State, Actions>(task: (args: A) => Promise<T>, args: A, succeedAction: ActionType<T, State, Actions>, failedAction: ActionType<Error, State, Actions>): CmdType<State, Actions> {
+  ofPromise<A, T, State, Actions>(
+    task: (args: A) => Promise<T>,
+    args: A,
+    succeedAction: ActionType<T, State, Actions>,
+    failedAction: ActionType<Error, State, Actions>
+  ): CmdType<State, Actions> {
     return [
       _ => {
         task(args)
@@ -14,7 +19,12 @@ export default {
       }
     ]
   },
-  ofFn<A, T, State, Actions>(task: (args: A) => T, args: A, succeedAction: ActionType<T, State, Actions>, failedAction: ActionType<Error, State, Actions>): CmdType<State, Actions> {
+  ofFn<A, T, State, Actions>(
+    task: (args: A) => T,
+    args: A,
+    succeedAction: ActionType<T, State, Actions>,
+    failedAction: ActionType<Error, State, Actions>
+  ): CmdType<State, Actions> {
     return [
       _ => {
         try {
