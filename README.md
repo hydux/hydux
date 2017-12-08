@@ -10,7 +10,105 @@ After trying [Fable](https://fable.io) + [Elmish](https://github.com/fable-elmis
 yarn add hydux # or npm i hydux
 ```
 
-## Example
+## Quick Example
+Let's say we got a counter, like this.
+
+```js
+const counter = {
+  init: () => { count: 1 },
+  actions: {
+    down: () => state => ({ count: state.count - 1 }),
+    up: () => state => ({ count: state.count + 1 })
+  },
+  view: (state: State) => (actions: Actions) =>
+    <div>
+      <h1>{state.count}</h1>
+      <button onclick={actions.down}>–</button>
+      <button onclick={actions.up}>+</button>
+    </div>
+}
+```
+
+Then we can compose it in Elm way, you can easily reuse your components.
+
+```js
+import _app from 'hydux'
+import withPersist from 'hydux/enhancers/persist'
+import withPicodom, { h, React } from 'hydux/enhancers/picodom-render'
+import Counter from './counter'
+
+// let app = withPersist<State, Actions>({
+//   key: 'time-game/v1'
+// })(_app)
+
+// use built-in 1kb picodom to render the view.
+let app = withPicodom()(_app)
+
+if (process.env.NODE_ENV === 'development') {
+  // built-in dev tools, without pain.
+  const devTools = require('hydux/enhancers/devtools').default
+  const logger = require('hydux/enhancers/logger').default
+  const hmr = require('hydux/enhancers/hmr').default
+  app = logger()(app)
+  app = devTools()(app)
+  app = hmr()(app)
+}
+
+const actions = {
+  counter1: Counter.actions,
+  counter2: Counter.actions,
+}
+
+const state = {
+  counter1: Counter.init(),
+  counter2: Counter.init(),
+}
+
+const view = (state: State) => (actions: Actions) =>
+    <main>
+      <h1>Counter1:</h1>
+      {Counter.view(state.counter1)(actions.counter1)}
+      <h1>Counter2:</h1>
+      {Counter.view(state.counter2)(actions.counter2)}
+    </main>
+
+export default app({
+  init: () => state,
+  actions,
+  view,
+})
+```
+
+## Actions with Cmd
+
+This library also implemented a Elm like side effects manager, you can simple return a tuple (two elements array) in your action, and put the Cmd as second command.
+e.g.
+
+```js
+import app, { Cmd } from 'hydux'
+
+function upLater(n) {
+  return new Promise(resolve => setTimeout(() => resolve(n), 1000))
+}
+app({
+  init: () => ({ count: 1}),
+  actions: {
+    down: () => state => ({ count: state.count - 1 }),
+    up: () => state => ({ count: state.count + 1 }),
+    upN: n => state => ({ count: state.count + n }),
+    upLater: _ => state => actions/* actions of same level */ => [
+      state, // don't change the state, don't trigger view update
+      Cmd.ofPromise(
+        upLater /* a function with single parameter and return a promise */,n /* the parameter of the funciton */,
+        actions.upN /* success handler, optional */,
+        console.error /* error handler, optional */)
+    ]
+  },
+  view: () => {/*...*/} ,
+})
+```
+
+## Counter App
 
 ```sh
 git clone https://github.com/hydux/hydux.git
@@ -22,4 +120,5 @@ npm start
 Now open http://localhost:8080 and hack!
 
 # License
+
 MIT

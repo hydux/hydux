@@ -1,5 +1,5 @@
 {
-  "name": "time-game",
+  "name": "counter-example",
   "version": "1.0.0",
   "private": true,
   "description": "",
@@ -11,20 +11,17 @@
     "build:dll": "cross-env NODE_ENV=production webpack --config ./webpack.config.dll.js --progress --profile --colors",
     "test": "DEBUG=react-starter* tsc && ava",
     "test-and-build-if-need": "node ./tools/test-and-build-if-need.js",
-    "lint": "tslint ./src/** --type-check -p ./tsconfig.json",
+    "lint": "tslint ./src/** --type-check -p ./tsconfig.json"
   },
-  "repository": {
-    "type": "git",
-    "url": "git@github.intra.douban.com:yangzhen/time-game.git"
-  },
-  "author": "yangzhen",
   "devDependencies": {
     "@hyperapp/logger": "^0.3.1",
     "@hyperapp/router": "^0.3.0",
+    "@types/es6-promise": "^0.0.33",
     "@types/node": "^8.0.55",
     "clean-webpack-plugin": "^0.1.17",
     "cross-env": "^5.1.1",
     "debug": "^3.1.0",
+    "es6-promise": "^4.1.1",
     "picodom": "^1.0.2",
     "remotedev": "^0.2.7",
     "tslint": "^5.8.0",

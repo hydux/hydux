@@ -11,8 +11,6 @@ import Counter, { State as CounterState, Actions as CounterActions } from './cou
 // })(_app)
 let app = withPicodom<State, Actions>()(_app)
 
-let mixins: any[] = []
-let plugins: any[] = []
 if (process.env.NODE_ENV === 'development') {
   const devTools = require('../../../src/enhancers/devtools').default
   const logger = require('../../../src/enhancers/logger').default

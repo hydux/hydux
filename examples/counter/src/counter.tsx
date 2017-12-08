@@ -1,19 +1,30 @@
 import { h, React } from '../../../src/enhancers/picodom-render'
-
+import { Cmd, noop } from '../../../src/index'
 const initState = { count: 0 }
 const counter = {
 
   init: () => initState,
   actions: {
-    down: _ => state => ({ count: state.count - 1 }),
-    up: _ => state => ({ count: state.count + 2 })
+    down: () => state => ({ count: state.count - 1 }),
+    up: () => state => ({ count: state.count + 1 }),
+    upN: n => state => ({ count: state.count + n }),
+    upLater: () => state => actions =>
+      [ state,
+        Cmd.ofPromise(
+          n => {
+            return new Promise(resolve =>
+              setTimeout(() => resolve(n), 1000))
+          },
+          10,
+          actions.upN) ]
   },
   view: (state: State) => (actions: Actions) =>
-    <main>
+    <div>
       <h1>{state.count}</h1>
       <button onclick={actions.down}>–</button>
       <button onclick={actions.up}>+</button>
-    </main>
+      <button onclick={actions.upLater}>+ later</button>
+    </div>
 }
 export default counter
 export type Actions = typeof counter.actions

@@ -8,8 +8,8 @@ export default {
   ofPromise<A, T, State, Actions>(
     task: (args: A) => Promise<T>,
     args: A,
-    succeedAction: ActionType<T, State, Actions>,
-    failedAction: ActionType<Error, State, Actions>
+    succeedAction?: ActionType<T, State, Actions>,
+    failedAction?: ActionType<Error, State, Actions>
   ): CmdType<State, Actions> {
     return [
       _ => {

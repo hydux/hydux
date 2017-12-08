@@ -2,15 +2,18 @@
   "name": "hydux",
   "version": "0.1.0",
   "description": "An elm-like state manager inspired by Hyperapp, Elmish, Elm, Redux, etc. Working with any vdom library!",
-  "main": "/lib/index.js",
+  "main": "./lib/index.js",
   "scripts": {
-    "build": "tsc -d",
+    "build": "del lib && tsc -d -t es5",
     "build:dist": "webpack -p --progress --profile",
-    "test": "mocha --require espower-typescript/guess \"test/**/*.ts\"",
+    "test": "mocha --require espower-typescript/guess \"src/test/**/*.ts\"",
     "test:watch": "npm run test -- -w --watch-extensions ts,tsx",
-    "prepublish": "npm run test && npm run build && npm run build:dist"
+    "prepublish": "npm run test && npm run build && npm run build:dist",
+    "doc": "typedoc --theme minimal --out ./docs --exclude ./test ./src && touch ./docs/.nojekyll"
   },
-  "pre-commit": ["test"],
+  "pre-commit": [
+    "test"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/hydux/hydux.git"
@@ -36,13 +39,16 @@
     "clean-webpack-plugin": "^0.1.17",
     "cross-env": "^5.1.1",
     "debug": "^3.1.0",
+    "del-cli": "^1.1.0",
     "espower-typescript": "^8.1.2",
     "mocha": "^4.0.1",
     "power-assert": "^1.4.4",
     "pre-commit": "^1.2.2",
     "source-map-loader": "^0.2.3",
+    "timekeeper": "^2.0.0",
     "tslint": "^5.8.0",
     "tslint-config-standard": "^7.0.0",
+    "typedoc": "^0.9.0",
     "typescript": "^2.6.2",
     "webpack": "^3.10.0"
   },

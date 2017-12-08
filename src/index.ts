@@ -7,7 +7,7 @@ export type View<S, A> = (appState: S) => ((actions: A) => any)
 export type Subscribe<S, A> = (state: S) => CmdType<S, A>
 export type OnUpdate<S, A> = <M>(data: { prevAppState: S, nextAppState: S, msgData: M, action: string }) => void
 
-export { Cmd }
+export { Cmd, noop }
 
 export type AppProps<State, Actions> = {
   init: Init<State, Actions>,
@@ -20,10 +20,9 @@ export type AppProps<State, Actions> = {
   onUpdate?: OnUpdate<State, Actions>,
 }
 
-function normalizeActionResult<State, Actions>(result, state): ActionStateWithCmd<State, Actions> {
-  if (isFunction(result)) {
-    result = result(state)
-  }
+function normalizeActionResult<State, Actions>(result, state, actions): ActionStateWithCmd<State, Actions> {
+  isFunction(result) && (result = result(state))
+  isFunction(result) && (result = result(actions))
 
   if (result instanceof Array) {
     return result as any
@@ -40,7 +39,7 @@ export default function app<State, Actions>(props: AppProps<State, Actions>) {
   const render = props.render || console.log
   const onError = props.onError || noop
   // const appMiddlewares = props.middlewares || []
-  let [appState, cmd] = normalizeActionResult(props.init(), void 0) as [State, CmdType<State, Actions>]
+  let [appState, cmd] = normalizeActionResult(props.init(), void 0, appActions) as [State, CmdType<State, Actions>]
 
   init(appState, appActions, props.actions, [])
   cmd.forEach(sub => sub(appActions))
@@ -81,7 +80,7 @@ export default function app<State, Actions>(props: AppProps<State, Actions>) {
             let nextAppState = appState
             let cmd = Cmd.none
             try {
-              [nextState, cmd] = normalizeActionResult(action(msgData), state)
+              [nextState, cmd] = normalizeActionResult(action(msgData), state, actions)
             } catch (error) {
               console.error(error)
               onError(error)
@@ -97,9 +96,8 @@ export default function app<State, Actions>(props: AppProps<State, Actions>) {
                 ? nextAppState
                 : setDeep(path, merge(state, nextState), appState)
               appRender(appState)
-              cmd.forEach(sub => sub(appActions))
             }
-
+            cmd.forEach(sub => sub(appActions))
             return msgData
           }
         })(key, from[key])
