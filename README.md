@@ -3,7 +3,7 @@ An elm-like state manager inspired by [Hyperapp](https://github.com/hyperapp/hyp
 
 ## Why
 
-After trying [Fable](https://fable.io) + [Elmish](https://github.com/fable-elmish/elmish) for a while, I need to write a small App in my company, for many reasons I cannot choose some fancy stuff like [Fable](https://fable.io) + [Elmish](https://github.com/fable-elmish/elmish). Anyway, I need to use the mainstream JS stack and cannot bear Redux's anymore(cumbersome, complex toolchain...). After some dig around hyperapp looks really awesome, but I quickly find out it doesn't work with React, and many libraries don't work with the newest API anymore. So I create this to support **different** vdom libraries, like React, [picodom](https://github.com/picodom/picodom), Preact, [inferno](https://github.com/infernojs/inferno) or what ever you want, just write a simple enhancer. Also to avoid breaking change, we have **built-in** support for HMR, logger, persist, Redux Devtools, you know you want it!
+After trying [Fable](https://fable.io) + [Elmish](https://github.com/fable-elmish/elmish) for a while, I need to write a small web App in my company, for many reasons I cannot choose some fancy stuff like [Fable](https://fable.io) + [Elmish](https://github.com/fable-elmish/elmish), I need to use the mainstream JS stack but cannot bear Redux's cumbersome, complex toolchain, etc anymore. After some digging around, hyperapp looks really good to me, but I quickly find out it doesn't work with React, and many libraries don't work with the newest API. So I create this to support **different** vdom libraries, like React, [picodom](https://github.com/picodom/picodom), Preact, [inferno](https://github.com/infernojs/inferno) or what ever you want, just need to write a simple enhancer! Also to avoid breaking change, we have **built-in** support for HMR, logger, persist, Redux Devtools, you know you want it!
 
 ## Install
 ```sh
@@ -38,7 +38,7 @@ import withPicodom, { h, React } from 'hydux/enhancers/picodom-render'
 import Counter from './counter'
 
 // let app = withPersist<State, Actions>({
-//   key: 'time-game/v1'
+//   key: 'my-counter-app/v1'
 // })(_app)
 
 // use built-in 1kb picodom to render the view.
@@ -81,7 +81,7 @@ export default app({
 
 ## Actions with Cmd
 
-This library also implemented a Elm like side effects manager, you can simple return a tuple (two elements array) in your action, and put the Cmd as second command.
+This library also implemented a Elm like side effects manager, you can simple return a tuple (two elements array) in your action, and put the Cmd as the second element.
 e.g.
 
 ```js
@@ -97,7 +97,7 @@ app({
     up: () => state => ({ count: state.count + 1 }),
     upN: n => state => ({ count: state.count + n }),
     upLater: _ => state => actions/* actions of same level */ => [
-      state, // don't change the state, don't trigger view update
+      state, // don't change the state, won't trigger view update
       Cmd.ofPromise(
         upLater /* a function with single parameter and return a promise */,n /* the parameter of the funciton */,
         actions.upN /* success handler, optional */,
