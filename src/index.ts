@@ -15,14 +15,22 @@ export type AppProps<State, Actions> = {
   actions: ActionsType<State, Actions>,
   subscribe?: Subscribe<State, Actions>,
   // middlewares: ((action: MyAction<any, State, Actions>, key: string, path: string[]) => MyAction<any, State, Actions>)[],
-  render?: (view: any) => void,
+  onRender?: (view: any) => void,
   onError?: (err: Error) => void,
   onUpdate?: OnUpdate<State, Actions>,
 }
 
 function normalizeActionResult<State, Actions>(result, state, actions): ActionStateWithCmd<State, Actions> {
+
   isFunction(result) && (result = result(state))
   isFunction(result) && (result = result(actions))
+  // action can be a function that return a promise or undefined(callback)
+  if (
+    result === undefined ||
+    (result.then && typeof result.then === 'function')
+  ) {
+    return [state, Cmd.none]
+  }
 
   if (result instanceof Array) {
     return result as any
@@ -36,7 +44,7 @@ export default function app<State, Actions>(props: AppProps<State, Actions>) {
   // const appEvents = props.events || {}
   const appActions = {} as ActionsType<State, Actions>
   const appSubscribe = props.subscribe || (_ => Cmd.none)
-  const render = props.render || console.log
+  const render = props.onRender || console.log
   const onError = props.onError || noop
   // const appMiddlewares = props.middlewares || []
   let [appState, cmd] = normalizeActionResult(props.init(), void 0, appActions) as [State, CmdType<State, Actions>]
@@ -50,7 +58,7 @@ export default function app<State, Actions>(props: AppProps<State, Actions>) {
     ...props,
     actions: appActions,
     getState() { return appState },
-    render: appRender
+    render: appRender,
   }
 
   function appRender(state) {
@@ -88,7 +96,12 @@ export default function app<State, Actions>(props: AppProps<State, Actions>) {
 
             if (props.onUpdate) {
               nextAppState = setDeep(path, merge(state, nextState), appState)
-              props.onUpdate({ prevAppState: appState, nextAppState, msgData, action: path.concat(key).join('.') })
+              props.onUpdate({
+                prevAppState: appState,
+                nextAppState,
+                msgData,
+                action: path.concat(key).join('.')
+              })
             }
 
             if (nextState !== state) {

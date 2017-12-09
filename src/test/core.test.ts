@@ -13,7 +13,7 @@ describe('core api', () => {
       init: () => ({ count: 1 }),
       actions: {},
       view: state => actions => state,
-      render: view => renderResult = view
+      onRender: view => renderResult = view
     })
     assert(ctx.getState().count === 1, 'simple state should work')
     assert.equal(renderResult.count, 1, 'simple state in view should work')
@@ -23,7 +23,7 @@ describe('core api', () => {
       init: () => state,
       actions: {},
       view: state => actions => ({ type: 'view', state }),
-      render: view => renderResult = view
+      onRender: view => renderResult = view
     })
     assert.deepStrictEqual(ctx.getState(), state, 'nested state should work')
     assert.deepStrictEqual(renderResult, { type: 'view', state }, 'nested state in view should work')
@@ -66,7 +66,7 @@ describe('core api', () => {
         reset: _ => ({ count: 1 }),
       },
       view: state => actions => actions,
-      render: view => renderResult = view
+      onRender: view => renderResult = view
     })
     testCounter(ctx, renderResult)
   })
@@ -79,11 +79,20 @@ describe('core api', () => {
         upN: n => state => ({ count: state.count + n }),
         down: _ => state => ({ count: state.count - 1 }),
         reset: _ => ({ count: 1 }),
-        upLater: n => state => actions => [state, Cmd.ofPromise(
-          n => new Promise(resolve => setTimeout(() => resolve(n), 10)),
-          n,
+        upLaterByPromise: n => state => actions => new Promise(resolve =>
+          setTimeout(() => resolve(actions.upN(n)), 10)),
+        upLater: () => state => actions => [state, Cmd.ofPromise(
+          () => new Promise(resolve => setTimeout(() => resolve(), 10)),
+          void 0,
           actions.up,
-        )]
+        )],
+        upLaterWithElmLikeCmd: () => state => actions => [state, Cmd.batch([
+          Cmd.ofPromise(
+            () => new Promise(resolve => setTimeout(() => resolve(), 10)),
+            void 0,
+            actions.up,
+          )
+        ])]
       }
     }
     let ctx
@@ -99,7 +108,7 @@ describe('core api', () => {
         counter2: counter.actions,
       },
       view: state => actions => actions,
-      render: view => renderResult = view
+      onRender: view => renderResult = view
     })
     assert(ctx.getState().counter1.count === 1, 'counter1 init should work')
 
@@ -115,5 +124,14 @@ describe('core api', () => {
     await sleep(10)
     assert(ctx.getState().counter1.count === 3, 'counter1 should work 3')
 
+    ctx.actions.counter1.upLaterByPromise(3)
+    assert(ctx.getState().counter1.count === 3, 'upLaterByPromise should work 3')
+    await sleep(10)
+    assert(ctx.getState().counter1.count === 6, 'upLaterByPromise should work 6')
+
+    ctx.actions.counter1.upLaterWithElmLikeCmd()
+    assert(ctx.getState().counter1.count === 6, 'upLaterWithElmLikeCmd should work 6')
+    await sleep(10)
+    assert(ctx.getState().counter1.count === 7, 'upLaterWithElmLikeCmd should work 7')
   })
 })

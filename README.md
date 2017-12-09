@@ -1,9 +1,13 @@
-# hydux
-An elm-like state manager inspired by [Hyperapp](https://github.com/hyperapp/hyperapp), [Elmish](https://github.com/fable-elmish/elmish), Elm, Redux, etc. Working with any vdom library!
+# Hydux
+An Elm-like state manager inspired by [Hyperapp](https://github.com/hyperapp/hyperapp), [Elmish](https://github.com/fable-elmish/elmish), Elm, Redux, etc. Working with any vdom library!
 
 ## Why
 
-After trying [Fable](https://fable.io) + [Elmish](https://github.com/fable-elmish/elmish) for a while, I need to write a small web App in my company, for many reasons I cannot choose some fancy stuff like [Fable](https://fable.io) + [Elmish](https://github.com/fable-elmish/elmish), I need to use the mainstream JS stack but cannot bear Redux's cumbersome, complex toolchain, etc anymore. After some digging around, hyperapp looks really good to me, but I quickly find out it doesn't work with React, and many libraries don't work with the newest API. So I create this to support **different** vdom libraries, like React, [picodom](https://github.com/picodom/picodom), Preact, [inferno](https://github.com/infernojs/inferno) or what ever you want, just need to write a simple enhancer! Also to avoid breaking change, we have **built-in** support for HMR, logger, persist, Redux Devtools, you know you want it!
+After trying [Fable](https://fable.io) + [Elmish](https://github.com/fable-elmish/elmish) for a while, I need to write a small web App in my company, for many reasons I cannot choose some fancy stuff like [Fable](https://fable.io) + [Elmish](https://github.com/fable-elmish/elmish), simply speaking, I need to use the mainstream JS stack but don't want to bear Redux's cumbersome, complex toolchain, etc anymore.
+
+After some digging around, hyperapp looks really good to me, but I quickly find out it doesn't work with React, and many libraries don't work with the newest API. So I create this to support **different** vdom libraries, like React, [picodom](https://github.com/picodom/picodom), Preact, [inferno](https://github.com/infernojs/inferno) or what ever you want, just need to write a simple enhancer!
+
+Also, to avoid breaking change, we have **built-in** support for HMR, logger, persist, Redux Devtools, you know you want it!
 
 ## Install
 ```sh
@@ -33,8 +37,8 @@ Then we can compose it in Elm way, you can easily reuse your components.
 
 ```js
 import _app from 'hydux'
-import withPersist from 'hydux/enhancers/persist'
-import withPicodom, { h, React } from 'hydux/enhancers/picodom-render'
+import withPersist from 'hydux/lib/enhancers/persist'
+import withPicodom, { h, React } from 'hydux/lib/enhancers/picodom-render'
 import Counter from './counter'
 
 // let app = withPersist<State, Actions>({
@@ -46,9 +50,9 @@ let app = withPicodom()(_app)
 
 if (process.env.NODE_ENV === 'development') {
   // built-in dev tools, without pain.
-  const devTools = require('hydux/enhancers/devtools').default
-  const logger = require('hydux/enhancers/logger').default
-  const hmr = require('hydux/enhancers/hmr').default
+  const devTools = require('hydux/lib/enhancers/devtools').default
+  const logger = require('hydux/lib/enhancers/logger').default
+  const hmr = require('hydux/lib/enhancers/hmr').default
   app = logger()(app)
   app = devTools()(app)
   app = hmr()(app)
@@ -81,7 +85,7 @@ export default app({
 
 ## Actions with Cmd
 
-This library also implemented a Elm like side effects manager, you can simple return a tuple (two elements array) in your action, and put the Cmd as the second element.
+This library also implemented a Elm-like side effects manager, you can simple return a tuple (two elements array) in your action, and put the Cmd as the second element.
 e.g.
 
 ```js
@@ -101,7 +105,7 @@ app({
       Cmd.ofPromise(
         upLater /* a function with single parameter and return a promise */,n /* the parameter of the funciton */,
         actions.upN /* success handler, optional */,
-        console.error /* error handler, optional */)
+        console.error /* error handler, optional */ )
     ]
   },
   view: () => {/*...*/} ,
@@ -119,6 +123,6 @@ npm start
 
 Now open http://localhost:8080 and hack!
 
-# License
+## License
 
 MIT

@@ -9,16 +9,18 @@ const DIST = `${__dirname}/static/dist`
 
 module.exports = module.exports = {
   entry: {
-    hydux: "./src/index.ts",
-    'hydux-picodom': './src/enhancers/picodom-render.ts',
-    'hydux-logger': './src/enhancers/logger.ts',
-    'hydux-persist': './src/enhancers/persist.ts',
-    'hydux-hmr': './src/enhancers/hmr.ts',
-    'hydux-devtools': './src/enhancers/devtools.ts',
+    core: "./src/index.ts",
+    picodom: './src/enhancers/picodom-render.ts',
+    logger: './src/enhancers/logger.ts',
+    persist: './src/enhancers/persist.ts',
+    hmr: './src/enhancers/hmr.ts',
+    devtools: './src/enhancers/devtools.ts',
   },
   output: {
-      filename: "[name].js",
-      path: __dirname + "/dist"
+      filename: "hydux.[name].js",
+      path: __dirname + "/dist",
+      library: ["hydux", "[name]"],
+      libraryTarget: 'umd'
   },
 
   // Enable sourcemaps for debugging webpack's output.
@@ -33,12 +35,12 @@ module.exports = module.exports = {
       rules: [
           // All files with a '.ts' or '.tsx' extension will be handled by 'awesome-typescript-loader'.
           { test: /\.tsx?$/,
-            use: {
+            use: [{
               loader: "awesome-typescript-loader",
-              query: {
+              options: {
                 configFileName: "./tsconfig.2015.json"
               }
-            },
+            }],
           },
           // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
           { enforce: "pre", test: /\.js$/, use: "source-map-loader" }

@@ -15,7 +15,8 @@ export default function withPicodom<State, Actions>(container = document.body): 
       container.innerHTML = ''
       return props.init()
     },
-    render(view) {
+    onRender(view) {
+      props.onRender && props.onRender(view)
       if (rafId) {
         window.cancelAnimationFrame(rafId)
       }
