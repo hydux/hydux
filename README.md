@@ -4,13 +4,13 @@
 
 An Elm-like state manager inspired by [Hyperapp](https://github.com/hyperapp/hyperapp), [Elmish](https://github.com/fable-elmish/elmish), Elm, Redux, etc. Working with any vdom library!
 
-## Why
+* [hyperapp](https://github.com/hyperapp/hyperapp) compatible API
+* Support any vdom library, including react ([official support](https://github.io/hydux/hydux-react))
+* [Official support for react-router](https://github.io/hydux/hydux-react-router)
+* hot reload (hmr), logger, persist, [Redux Devtools](https://github.com/zalmoxisus/redux-devtools-extension), picodom([1kb vdom](https://github.com/picodom/picodom)), ****All in One****, easily setup all these fancy stuff without pain!
+* Elm-like side effect manager and subscribe API
 
-After trying [Fable](https://fable.io) + [Elmish](https://github.com/fable-elmish/elmish) for several month, I need to write a small web App in my company, for many reasons I cannot choose some fancy stuff like [Fable](https://fable.io) + [Elmish](https://github.com/fable-elmish/elmish), simply speaking, I need to use the mainstream JS stack but don't want to bear Redux's cumbersome, complex toolchain, etc anymore.
-
-After some digging around, hyperapp looks really good to me, but I quickly find out it doesn't work with React, and many libraries don't work with the newest API. So I create this to support ****different**** vdom libraries, like React([official support](https://github.io/hydux/hydux-react)), [picodom](https://github.com/picodom/picodom)([built-in](https://github.com/hydux/hydux/blob/master/src/enhancers/picodom-render.ts)), Preact, [inferno](https://github.com/infernojs/inferno) or what ever you want, just need to write a simple enhancer!
-
-Also, to avoid breaking change, we have ****built-in**** support for HMR, logger, persist, [Redux Devtools](https://github.com/zalmoxisus/redux-devtools-extension), you know you want it!
+![](media/timetravel.gif)
 
 ## Install
 
@@ -130,6 +130,14 @@ npm start
 ```
 
 Now open <http://localhost:8080> and hack!
+
+## Why
+
+After trying [Fable](https://fable.io) + [Elmish](https://github.com/fable-elmish/elmish) for several month, I need to write a small web App in my company, for many reasons I cannot choose some fancy stuff like [Fable](https://fable.io) + [Elmish](https://github.com/fable-elmish/elmish), simply speaking, I need to use the mainstream JS stack but don't want to bear Redux's cumbersome, complex toolchain, etc anymore.
+
+After some digging around, hyperapp looks really good to me, but I quickly find out it doesn't work with React, and many libraries don't work with the newest API. So I create this to support ****different**** vdom libraries, like React([official support](https://github.io/hydux/hydux-react)), [picodom](https://github.com/picodom/picodom)([built-in](https://github.com/hydux/hydux/blob/master/src/enhancers/picodom-render.ts)), Preact, [inferno](https://github.com/infernojs/inferno) or what ever you want, just need to write a simple enhancer!
+
+Also, to avoid breaking change, we have ****built-in**** support for HMR, logger, persist, [Redux Devtools](https://github.com/zalmoxisus/redux-devtools-extension), you know you want it!
 
 ## License
 
