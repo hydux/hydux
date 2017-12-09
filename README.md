@@ -5,8 +5,8 @@
 An Elm-like state manager inspired by [Hyperapp](https://github.com/hyperapp/hyperapp), [Elmish](https://github.com/fable-elmish/elmish), Elm, Redux, etc. Working with any vdom library!
 
 * [hyperapp](https://github.com/hyperapp/hyperapp) compatible API
-* Support any vdom library, including react ([official support](https://github.io/hydux/hydux-react))
-* [Official support for react-router](https://github.io/hydux/hydux-react-router)
+* Support any vdom library, including react ([official support](https://github.com/hydux/hydux-react))
+* [Official support for react-router](https://github.com/hydux/hydux-react-router)
 * hot reload (hmr), logger, persist, [Redux Devtools](https://github.com/zalmoxisus/redux-devtools-extension), picodom([1kb vdom](https://github.com/picodom/picodom)), ****All in One****, easily setup all these fancy stuff without pain!
 * Elm-like side effect manager and subscribe API
 
@@ -98,7 +98,7 @@ e.g.
 import app, { Cmd } from 'hydux'
 
 function upLater(n) {
-  return new Promise(resolve => setTimeout(() => resolve(n), 1000))
+  return new Promise(resolve => setTimeout(() => resolve(n + 10), 1000))
 }
 app({
   init: () => ({ count: 1}),
@@ -106,10 +106,11 @@ app({
     down: () => state => ({ count: state.count - 1 }),
     up: () => state => ({ count: state.count + 1 }),
     upN: n => state => ({ count: state.count + n }),
-    upLater: _ => state => actions/* actions of same level */ => [
+    upLater: n => state => actions/* actions of same level */ => [
       state, // don't change the state, won't trigger view update
       Cmd.ofPromise(
-        upLater /* a function with single parameter and return a promise */,n /* the parameter of the funciton */,
+        upLater /* a function with single parameter and return a promise */,
+        n /* the parameter of the funciton */,
         actions.upN /* success handler, optional */,
         console.error /* error handler, optional */ )
     ]
