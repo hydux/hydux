@@ -1,25 +1,29 @@
 # Hydux
+
 An Elm-like state manager inspired by [Hyperapp](https://github.com/hyperapp/hyperapp), [Elmish](https://github.com/fable-elmish/elmish), Elm, Redux, etc. Working with any vdom library!
 
 ## Why
 
-After trying [Fable](https://fable.io) + [Elmish](https://github.com/fable-elmish/elmish) for a while, I need to write a small web App in my company, for many reasons I cannot choose some fancy stuff like [Fable](https://fable.io) + [Elmish](https://github.com/fable-elmish/elmish), simply speaking, I need to use the mainstream JS stack but don't want to bear Redux's cumbersome, complex toolchain, etc anymore.
+After trying [Fable](https://fable.io) + [Elmish](https://github.com/fable-elmish/elmish) for several month, I need to write a small web App in my company, for many reasons I cannot choose some fancy stuff like [Fable](https://fable.io) + [Elmish](https://github.com/fable-elmish/elmish), simply speaking, I need to use the mainstream JS stack but don't want to bear Redux's cumbersome, complex toolchain, etc anymore.
 
-After some digging around, hyperapp looks really good to me, but I quickly find out it doesn't work with React, and many libraries don't work with the newest API. So I create this to support **different** vdom libraries, like React, [picodom](https://github.com/picodom/picodom), Preact, [inferno](https://github.com/infernojs/inferno) or what ever you want, just need to write a simple enhancer!
+After some digging around, hyperapp looks really good to me, but I quickly find out it doesn't work with React, and many libraries don't work with the newest API. So I create this to support ****different**** vdom libraries, like React, [picodom](https://github.com/picodom/picodom), Preact, [inferno](https://github.com/infernojs/inferno) or what ever you want, just need to write a simple enhancer!
 
-Also, to avoid breaking change, we have **built-in** support for HMR, logger, persist, Redux Devtools, you know you want it!
+Also, to avoid breaking change, we have ****built-in**** support for HMR, logger, persist, Redux Devtools, you know you want it!
 
 ## Install
+
 ```sh
 yarn add hydux # or npm i hydux
 ```
 
 ## Quick Example
+
 Let's say we got a counter, like this.
 
 ```js
-const counter = {
-  init: () => { count: 1 },
+// Counter.js
+export default {
+  init: () => ({ count: 1 }),
   actions: {
     down: () => state => ({ count: state.count - 1 }),
     up: () => state => ({ count: state.count + 1 })
@@ -112,6 +116,8 @@ app({
 })
 ```
 
+### [Try it online!](https://codepen.io/zaaack/pen/zPgodL)
+
 ## Counter App
 
 ```sh
@@ -121,7 +127,7 @@ yarn # or npm i
 npm start
 ```
 
-Now open http://localhost:8080 and hack!
+Now open <http://localhost:8080> and hack!
 
 ## License
 

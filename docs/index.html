@@ -914,10 +914,12 @@ img { max-width: 100%; }
 <div class="container container-main">
 	<div class="content-wrap">
 		<div class="tsd-panel tsd-typography">
-			<h1 id="hydux">hydux</h1>
-			<p>An elm-like state manager inspired by <a href="https://github.com/hyperapp/hyperapp">Hyperapp</a>, <a href="https://github.com/fable-elmish/elmish">Elmish</a>, Elm, Redux, etc. Working with any vdom library!</p>
+			<h1 id="hydux">Hydux</h1>
+			<p>An Elm-like state manager inspired by <a href="https://github.com/hyperapp/hyperapp">Hyperapp</a>, <a href="https://github.com/fable-elmish/elmish">Elmish</a>, Elm, Redux, etc. Working with any vdom library!</p>
 			<h2 id="why">Why</h2>
-			<p>After trying <a href="https://fable.io">Fable</a> + <a href="https://github.com/fable-elmish/elmish">Elmish</a> for a while, I need to write a small App in my company, for many reasons I cannot choose some fancy stuff like <a href="https://fable.io">Fable</a> + <a href="https://github.com/fable-elmish/elmish">Elmish</a>. Anyway, I need to use the mainstream JS stack and cannot bear Redux&#39;s anymore(cumbersome, complex toolchain...). After some dig around hyperapp looks really awesome, but I quickly find out it doesn&#39;t work with React, and many libraries don&#39;t work with the newest API anymore. So I create this to support <strong>different</strong> vdom libraries, like React, <a href="https://github.com/picodom/picodom">picodom</a>, Preact, <a href="https://github.com/infernojs/inferno">inferno</a> or what ever you want, just write a simple enhancer. Also to avoid breaking change, we have <strong>built-in</strong> support for HMR, logger, persist, Redux Devtools, you know you want it!</p>
+			<p>After trying <a href="https://fable.io">Fable</a> + <a href="https://github.com/fable-elmish/elmish">Elmish</a> for a while, I need to write a small web App in my company, for many reasons I cannot choose some fancy stuff like <a href="https://fable.io">Fable</a> + <a href="https://github.com/fable-elmish/elmish">Elmish</a>, simply speaking, I need to use the mainstream JS stack but don&#39;t want to bear Redux&#39;s cumbersome, complex toolchain, etc anymore.</p>
+			<p>After some digging around, hyperapp looks really good to me, but I quickly find out it doesn&#39;t work with React, and many libraries don&#39;t work with the newest API. So I create this to support <strong>different</strong> vdom libraries, like React, <a href="https://github.com/picodom/picodom">picodom</a>, Preact, <a href="https://github.com/infernojs/inferno">inferno</a> or what ever you want, just need to write a simple enhancer!</p>
+			<p>Also, to avoid breaking change, we have <strong>built-in</strong> support for HMR, logger, persist, Redux Devtools, you know you want it!</p>
 			<h2 id="install">Install</h2>
 			<pre><code class="lang-sh">yarn add hydux <span class="hljs-comment"># or npm i hydux</span>
 </code></pre>
@@ -939,12 +941,12 @@ img { max-width: 100%; }
 </code></pre>
 			<p>Then we can compose it in Elm way, you can easily reuse your components.</p>
 			<pre><code class="lang-js"><span class="hljs-keyword">import</span> _app <span class="hljs-keyword">from</span> <span class="hljs-string">'hydux'</span>
-<span class="hljs-keyword">import</span> withPersist <span class="hljs-keyword">from</span> <span class="hljs-string">'hydux/enhancers/persist'</span>
-<span class="hljs-keyword">import</span> withPicodom, { h, React } <span class="hljs-keyword">from</span> <span class="hljs-string">'hydux/enhancers/picodom-render'</span>
+<span class="hljs-keyword">import</span> withPersist <span class="hljs-keyword">from</span> <span class="hljs-string">'hydux/lib/enhancers/persist'</span>
+<span class="hljs-keyword">import</span> withPicodom, { h, React } <span class="hljs-keyword">from</span> <span class="hljs-string">'hydux/lib/enhancers/picodom-render'</span>
 <span class="hljs-keyword">import</span> Counter <span class="hljs-keyword">from</span> <span class="hljs-string">'./counter'</span>
 
 <span class="hljs-comment">// let app = withPersist&lt;State, Actions&gt;({</span>
-<span class="hljs-comment">//   key: 'time-game/v1'</span>
+<span class="hljs-comment">//   key: 'my-counter-app/v1'</span>
 <span class="hljs-comment">// })(_app)</span>
 
 <span class="hljs-comment">// use built-in 1kb picodom to render the view.</span>
@@ -952,9 +954,9 @@ img { max-width: 100%; }
 
 <span class="hljs-keyword">if</span> (process.env.NODE_ENV === <span class="hljs-string">'development'</span>) {
   <span class="hljs-comment">// built-in dev tools, without pain.</span>
-  <span class="hljs-keyword">const</span> devTools = <span class="hljs-built_in">require</span>(<span class="hljs-string">'hydux/enhancers/devtools'</span>).default
-  <span class="hljs-keyword">const</span> logger = <span class="hljs-built_in">require</span>(<span class="hljs-string">'hydux/enhancers/logger'</span>).default
-  <span class="hljs-keyword">const</span> hmr = <span class="hljs-built_in">require</span>(<span class="hljs-string">'hydux/enhancers/hmr'</span>).default
+  <span class="hljs-keyword">const</span> devTools = <span class="hljs-built_in">require</span>(<span class="hljs-string">'hydux/lib/enhancers/devtools'</span>).default
+  <span class="hljs-keyword">const</span> logger = <span class="hljs-built_in">require</span>(<span class="hljs-string">'hydux/lib/enhancers/logger'</span>).default
+  <span class="hljs-keyword">const</span> hmr = <span class="hljs-built_in">require</span>(<span class="hljs-string">'hydux/lib/enhancers/hmr'</span>).default
   app = logger()(app)
   app = devTools()(app)
   app = hmr()(app)
@@ -985,7 +987,7 @@ img { max-width: 100%; }
 })
 </code></pre>
 			<h2 id="actions-with-cmd">Actions with Cmd</h2>
-			<p>This library also implemented a Elm like side effects manager, you can simple return a tuple (two elements array) in your action, and put the Cmd as second command.
+			<p>This library also implemented a Elm-like side effects manager, you can simple return a tuple (two elements array) in your action, and put the Cmd as the second element.
 			e.g.</p>
 			<pre><code class="lang-js"><span class="hljs-keyword">import</span> app, { Cmd } <span class="hljs-keyword">from</span> <span class="hljs-string">'hydux'</span>
 
@@ -999,11 +1001,11 @@ app({
     <span class="hljs-attr">up</span>: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> state =&gt; ({ <span class="hljs-attr">count</span>: state.count + <span class="hljs-number">1</span> }),
     <span class="hljs-attr">upN</span>: <span class="hljs-function"><span class="hljs-params">n</span> =&gt;</span> state =&gt; ({ <span class="hljs-attr">count</span>: state.count + n }),
     <span class="hljs-attr">upLater</span>: <span class="hljs-function"><span class="hljs-params">_</span> =&gt;</span> state =&gt; actions<span class="hljs-comment">/* actions of same level */</span> =&gt; [
-      state, <span class="hljs-comment">// don't change the state, don't trigger view update</span>
+      state, <span class="hljs-comment">// don't change the state, won't trigger view update</span>
       Cmd.ofPromise(
         upLater <span class="hljs-comment">/* a function with single parameter and return a promise */</span>,n <span class="hljs-comment">/* the parameter of the funciton */</span>,
         actions.upN <span class="hljs-comment">/* success handler, optional */</span>,
-        <span class="hljs-built_in">console</span>.error <span class="hljs-comment">/* error handler, optional */</span>)
+        <span class="hljs-built_in">console</span>.error <span class="hljs-comment">/* error handler, optional */</span> )
     ]
   },
   <span class="hljs-attr">view</span>: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {<span class="hljs-comment">/*...*/</span>} ,
@@ -1016,7 +1018,7 @@ yarn <span class="hljs-comment"># or npm i</span>
 npm start
 </code></pre>
 			<p>Now open <a href="http://localhost:8080">http://localhost:8080</a> and hack!</p>
-			<h1 id="license">License</h1>
+			<h2 id="license">License</h2>
 			<p>MIT</p>
 		</div>
 		<div style="position:relative;"><a name="typedoc-main-index" class="tsd-anchor"></a></div>
