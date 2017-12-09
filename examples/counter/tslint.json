@@ -5,8 +5,9 @@
     ],
     "jsRules": {},
     "rules": {
-        "trailing-comma": true,
-        "space-before-function-paren": false
+      "trailing-comma": true,
+      "space-before-function-paren": false,
+      "quotemark": [true, "single", "jsx-double"]
     },
     "rulesDirectory": []
 }
