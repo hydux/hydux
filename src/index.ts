@@ -1,7 +1,8 @@
 import { ActionResult, ActionState, ActionStateWithCmd, ActionType, ActionsType } from './types'
-import Cmd, { CmdType } from './cmd'
+import Cmd, { CmdType, Sub } from './cmd'
 import { set, merge, setDeep, get, isFunction, noop } from './utils'
 
+export { CmdType, Sub }
 export type Init<S, A> = () => S | [S, CmdType<S, A>]
 export type View<S, A> = (appState: S) => ((actions: A) => any)
 export type Subscribe<S, A> = (state: S) => CmdType<S, A>

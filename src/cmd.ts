@@ -1,4 +1,3 @@
-import { CmdType } from './cmd'
 import { ActionResult, ActionType, ActionsType } from './types'
 
 export type Sub<State, Actions> = (actions: ActionsType<State, Actions>) => void | null
@@ -38,7 +37,7 @@ export default {
   ofSub<State, Actions>(sub: Sub<State, Actions>) {
     return [sub]
   },
-  batch<State, Actions>(...cmds: (CmdType<State, Actions> | CmdType<State, Actions>[])[]) {
+  batch<State, Actions>(...cmds: (CmdType<State, Actions> | CmdType<State, Actions>[])[]): CmdType<State, Actions> {
     const _concat = Array.prototype.concat
     return _concat.apply([], _concat.apply([], cmds))
   },
