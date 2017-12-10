@@ -111,7 +111,6 @@ export default function app<State, Actions>(props: AppProps<State, Actions>) {
               appRender(appState)
             }
             cmd.forEach(sub => sub(appActions))
-            return msgData
           }
         })(key, from[key])
         : init(
