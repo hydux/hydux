@@ -1,7 +1,10 @@
 import { ActionResult, ActionType, ActionsType } from './types'
 
-export type Sub<State, Actions> = (actions: ActionsType<State, Actions>) => void | null
+export interface Sub<State, Actions> {
+  (actions: ActionsType<State, Actions>): void
+}
 export type CmdType<State, Actions> = Sub<State, Actions>[]
+
 export default {
   none: ([] as Array<Sub<any, any>>),
   ofPromise<A, T, State, Actions>(

@@ -2,7 +2,9 @@
 
 [![Build Status](https://travis-ci.org/hydux/hydux.svg?branch=master)](https://travis-ci.org/hydux/hydux) [![npm](https://img.shields.io/npm/v/hydux.svg)](https://www.npmjs.com/package/hydux) [![npm](https://img.shields.io/npm/dm/immuter.svg)](https://www.npmjs.com/package/hydux)
 
-An Elm-like state manager inspired by [Hyperapp](https://github.com/hyperapp/hyperapp), [Elmish](https://github.com/fable-elmish/elmish), Elm, Redux, etc. Working with any vdom library!
+A React-Compatible fork of [Hyperapp](https://github.com/hyperapp/hyperapp), an Elm-like state manager inspired by [Elmish](https://github.com/fable-elmish/elmish), Elm, Redux, etc. Working with any vdom library!
+
+## Features
 
 * [hyperapp](https://github.com/hyperapp/hyperapp) compatible API
 * Support any vdom library, including react ([official support](https://github.com/hydux/hydux-react))
