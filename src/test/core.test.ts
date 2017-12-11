@@ -79,6 +79,7 @@ describe('core api', () => {
         upN: n => state => ({ count: state.count + n }),
         down: _ => state => ({ count: state.count - 1 }),
         reset: _ => ({ count: 1 }),
+        up12: _ => state => actions => actions.upN(12),
         upLaterByPromise: n => state => actions => new Promise(resolve =>
           setTimeout(() => resolve(actions.upN(n)), 10)),
         upLater: () => state => actions => [state, Cmd.ofPromise(
@@ -86,7 +87,7 @@ describe('core api', () => {
           void 0,
           actions.up,
         )],
-        upLaterWithElmLikeCmd: () => state => actions => [state, Cmd.batch([
+        upLaterWithBatchedCmd: () => state => actions => [state, Cmd.batch([
           Cmd.ofPromise(
             () => new Promise(resolve => setTimeout(() => resolve(), 10)),
             void 0,
@@ -129,9 +130,11 @@ describe('core api', () => {
     await sleep(10)
     assert(ctx.getState().counter1.count === 6, 'upLaterByPromise should work 6')
 
-    ctx.actions.counter1.upLaterWithElmLikeCmd()
-    assert(ctx.getState().counter1.count === 6, 'upLaterWithElmLikeCmd should work 6')
+    ctx.actions.counter1.upLaterWithBatchedCmd()
+    assert(ctx.getState().counter1.count === 6, 'upLaterWithBatchedCmd should work 6')
     await sleep(10)
-    assert(ctx.getState().counter1.count === 7, 'upLaterWithElmLikeCmd should work 7')
+    assert(ctx.getState().counter1.count === 7, 'upLaterWithBatchedCmd should work 7')
+    ctx.actions.counter1.up12()
+    assert(ctx.getState().counter1.count === 19, 'up12 should work 19')
   })
 })
