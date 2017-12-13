@@ -1,6 +1,6 @@
 # Hydux
 
-[![Build Status](https://travis-ci.org/hydux/hydux.svg?branch=master)](https://travis-ci.org/hydux/hydux) [![npm](https://img.shields.io/npm/v/hydux.svg)](https://www.npmjs.com/package/hydux) [![npm](https://img.shields.io/npm/dm/immuter.svg)](https://www.npmjs.com/package/hydux)
+[![Build Status](https://travis-ci.org/hydux/hydux.svg?branch=master)](https://travis-ci.org/hydux/hydux) [![npm](https://img.shields.io/npm/v/hydux.svg)](https://www.npmjs.com/package/hydux) [![npm](https://img.shields.io/npm/dm/hydux.svg)](https://www.npmjs.com/package/hydux)
 
 A React-Compatible fork of [Hyperapp](https://github.com/hyperapp/hyperapp), inspired by [Elmish](https://github.com/fable-elmish/elmish), Elm, Redux, etc. Working with any vdom library!
 
