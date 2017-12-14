@@ -1,7 +1,7 @@
 import { ActionResult, ActionType, ActionsType } from './types'
 
 export interface Sub<State, Actions> {
-  (actions: ActionsType<State, Actions>): void
+  (actions: Actions): void
 }
 export type CmdType<State, Actions> = Sub<State, Actions>[]
 
@@ -44,7 +44,7 @@ export default {
     const _concat = Array.prototype.concat
     return _concat.apply([], _concat.apply([], cmds))
   },
-  map<State, Actions, SubActions>(map: (action: ActionsType<State, Actions>) => ActionsType<State, SubActions>, cmd: CmdType<State, SubActions>): CmdType<State, Actions> {
+  map<State, Actions, SubActions>(map: (action: Actions) => SubActions, cmd: CmdType<State, SubActions>): CmdType<State, Actions> {
     return cmd.map(sub => actions => sub(map(actions)))
   }
 }

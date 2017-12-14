@@ -43,14 +43,15 @@ export type App<State, Actions> = (props: AppProps<State, Actions>) => any
 
 export default function app<State, Actions>(props: AppProps<State, Actions>) {
   // const appEvents = props.events || {}
-  const appActions = {} as ActionsType<State, Actions>
+  const appActions = {} as Actions
   const appSubscribe = props.subscribe || (_ => Cmd.none)
   const render = props.onRender || console.log
   const onError = props.onError || noop
   // const appMiddlewares = props.middlewares || []
   let [appState, cmd] = normalizeActionResult(props.init(), void 0, appActions) as [State, CmdType<State, Actions>]
-
+  console.log('appState', appState)
   init(appState, appActions, props.actions, [])
+  console.log('appActions after init', appActions)
   cmd.forEach(sub => sub(appActions))
   appRender(appState)
   appSubscribe(appState).forEach(sub => sub(appActions))

@@ -1,0 +1,37 @@
+{
+  "name": "counter-example",
+  "version": "1.0.0",
+  "private": true,
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "cross-env NODE_ENV=production webpack --config webpack.config.js",
+    "start": "cross-env NODE_ENV=development webpack-dev-server --progress --config webpack.config.js",
+    "build:dll:dev": "cross-env NODE_ENV=development webpack --config ./webpack.config.dll.js --progress --colors",
+    "build:dll": "cross-env NODE_ENV=production webpack --config ./webpack.config.dll.js --progress --profile --colors",
+    "test": "DEBUG=react-starter* tsc && ava",
+    "test-and-build-if-need": "node ./tools/test-and-build-if-need.js",
+    "lint": "tslint ./src/** --type-check -p ./tsconfig.json"
+  },
+  "devDependencies": {
+    "@types/history": "^4.6.2",
+    "@types/node": "^8.0.55",
+    "clean-webpack-plugin": "^0.1.17",
+    "cross-env": "^5.1.1",
+    "debug": "^3.1.0",
+    "hydux-react": "^0.1.4",
+    "react-router-dom": "^4.2.2",
+    "remotedev": "^0.2.7",
+    "tslint": "^5.8.0",
+    "tslint-config-standard": "^7.0.0",
+    "tslint-react": "^3.2.0",
+    "typescript": "^2.6.2",
+    "webpack": "^3.10.0",
+    "webpack-blocks": "^1.0.0-rc.2",
+    "webpack-dev-server": "^2.9.5"
+  },
+  "dependencies": {
+    "hydux": "^0.1.3",
+    "typestyle": "^1.5.1"
+  }
+}
