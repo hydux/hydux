@@ -49,9 +49,7 @@ export default function app<State, Actions>(props: AppProps<State, Actions>) {
   const onError = props.onError || noop
   // const appMiddlewares = props.middlewares || []
   let [appState, cmd] = normalizeActionResult(props.init(), void 0, appActions) as [State, CmdType<State, Actions>]
-  console.log('appState', appState)
   init(appState, appActions, props.actions, [])
-  console.log('appActions after init', appActions)
   cmd.forEach(sub => sub(appActions))
   appRender(appState)
   appSubscribe(appState).forEach(sub => sub(appActions))

@@ -1,6 +1,7 @@
 import { ActionsType } from './types';
-import Cmd, { CmdType } from './cmd';
+import Cmd, { CmdType, Sub } from './cmd';
 import { noop } from './utils';
+export { CmdType, Sub };
 export declare type Init<S, A> = () => S | [S, CmdType<S, A>];
 export declare type View<S, A> = (appState: S) => ((actions: A) => any);
 export declare type Subscribe<S, A> = (state: S) => CmdType<S, A>;
@@ -22,7 +23,7 @@ export declare type AppProps<State, Actions> = {
 };
 export declare type App<State, Actions> = (props: AppProps<State, Actions>) => any;
 export default function app<State, Actions>(props: AppProps<State, Actions>): {
-    actions: ActionsType<State, Actions>;
+    actions: Actions;
     getState(): State;
     render: (state: any) => void;
     init: Init<State, Actions>;

@@ -4,11 +4,12 @@ import withPicodom, { React } from '../../../src/enhancers/picodom-render'
 import { ActionsType } from '../../../src/types'
 import withRouter, {
   mkLink, History, HashHistory, BrowserHistory,
-  RouterActions, Routes
+  RouterActions, RouterState, Routes
 } from '../../../src/enhancers/router'
 import Counter, { State as CounterState } from './counter'
 import './polyfill.js'
-const history = new HashHistory()
+// const history = new HashHistory()
+const history = new BrowserHistory()
 // let app = withPersist<State, Actions>({
 //   key: 'time-game/v1'
 // })(_app)
@@ -35,10 +36,17 @@ const routes: Routes<State, Actions> = {
       data: Counter.init(),
     }
   }),
+  '*': loc => state => ({
+    ...state,
+    page: {
+      page: '404',
+      data: null,
+    }
+  })
 }
 
-let app = withPicodom<State, Actions>()(_app)
-app = withRouter<State, Actions>({ history, routes })(app)
+let app = withRouter<State, Actions>({ history, routes })(_app)
+app = withPicodom()(app)
 
 if (process.env.NODE_ENV === 'development') {
   const devTools = require('hydux/lib/enhancers/devtools').default
@@ -64,6 +72,7 @@ type Page =
 | { page: 'Home', data: HomeState }
 | { page: 'User', data: UserState }
 | { page: 'Counter', data: CounterState }
+| { page: '404', data: null }
 
 type State = {
   counter: CounterState,
@@ -88,6 +97,8 @@ const renderRoutes = (page: Page) => (actions: Actions) => {
       return <div>{page.data.user.name}({page.data.user.id})</div>
     case 'Counter':
       return Counter.view(page.data)(actions.counter)
+    case '404':
+      return <NoMatch />
   }
 }
 const view = (state: State) => (actions: RouterActions<Actions>) => (

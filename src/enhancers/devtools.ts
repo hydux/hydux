@@ -36,7 +36,6 @@ export default function withDevtools<State, Actions>(options): (app: App<State, 
       subscribe: (model) => {
         function sub(actions) {
           connection.subscribe(function(msg) {
-            console.log('msg', msg)
             if (msg.type === 'DISPATCH') {
               switch (msg.payload.type) {
                 case 'JUMP_TO_ACTION':
@@ -46,7 +45,6 @@ export default function withDevtools<State, Actions>(options): (app: App<State, 
                 case 'IMPORT_STATE':
                   const states = msg.payload.nextLiftedState.computedStates
                   const state = states[states.length - 1]
-                  console.log('state', state, msg)
                   ctx.render(state.state)
                   connection.send(null, msg.payload.nextLiftedState)
               }

@@ -47,23 +47,9 @@ module.exports = createConfig([
       context: __dirname,
       manifest: require(`${DIST}/vendor-manifest.json`),
     }),
-    // new webpack.optimize.CommonsChunkPlugin({
-    //     name: 'vendor',
-    //     minChunks: function (module) {
-    //        // this assumes your vendor imports exist in the node_modules directory
-    //        return module.context && (
-    //          module.context.indexOf('node_modules') !== -1 ||
-    //          module.context.indexOf('src/vendor.js') !== -1)
-    //     },
-    // }),
-    // //CommonChunksPlugin will now extract all the common modules from vendor and main bundles
-    // new webpack.optimize.CommonsChunkPlugin({
-    //     name: 'manifest', //But since there are no more common modules between them we end up with just the runtime code included in the manifest file
-    // }),
   ]),
   env('development', [
     devServer({
-      hot: true,
       clientLogLevel: 'info',
       stats: {
         assets: false,
@@ -79,11 +65,6 @@ module.exports = createConfig([
         changeOrigin: true,
       },
     }),
-    addPlugins([
-      // prints more readable module names in the browser console on HMR updates
-      new webpack.NamedModulesPlugin(),
-      // new webpack.HotModuleReplacementPlugin(),
-    ]),
     sourceMaps(),
   ]),
   env('production', [
