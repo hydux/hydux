@@ -6,8 +6,8 @@ import { HistoryProps, BaseHistory, HashHistory, BrowserHistory } from './histor
 
 export { HistoryProps, BaseHistory, HashHistory, BrowserHistory }
 const ROUTE_ACTION = '@@hydux-router/CHANGE_LOCATION'
-export type Query = { [key: string]: string | string[] }
-export type Location<P, Q extends Query> = {
+export interface Query { [key: string]: string | string[] }
+export interface Location<P, Q extends Query> {
   template: string | null
   pathname: string,
   params: P,
@@ -168,31 +168,129 @@ export default function withRouter<State, Actions>({
 
 }
 
-export type NestedRoutes<Actions> = {
+export interface NestedRoutes<State, Actions> {
   path: string,
   label?: string,
-  action?: <T>(loc: Location<any, any>) => (actions: Actions) => void,
-  parents?: NestedRoutes<Actions>[],
-  children: NestedRoutes<Actions>[],
+  action?: ActionType<Location<any, any>, State, Actions>,
+  parents?: NestedRoutes<State, Actions>[],
+  children: NestedRoutes<State, Actions>[],
 }
 
-export function nestedRoutes<Actions>(routes: NestedRoutes<Actions>): {[key: string]: NestedRoutes<Actions>} {
-  function rec(routes: NestedRoutes<Actions>, newRoutes: {}) {
+export interface ParsedNestedRoutes<State, Actions> {
+  path: string,
+  label?: string,
+  action?: ActionType<Location<any, any>, State, Actions>,
+  parents: NestedRoutes<State, Actions>[],
+  children: NestedRoutes<State, Actions>[],
+}
+
+export interface NestedRoutesMeta<State, Actions> {
+  [key: string]: ParsedNestedRoutes<State, Actions>
+}
+/**
+ * @param routes nested routes like this:
+ * ```js
+ * const action = (loc: Location<any, any>) => ({}) // a action that take the location
+ * {
+ *   path: '/',
+ *   children: [{
+ *     path: '/general',
+ *     label: 'General',
+ *     action: action
+ *     children: [{
+ *       path: '/users',
+ *       action: action
+ *       label: 'User Management',
+ *       children: []
+ *     }],
+ *   }, {
+ *     path: '/about',
+ *     label: 'About',
+ *     action: action
+ *     children: [],
+ *   }]
+ * }
+ * // ==>
+ * {
+ *   routes: {
+ *     '/general': action,
+ *     '/general/users: action,
+ *     '/about': action,
+ *   },
+ *   meta: {
+ *     '/': {
+ *        path: '/',
+ *        parents: [],
+ *        children: [],
+ *     },
+ *     '/general': {
+ *        path: '/general',
+ *        label: 'General',
+ *        action: action,
+ *        parents: [{
+ *          path: '/',
+ *          parents: [],
+ *          children: [],
+ *        }],
+ *        children: [ ... ],
+ *      },
+ *     '/general/users: {
+ *        path: '/users',
+ *        label: 'User Management',
+ *        action: action,
+ *        parents: [{
+ *          path: '/',
+ *          parents: [],
+ *          children: [],
+ *        }, {
+ *          path: '/general',
+ *          label: 'User Management',
+ *          action: action,
+ *          parents: [],
+ *          children: [],
+ *        }],
+ *        children: [ ... ],
+ *      },
+ *     '/about': {
+ *        path: '/about',
+ *        label: 'About',
+ *        action: action
+ *        children: [],
+ *      },
+ *   }
+ * }
+ * ```
+ */
+export function parseNestedRoutes<State, Actions>(routes: NestedRoutes<State, Actions>): {
+  routes: Routes<State, Actions>,
+  meta: NestedRoutesMeta<State, Actions>,
+} {
+  function rec(routes: NestedRoutes<State, Actions>, newRoutes: {}): NestedRoutesMeta<State, Actions> {
+    newRoutes[routes.path] = routes
     routes.children
       .map(r => ({
-        path: routes.path + r.path,
+        ...r,
+        path: routes.path.replace(/\/$/, '') + '/' + r.path.replace(/^\//, ''),
         action: r.action,
-        parent: (routes.parents || []).concat(r),
+        parents: (routes.parents || []).concat({
+          ...routes,
+          parents: [],
+          children: [],
+        }),
         children: r.children,
       }))
       .forEach(r => {
-        if (!r.children.length) {
-          newRoutes[r.path] = r
-        } else {
-          rec(r, newRoutes)
-        }
+        rec(r, newRoutes)
       })
     return newRoutes
   }
-  return rec(routes, {})
+  const meta = rec(routes, {})
+  let simpleRoutes = {} as Routes<State, Actions>
+  for (const key in meta) {
+    const route = meta[key]
+    if (route.action) {
+      simpleRoutes[key] = route.action
+    }
+  }
+  return { routes: simpleRoutes, meta }
 }

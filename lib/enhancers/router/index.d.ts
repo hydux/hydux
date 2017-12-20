@@ -44,13 +44,17 @@ export default function withRouter<State, Actions>({history, routes}?: {
     history?: BaseHistory;
     routes?: Routes<State, Actions>;
 }): (app: App<State, Actions>) => (props: AppProps<State, Actions>) => any;
-export declare type NestedRoutes<Actions> = {
+export declare type NestedRoutes<State, Actions> = {
     path: string;
     label?: string;
-    action?: <T>(loc: Location<any, any>) => (actions: Actions) => void;
-    parents?: NestedRoutes<Actions>[];
-    children: NestedRoutes<Actions>[];
+    action?: ActionType<Location<any, any>, State, Actions>;
+    parents?: NestedRoutes<State, Actions>[];
+    children: NestedRoutes<State, Actions>[];
 };
-export declare function nestedRoutes<Actions>(routes: NestedRoutes<Actions>): {
-    [key: string]: NestedRoutes<Actions>;
+export declare type NestedRoutesMeta<State, Actions> = {
+    [key: string]: NestedRoutes<State, Actions>;
+};
+export declare function parseNestedRoutes<State, Actions>(routes: NestedRoutes<State, Actions>): {
+    routes: Routes<State, Actions>;
+    meta: NestedRoutesMeta<State, Actions>;
 };

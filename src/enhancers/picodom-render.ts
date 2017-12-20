@@ -1,9 +1,24 @@
-import { patch, h, Component, VNode } from 'picodom'
+import { patch, h as _h, Component, VNode } from 'picodom'
 import { App } from '../index'
 
 const React = { createElement: h }
 
-export { h, React }
+export { React }
+
+export function h<Props>(
+  type: Component<Props> | string,
+  props?: Props,
+  ...children: Array<VNode<{}> | string | number | null>
+): VNode<Props> {
+  if (props) {
+    for (const key in props) {
+      if (key.match(/^on[A-Z]\w+$/)) {
+        props[key.toLowerCase()] = props[key]
+      }
+    }
+  }
+  return _h(type, props, ...children)
+}
 
 export default function withPicodom<State, Actions>(container = document.body): (app: App<State, Actions>) => App<State, Actions> {
   let node

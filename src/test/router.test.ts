@@ -1,6 +1,7 @@
+import { noop } from './../utils'
 import * as assert from 'assert'
 import app, { Cmd } from '../index'
-import { parsePath, matchPath } from '../enhancers/router'
+import { parsePath, matchPath, parseNestedRoutes, NestedRoutes } from '../enhancers/router'
 
 describe('router', () => {
   it('parsePath simple', () => {
@@ -27,26 +28,67 @@ describe('router', () => {
     assert.deepEqual(match, true, 'match')
     assert.deepEqual(params, {}, 'params')
 
-    ;[match, params] = matchPath('/aa/bb/cc', '/aa/bb/cc/')
+      ;[match, params] = matchPath('/aa/bb/cc', '/aa/bb/cc/')
     assert.deepEqual(match, true, 'match')
 
-    ;[match, params] = matchPath('/aa/bb/cc/', '/aa/bb/cc')
+      ;[match, params] = matchPath('/aa/bb/cc/', '/aa/bb/cc')
     assert.deepEqual(match, true, 'match')
 
-    ;[match, params] = matchPath('/aa/bb/cc/', '/aa/bb/cc/')
+      ;[match, params] = matchPath('/aa/bb/cc/', '/aa/bb/cc/')
     assert.deepEqual(match, true, 'match')
 
-    ;[match, params] = matchPath('/aa/bb/cc', '/aa/bb/cd')
+      ;[match, params] = matchPath('/aa/bb/cc', '/aa/bb/cd')
     assert.deepEqual(match, false, 'match')
     assert.deepEqual(params, {}, 'params')
 
-    ;[match, params] = matchPath('/aa/bb/cc', '/aa/ba/cc')
+      ;[match, params] = matchPath('/aa/bb/cc', '/aa/ba/cc')
     assert.deepEqual(match, false, 'match')
 
-    ;[match, params] = matchPath('/aa/bb/cc', '/aa/bb')
+      ;[match, params] = matchPath('/aa/bb/cc', '/aa/bb')
     assert.deepEqual(match, false, 'match')
 
-    ;[match, params] = matchPath('/aa/bb/', '/aa/bb/cc/')
+      ;[match, params] = matchPath('/aa/bb/', '/aa/bb/cc/')
     assert.deepEqual(match, false, 'match')
+  })
+
+  it('nestedRoutes', () => {
+    const routes: NestedRoutes<any, any> = {
+      path: '/',
+      action: noop,
+      children: [{
+        path: '/general',
+        label: 'General',
+        action: noop,
+        children: [{
+          path: '/users',
+          label: 'User Management',
+          action: noop,
+          children: []
+        }]
+      }, {
+        path: '/about',
+        label: 'About',
+        action: noop,
+        children: []
+      }]
+    }
+    const parsedRoutes = parseNestedRoutes(routes)
+    assert.deepEqual(parsedRoutes.routes, {
+      '/': noop,
+      '/general': noop,
+      '/general/users': noop,
+      '/about': noop,
+    })
+    assert.deepEqual(Object.keys(parsedRoutes.meta), [ '/', '/general', '/general/users', '/about' ])
+    assert.deepEqual(parsedRoutes.meta['/general'].path, '/general')
+    assert.deepEqual(parsedRoutes.meta['/general'].label, 'General')
+    assert.deepEqual(parsedRoutes.meta['/general'].parents.length, 1)
+    assert.deepEqual(parsedRoutes.meta['/general'].parents[0].path, '/')
+    assert.deepEqual(parsedRoutes.meta['/general'].children.length, 1)
+    assert.deepEqual(parsedRoutes.meta['/general'].children[0].path, '/users')
+    assert.deepEqual(parsedRoutes.meta['/general/users'].parents.length, 2)
+    assert.deepEqual(parsedRoutes.meta['/general/users'].parents[1].path, '/general')
+    assert.deepEqual(parsedRoutes.meta['/general/users'].parents[1].parents, [])
+    assert.deepEqual(parsedRoutes.meta['/general/users'].parents[1].children.length, 0, 'users parents length')
   })
 })
