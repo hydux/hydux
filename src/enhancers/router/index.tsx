@@ -172,7 +172,7 @@ export interface NestedRoutes<State, Actions> {
   path: string,
   label?: string,
   action?: ActionType<Location<any, any>, State, Actions>,
-  children: NestedRoutes<State, Actions>[],
+  children?: NestedRoutes<State, Actions>[],
 }
 export interface RouteInfo<State, Actions> {
   path: string,
@@ -198,11 +198,12 @@ export function parseNestedRoutes<State, Actions>(routes: NestedRoutes<State, Ac
   meta: RoutesMeta<State, Actions>,
 } {
   function rec(routes: NestedRoutes<State, Actions>, newRoutes: {}): RoutesMeta<State, Actions> {
+    let children = routes.children || []
     newRoutes[routes.path] = {
       ...routes,
-      children: routes.children.map(r => ({ ...r, parents: void 0, children: void 0 }))
+      children: children.map(r => ({ ...r, parents: void 0, children: void 0 }))
     }
-    routes.children
+    children
       .map(r => ({
         ...r,
         path: routes.path.replace(/\/$/, '') + '/' + r.path.replace(/^\//, ''),
