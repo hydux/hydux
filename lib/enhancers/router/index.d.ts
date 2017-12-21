@@ -2,16 +2,16 @@ import { ActionType, ActionsType } from './../../types';
 import { AppProps, App, Init, View, Subscribe, OnUpdate } from './../../index';
 import { HistoryProps, BaseHistory, HashHistory, BrowserHistory } from './history';
 export { HistoryProps, BaseHistory, HashHistory, BrowserHistory };
-export declare type Query = {
+export interface Query {
     [key: string]: string | string[];
-};
-export declare type Location<P, Q extends Query> = {
+}
+export interface Location<P, Q extends Query> {
     template: string | null;
     pathname: string;
     params: P;
     query: Q;
     search: string;
-};
+}
 export interface History {
     push: (path: string) => void;
     replace: (path: string) => void;
@@ -44,17 +44,31 @@ export default function withRouter<State, Actions>({history, routes}?: {
     history?: BaseHistory;
     routes?: Routes<State, Actions>;
 }): (app: App<State, Actions>) => (props: AppProps<State, Actions>) => any;
-export declare type NestedRoutes<State, Actions> = {
+export interface NestedRoutes<State, Actions> {
     path: string;
     label?: string;
     action?: ActionType<Location<any, any>, State, Actions>;
-    parents?: NestedRoutes<State, Actions>[];
     children: NestedRoutes<State, Actions>[];
-};
-export declare type NestedRoutesMeta<State, Actions> = {
-    [key: string]: NestedRoutes<State, Actions>;
-};
+}
+export interface RouteInfo<State, Actions> {
+    path: string;
+    label?: string;
+    action?: ActionType<Location<any, any>, State, Actions>;
+}
+export interface RouteMeta<State, Actions> {
+    path: string;
+    label?: string;
+    action?: ActionType<Location<any, any>, State, Actions>;
+    parents: RouteInfo<State, Actions>[];
+    children: RouteInfo<State, Actions>[];
+}
+export interface RoutesMeta<State, Actions> {
+    [key: string]: RouteMeta<State, Actions>;
+}
+/**
+ * @param routes nested routes contains path, action, children, it would parse it to a `route` field (path:action map) for router enhancer, and a `meta` field which contains each route's parents.
+ */
 export declare function parseNestedRoutes<State, Actions>(routes: NestedRoutes<State, Actions>): {
     routes: Routes<State, Actions>;
-    meta: NestedRoutesMeta<State, Actions>;
+    meta: RoutesMeta<State, Actions>;
 };
