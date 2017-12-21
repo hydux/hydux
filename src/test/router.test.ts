@@ -88,7 +88,5 @@ describe('router', () => {
     assert.deepEqual(parsedRoutes.meta['/general'].children[0].path, '/users')
     assert.deepEqual(parsedRoutes.meta['/general/users'].parents.length, 2)
     assert.deepEqual(parsedRoutes.meta['/general/users'].parents[1].path, '/general')
-    assert.deepEqual(parsedRoutes.meta['/general/users'].parents[1].parents, [])
-    assert.deepEqual(parsedRoutes.meta['/general/users'].parents[1].children.length, 0, 'users parents length')
   })
 })

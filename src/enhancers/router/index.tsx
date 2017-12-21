@@ -172,116 +172,49 @@ export interface NestedRoutes<State, Actions> {
   path: string,
   label?: string,
   action?: ActionType<Location<any, any>, State, Actions>,
-  parents?: NestedRoutes<State, Actions>[],
   children: NestedRoutes<State, Actions>[],
 }
-
-export interface ParsedNestedRoutes<State, Actions> {
+export interface RouteInfo<State, Actions> {
   path: string,
   label?: string,
   action?: ActionType<Location<any, any>, State, Actions>,
-  parents: NestedRoutes<State, Actions>[],
-  children: NestedRoutes<State, Actions>[],
+}
+export interface RouteMeta<State, Actions> {
+  path: string,
+  label?: string,
+  action?: ActionType<Location<any, any>, State, Actions>,
+  parents: RouteInfo<State, Actions>[],
+  children: RouteInfo<State, Actions>[],
 }
 
-export interface NestedRoutesMeta<State, Actions> {
-  [key: string]: ParsedNestedRoutes<State, Actions>
+export interface RoutesMeta<State, Actions> {
+  [key: string]: RouteMeta<State, Actions>
 }
 /**
- * @param routes nested routes like this:
- * ```js
- * const action = (loc: Location<any, any>) => ({}) // a action that take the location
- * {
- *   path: '/',
- *   children: [{
- *     path: '/general',
- *     label: 'General',
- *     action: action
- *     children: [{
- *       path: '/users',
- *       action: action
- *       label: 'User Management',
- *       children: []
- *     }],
- *   }, {
- *     path: '/about',
- *     label: 'About',
- *     action: action
- *     children: [],
- *   }]
- * }
- * // ==>
- * {
- *   routes: {
- *     '/general': action,
- *     '/general/users: action,
- *     '/about': action,
- *   },
- *   meta: {
- *     '/': {
- *        path: '/',
- *        parents: [],
- *        children: [],
- *     },
- *     '/general': {
- *        path: '/general',
- *        label: 'General',
- *        action: action,
- *        parents: [{
- *          path: '/',
- *          parents: [],
- *          children: [],
- *        }],
- *        children: [ ... ],
- *      },
- *     '/general/users: {
- *        path: '/users',
- *        label: 'User Management',
- *        action: action,
- *        parents: [{
- *          path: '/',
- *          parents: [],
- *          children: [],
- *        }, {
- *          path: '/general',
- *          label: 'User Management',
- *          action: action,
- *          parents: [],
- *          children: [],
- *        }],
- *        children: [ ... ],
- *      },
- *     '/about': {
- *        path: '/about',
- *        label: 'About',
- *        action: action
- *        children: [],
- *      },
- *   }
- * }
- * ```
+ * @param routes nested routes contains path, action, children, it would parse it to a `route` field (path:action map) for router enhancer, and a `meta` field which contains each route's parents.
  */
 export function parseNestedRoutes<State, Actions>(routes: NestedRoutes<State, Actions>): {
   routes: Routes<State, Actions>,
-  meta: NestedRoutesMeta<State, Actions>,
+  meta: RoutesMeta<State, Actions>,
 } {
-  function rec(routes: NestedRoutes<State, Actions>, newRoutes: {}): NestedRoutesMeta<State, Actions> {
-    newRoutes[routes.path] = routes
+  function rec(routes: NestedRoutes<State, Actions>, newRoutes: {}): RoutesMeta<State, Actions> {
+    newRoutes[routes.path] = {
+      ...routes,
+      children: routes.children.map(r => ({ ...r, parents: void 0, children: void 0 }))
+    }
     routes.children
       .map(r => ({
         ...r,
         path: routes.path.replace(/\/$/, '') + '/' + r.path.replace(/^\//, ''),
         action: r.action,
-        parents: (routes.parents || []).concat({
+        parents: ((routes as any).parents || []).concat({
           ...routes,
-          parents: [],
-          children: [],
+          parents: void 0,
+          children: void 0,
         }),
         children: r.children,
       }))
-      .forEach(r => {
-        rec(r, newRoutes)
-      })
+      .forEach(r => rec(r, newRoutes))
     return newRoutes
   }
   const meta = rec(routes, {})
