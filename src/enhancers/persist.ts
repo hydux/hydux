@@ -2,19 +2,20 @@ import { AppProps, App } from './../index'
 import Cmd from './../cmd'
 import { get } from '../utils'
 
-export default function withPersist<State, Actions>({
-  store = localStorage,
-  serialize = JSON.stringify,
-  deserialize = JSON.parse,
-  debounce = 50,
-  key = 'hydux-persist',
-}: {
+export default function withPersist<State, Actions>(props: {
   store?: Storage,
   serialize?: (data: any) => string,
   deserialize?: (str: string) => any,
   debounce?: number,
   key?: string,
 } = {}): (app: App<State, Actions>) => App<State, Actions> {
+  const {
+    store = localStorage,
+    serialize = JSON.stringify,
+    deserialize = JSON.parse,
+    debounce = 50,
+    key = 'hydux-persist',
+  } = props
   let timer
   return (app: App<State, Actions>) => (props: AppProps<State, Actions>) => {
     return app({

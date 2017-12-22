@@ -20,16 +20,12 @@ export function h<Props>(
   return _h(type, props, ...children)
 }
 
+// fix duplicate node in hmr
+let node
 export default function withPicodom<State, Actions>(container = document.body): (app: App<State, Actions>) => App<State, Actions> {
-  let node
   let rafId
   return app => props => app({
     ...props,
-    init() {
-      // fix duplicate node in hmr
-      container.innerHTML = ''
-      return props.init()
-    },
     onRender(view) {
       props.onRender && props.onRender(view)
       if (rafId) {
