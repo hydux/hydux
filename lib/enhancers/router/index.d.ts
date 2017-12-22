@@ -48,7 +48,7 @@ export interface NestedRoutes<State, Actions> {
     path: string;
     label?: string;
     action?: ActionType<Location<any, any>, State, Actions>;
-    children: NestedRoutes<State, Actions>[];
+    children?: NestedRoutes<State, Actions>[];
 }
 export interface RouteInfo<State, Actions> {
     path: string;
