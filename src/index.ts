@@ -10,7 +10,7 @@ export type OnUpdate<S, A> = <M>(data: { prevAppState: S, nextAppState: S, msgDa
 
 export { Cmd, noop }
 
-export type AppProps<State, Actions> = {
+export interface AppProps<State, Actions> {
   init: Init<State, Actions>,
   view: View<State, Actions>
   actions: ActionsType<State, Actions>,

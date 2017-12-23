@@ -12,7 +12,7 @@ export declare type OnUpdate<S, A> = <M>(data: {
     action: string;
 }) => void;
 export { Cmd, noop };
-export declare type AppProps<State, Actions> = {
+export interface AppProps<State, Actions> {
     init: Init<State, Actions>;
     view: View<State, Actions>;
     actions: ActionsType<State, Actions>;
@@ -20,7 +20,7 @@ export declare type AppProps<State, Actions> = {
     onRender?: (view: any) => void;
     onError?: (err: Error) => void;
     onUpdate?: OnUpdate<State, Actions>;
-};
+}
 export declare type App<State, Actions> = (props: AppProps<State, Actions>) => any;
 export default function app<State, Actions>(props: AppProps<State, Actions>): {
     actions: Actions;

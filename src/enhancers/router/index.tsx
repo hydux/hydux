@@ -85,14 +85,8 @@ export type Routes<State, Actions> = {
   [key: string]: ActionType<Location<any, any>, State, Actions>
 }
 
-export type AppProps<State, Actions> = {
-  init: Init<State, Actions>,
-  view: View<State, RouterActions<Actions>>
-  actions: ActionsType<State, Actions>,
-  subscribe?: Subscribe<RouterState<State>, RouterActions<Actions>>,
-  // middlewares: ((action: MyAction<any, State, Actions>, key: string, path: string[]) => MyAction<any, State, Actions>)[],
-  onRender?: (view: any) => void,
-  onError?: (err: Error) => void,
+export interface RouterAppProps<State, Actions> extends AppProps<State, Actions> {
+  view: View<RouterState<State>, RouterActions<Actions>>
   onUpdate?: OnUpdate<RouterState<State>, RouterActions<Actions>>,
 }
 
@@ -104,7 +98,7 @@ export default function withRouter<State, Actions>({
   routes?: Routes<State, Actions>,
 } = {}) {
   let timer
-  return (app: App<State, Actions>) => (props: AppProps<State, Actions>) => {
+  return (app: App<State, Actions>) => (props: RouterAppProps<State, Actions>) => {
     function pathToLoc(path) {
       const loc = parsePath<any, any>(path)
       for (const key in routes) {

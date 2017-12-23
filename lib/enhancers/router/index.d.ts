@@ -1,5 +1,5 @@
-import { ActionType, ActionsType } from './../../types';
-import { AppProps, App, Init, View, Subscribe, OnUpdate } from './../../index';
+import { ActionType } from './../../types';
+import { AppProps, App, View, OnUpdate } from './../../index';
 import { HistoryProps, BaseHistory, HashHistory, BrowserHistory } from './history';
 export { HistoryProps, BaseHistory, HashHistory, BrowserHistory };
 export interface Query {
@@ -31,15 +31,10 @@ export declare function mkLink(history: History, h: any): (props: any, children:
 export declare type Routes<State, Actions> = {
     [key: string]: ActionType<Location<any, any>, State, Actions>;
 };
-export declare type AppProps<State, Actions> = {
-    init: Init<State, Actions>;
+export interface AppProps<State, Actions> extends AppProps<State, Actions> {
     view: View<State, RouterActions<Actions>>;
-    actions: ActionsType<State, Actions>;
-    subscribe?: Subscribe<RouterState<State>, RouterActions<Actions>>;
-    onRender?: (view: any) => void;
-    onError?: (err: Error) => void;
     onUpdate?: OnUpdate<RouterState<State>, RouterActions<Actions>>;
-};
+}
 export default function withRouter<State, Actions>({history, routes}?: {
     history?: BaseHistory;
     routes?: Routes<State, Actions>;
