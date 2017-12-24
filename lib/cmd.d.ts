@@ -1,14 +1,14 @@
 import { ActionType } from './types';
-export interface Sub<State, Actions> {
+export interface Sub<Actions> {
     (actions: Actions): void;
 }
-export declare type CmdType<State, Actions> = Sub<State, Actions>[];
+export declare type CmdType<Actions> = Sub<Actions>[];
 declare const _default: {
-    none: Sub<any, any>[];
-    ofPromise<A, T, State, Actions>(task: (args: A) => Promise<T>, args: A, succeedAction?: ActionType<T, State, Actions> | undefined, failedAction?: ActionType<Error, State, Actions> | undefined): Sub<State, Actions>[];
-    ofFn<A, T, State, Actions>(task: (args: A) => T, args: A, succeedAction: ActionType<T, State, Actions>, failedAction: ActionType<Error, State, Actions>): Sub<State, Actions>[];
-    ofSub<State, Actions>(sub: Sub<State, Actions>): Sub<State, Actions>[];
-    batch<State, Actions>(...cmds: (Sub<State, Actions>[] | Sub<State, Actions>[][])[]): Sub<State, Actions>[];
-    map<State, Actions, SubActions>(map: (action: Actions) => SubActions, cmd: Sub<State, SubActions>[]): Sub<State, Actions>[];
+    none: Sub<any>[];
+    ofPromise<A, T, State, Actions>(task: (args: A) => Promise<T>, args: A, succeedAction?: ActionType<T, State, Actions> | undefined, failedAction?: ActionType<Error, State, Actions> | undefined): Sub<Actions>[];
+    ofFn<A, T, State, Actions>(task: (args: A) => void | T, args: A, succeedAction?: ActionType<T, State, Actions> | undefined, failedAction?: ActionType<Error, State, Actions> | undefined): Sub<Actions>[];
+    ofSub<Actions>(sub: Sub<Actions>): Sub<Actions>[];
+    batch<State, Actions>(...cmds: (Sub<Actions>[] | Sub<Actions>[][])[]): Sub<Actions>[];
+    map<State, Actions, SubActions>(map: (action: Actions) => SubActions, cmd: Sub<SubActions>[]): Sub<Actions>[];
 };
 export default _default;

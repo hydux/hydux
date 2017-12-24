@@ -124,7 +124,7 @@ export default function withRouter<State, Actions>({
         if (loc) {
           cmd = Cmd.batch(
             result[1],
-            Cmd.ofSub<State, RouterActions<Actions>>(
+            Cmd.ofSub<RouterActions<Actions>>(
               actions => actions[ROUTE_ACTION](loc)
             )
           )
@@ -132,7 +132,7 @@ export default function withRouter<State, Actions>({
         return [{ ...result[0] as any, location: loc }, cmd]
       },
       subscribe: state => Cmd.batch(
-        Cmd.ofSub<State, RouterActions<Actions>>(actions => {
+        Cmd.ofSub<RouterActions<Actions>>(actions => {
           history.listen(path => {
             const loc = pathToLoc(path)
             actions[ROUTE_ACTION](loc)
@@ -184,6 +184,11 @@ export interface RouteMeta<State, Actions> {
 export interface RoutesMeta<State, Actions> {
   [key: string]: RouteMeta<State, Actions>
 }
+
+export function join(...args: string[]) {
+  return args.join('/').replace(/\/+/g, '/')
+}
+
 /**
  * @param routes nested routes contains path, action, children, it would parse it to a `route` field (path:action map) for router enhancer, and a `meta` field which contains each route's parents.
  */
@@ -200,7 +205,7 @@ export function parseNestedRoutes<State, Actions>(routes: NestedRoutes<State, Ac
     children
       .map(r => ({
         ...r,
-        path: routes.path.replace(/\/$/, '') + '/' + r.path.replace(/^\//, ''),
+        path: join(routes.path, r.path),
         action: r.action,
         parents: ((routes as any).parents || []).concat({
           ...routes,

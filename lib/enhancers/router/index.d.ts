@@ -31,14 +31,14 @@ export declare function mkLink(history: History, h: any): (props: any, children:
 export declare type Routes<State, Actions> = {
     [key: string]: ActionType<Location<any, any>, State, Actions>;
 };
-export interface AppProps<State, Actions> extends AppProps<State, Actions> {
-    view: View<State, RouterActions<Actions>>;
+export interface RouterAppProps<State, Actions> extends AppProps<State, Actions> {
+    view: View<RouterState<State>, RouterActions<Actions>>;
     onUpdate?: OnUpdate<RouterState<State>, RouterActions<Actions>>;
 }
 export default function withRouter<State, Actions>({history, routes}?: {
     history?: BaseHistory;
     routes?: Routes<State, Actions>;
-}): (app: App<State, Actions>) => (props: AppProps<State, Actions>) => any;
+}): (app: App<State, Actions>) => (props: RouterAppProps<State, Actions>) => any;
 export interface NestedRoutes<State, Actions> {
     path: string;
     label?: string;
@@ -60,6 +60,7 @@ export interface RouteMeta<State, Actions> {
 export interface RoutesMeta<State, Actions> {
     [key: string]: RouteMeta<State, Actions>;
 }
+export declare function join(...args: string[]): string;
 /**
  * @param routes nested routes contains path, action, children, it would parse it to a `route` field (path:action map) for router enhancer, and a `meta` field which contains each route's parents.
  */

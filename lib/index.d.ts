@@ -1,10 +1,10 @@
-import { ActionsType } from './types';
+import { ActionResult, ActionState, ActionCmdResult, ActionType, ActionsType } from './types';
 import Cmd, { CmdType, Sub } from './cmd';
 import { noop } from './utils';
-export { CmdType, Sub };
-export declare type Init<S, A> = () => S | [S, CmdType<S, A>];
+export { CmdType, Sub, ActionResult, ActionState, ActionCmdResult, ActionType, ActionsType };
+export declare type Init<S, A> = () => S | [S, CmdType<A>];
 export declare type View<S, A> = (appState: S) => ((actions: A) => any);
-export declare type Subscribe<S, A> = (state: S) => CmdType<S, A>;
+export declare type Subscribe<S, A> = (state: S) => CmdType<A>;
 export declare type OnUpdate<S, A> = <M>(data: {
     prevAppState: S;
     nextAppState: S;

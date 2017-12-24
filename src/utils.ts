@@ -7,11 +7,11 @@ export function set(to, from) {
 }
 
 export function merge(to, from) {
-  return set(set({}, to), from)
+  return set(set(to ? new to.constructor() : {}, to), from)
 }
 
 export function setDeep(path, value, from) {
-  const to = {}
+  const to = from ? new from.constructor() : {}
   return 0 === path.length
     ? value
     : ((to[path[0]] =
