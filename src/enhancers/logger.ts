@@ -8,7 +8,16 @@ function defaultLogger (prevState, action, nextState) {
   console.groupEnd()
 }
 
-export default function withLogger<State, Actions>({ logger = defaultLogger, windowInspectKey = '__HYDUX_STATE__' } = {}): (app: App<State, Actions>) => App<State, Actions> {
+export default function withLogger<State, Actions>(options: {
+  logger?: (prevState: State, action: { name: string, data: any }, nextState: State) => void,
+  windowInspectKey?: string,
+  filter?: (actionPath: string) => boolean
+} = {}): (app: App<State, Actions>) => App<State, Actions> {
+  const {
+    logger = defaultLogger,
+    windowInspectKey = '__HYDUX_STATE__',
+    filter = _ => true,
+  } = options
   const scope = typeof window !== 'undefined'
     ? window
     : typeof global !== 'undefined'
@@ -38,7 +47,9 @@ export default function withLogger<State, Actions>({ logger = defaultLogger, win
         const path = data.action.split('.').slice(0, -1)
         const prevState = get(path, data.prevAppState)
         const nextState = get(path, data.nextAppState)
-        logger(data.prevAppState, { name: data.action, data: data.msgData }, nextState)
+        if (filter(data.action)) {
+          logger(data.prevAppState, { name: data.action, data: data.msgData }, nextState)
+        }
         if (windowInspectKey) {
           scope[windowInspectKey] = data
         }

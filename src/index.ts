@@ -61,7 +61,7 @@ export default function app<State, Actions>(props: AppProps<State, Actions>) {
     render: appRender,
   }
 
-  function appRender(state) {
+  function appRender(state = appState) {
     if (state !== appState) {
       appState = state
     }

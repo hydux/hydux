@@ -20,8 +20,6 @@ export function h<Props>(
   return _h(type, props, ...children)
 }
 
-// fix duplicate node in hmr
-let node
 export default function withPicodom<State, Actions>(container = document.body): (app: App<State, Actions>) => App<State, Actions> {
   let rafId
   return app => props => app({
@@ -32,7 +30,8 @@ export default function withPicodom<State, Actions>(container = document.body): 
         window.cancelAnimationFrame(rafId)
       }
       rafId = window.requestAnimationFrame(
-        () => patch(node, (node = view), container)
+        // fix duplicate node in hmr
+        () => patch((container as any).__HYDUX_PICO_NODE__, ((container as any).__HYDUX_PICO_NODE__ = view), container)
       )
     }
   })

@@ -11,8 +11,11 @@ export default function withDevtools<State, Actions>(options): (app: App<State, 
     secure: true,
     getActionType: f => f,
     debounce: 10,
+    jsonToState: f => f,
+    stateToJson: f => f,
     ...options
   }
+  const { jsonToState, stateToJson } = options
   const connection = connectViaExtension(options)
   let timer
   return (app: App<State, Actions>) => (props: AppProps<State, Actions>) => {
@@ -21,7 +24,7 @@ export default function withDevtools<State, Actions>(options): (app: App<State, 
       init: () => {
         const result = props.init()
         const state = (result instanceof Array) ? result[0] : result
-        connection.init(state)
+        connection.init(stateToJson(state))
         return result
       },
       onUpdate: (data) => {
@@ -29,7 +32,7 @@ export default function withDevtools<State, Actions>(options): (app: App<State, 
         const send = () => connection.send({
           type: 'update',
           msg: { data: data.msgData, type: data.action },
-        }, data.nextAppState)
+        }, stateToJson(data.nextAppState))
         timer && clearTimeout(timer)
         timer = setTimeout(send, options.debounce)
       },
@@ -40,12 +43,12 @@ export default function withDevtools<State, Actions>(options): (app: App<State, 
               switch (msg.payload.type) {
                 case 'JUMP_TO_ACTION':
                 case 'JUMP_TO_STATE':
-                  ctx.render(extractState(msg))
+                  ctx.render(jsonToState(extractState(msg)))
                   break
                 case 'IMPORT_STATE':
                   const states = msg.payload.nextLiftedState.computedStates
                   const state = states[states.length - 1]
-                  ctx.render(state.state)
+                  ctx.render(jsonToState(state.state))
                   connection.send(null, msg.payload.nextLiftedState)
               }
             }
