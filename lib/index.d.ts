@@ -25,7 +25,7 @@ export declare type App<State, Actions> = (props: AppProps<State, Actions>) => a
 export default function app<State, Actions>(props: AppProps<State, Actions>): {
     actions: Actions;
     getState(): State;
-    render: (state: any) => void;
+    render: (state?: State) => void;
     init: Init<State, Actions>;
     view: View<State, Actions>;
     subscribe?: Subscribe<State, Actions> | undefined;
