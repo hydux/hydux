@@ -21,8 +21,16 @@ export interface AppProps<State, Actions> {
   onError?: (err: Error) => void,
   onUpdate?: OnUpdate<State, Actions>,
 }
-
-function normalizeActionResult<State, Actions>(result, state, actions): ActionCmdResult<State, Actions> {
+/**
+ * run action and return a normalized result ([State, CmdType<>]),
+ * this is useful to write High-Order-Action, which take an action and return a wrapped action.
+ * @param action
+ * @param msg
+ * @param state
+ * @param actions
+ */
+export function runAction<A, State, Actions>(action: (msg: A) => any, msg: A, state: State, actions: Actions): ActionCmdResult<State, Actions> {
+  let result = action(msg)
   isFunction(result) && (result = result(state))
   isFunction(result) && (result = result(actions))
   // action can be a function that return a promise or undefined(callback)
@@ -48,7 +56,7 @@ export default function app<State, Actions>(props: AppProps<State, Actions>) {
   const render = props.onRender || console.log
   const onError = props.onError || noop
   // const appMiddlewares = props.middlewares || []
-  let [appState, cmd] = normalizeActionResult(props.init(), void 0, appActions) as [State, CmdType<Actions>]
+  let [appState, cmd] = runAction(props.init, void 0, void 0 as any as State, appActions) as [State, CmdType<Actions>]
   init(appState, appActions, props.actions, [])
   cmd.forEach(sub => sub(appActions))
   appRender(appState)
@@ -88,7 +96,7 @@ export default function app<State, Actions>(props: AppProps<State, Actions>) {
             let nextAppState = appState
             let cmd = Cmd.none
             try {
-              [nextState, cmd] = normalizeActionResult(action(msgData), state, actions)
+              [nextState, cmd] = runAction(action, msgData, state, actions)
             } catch (error) {
               console.error(error)
               onError(error)
