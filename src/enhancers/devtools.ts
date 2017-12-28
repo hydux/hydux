@@ -2,7 +2,19 @@ import { connectViaExtension, extractState } from 'remotedev'
 import Cmd from '../cmd'
 import { merge, setDeep } from '../utils'
 import { AppProps, App } from './../index'
-
+export type Options = {
+  remote?: boolean,
+  hostname?: string,
+  port?: number,
+  secure?: boolean,
+  getActionType?: (a: object) => any,
+  /// debounce ms
+  debounce?: number,
+  /// filter action name
+  filter?: (action: string) => true,
+  jsonToState?: (j: object) => any,
+  stateToJson?: (s: object) => any,
+}
 export default function withDevtools<State, Actions>(options): (app: App<State, Actions>) => App<State, Actions> {
   options = {
     remote: false,
@@ -11,6 +23,7 @@ export default function withDevtools<State, Actions>(options): (app: App<State, 
     secure: true,
     getActionType: f => f,
     debounce: 10,
+    filter: _ => true,
     jsonToState: f => f,
     stateToJson: f => f,
     ...options
@@ -29,6 +42,9 @@ export default function withDevtools<State, Actions>(options): (app: App<State, 
       },
       onUpdate: (data) => {
         props.onUpdate && props.onUpdate(data)
+        if (!options.filter(data.action)) {
+          return
+        }
         const send = () => connection.send({
           type: 'update',
           msg: { data: data.msgData, type: data.action },
