@@ -1,4 +1,4 @@
-const assert = require('assert')
+import * as assert from 'assert'
 import app, { Cmd } from '../index'
 import logger from '../enhancers/logger'
 function sleep(ns) {
@@ -46,7 +46,8 @@ describe('core api', () => {
     actions.up()
     actions.up()
     actions.up()
-    assert(getState().count === 4, 'up should work')
+    console.log('getState().count', getState())
+    assert.equal(getState().count, 4, 'up should work')
     actions.down()
     actions.down()
     assert(getState().count === 2, 'down should work')

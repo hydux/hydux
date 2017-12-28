@@ -1,6 +1,6 @@
 import { ActionResult, ActionState, ActionCmdResult, ActionType, ActionsType } from './types'
 import Cmd, { CmdType, Sub } from './cmd'
-import { set, merge, setDeep, get, isFunction, noop } from './utils'
+import { set, merge, setDeep, get, isFn, noop } from './utils'
 
 export { CmdType, Sub, ActionResult, ActionState, ActionCmdResult, ActionType, ActionsType }
 
@@ -31,12 +31,12 @@ export interface AppProps<State, Actions> {
  */
 export function runAction<A, State, Actions>(action: (msg: A) => any, msg: A, state: State, actions: Actions): ActionCmdResult<State, Actions> {
   let result = action(msg)
-  isFunction(result) && (result = result(state))
-  isFunction(result) && (result = result(actions))
+  isFn(result) && (result = result(state))
+  isFn(result) && (result = result(actions))
   // action can be a function that return a promise or undefined(callback)
   if (
     result === undefined ||
-    (result.then && typeof result.then === 'function')
+    (result.then && isFn(result.then))
   ) {
     return [state, Cmd.none]
   }
@@ -74,7 +74,7 @@ export default function app<State, Actions>(props: AppProps<State, Actions>) {
       appState = state
     }
     let view
-    if (isFunction(view = props.view(appState))) {
+    if (isFn(view = props.view(appState))) {
       view = view(appActions)
     }
     try {
@@ -87,7 +87,7 @@ export default function app<State, Actions>(props: AppProps<State, Actions>) {
 
   function init(state, actions, from: ActionsType<State, Actions> | ActionType<any, State, Actions>, path: string[]) {
     for (const key in from) {
-      isFunction(from[key])
+      isFn(from[key])
         ? ((key, action: ActionType<any, State, Actions>) => {
           actions[key] = function(msgData) {
             state = get(path, appState)

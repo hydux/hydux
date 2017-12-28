@@ -1,7 +1,7 @@
 import { ActionType, ActionsType } from './../../types'
 import { AppProps, App, Init, View, Subscribe, OnUpdate } from './../../index'
 import Cmd, { CmdType } from './../../cmd'
-import { get, isFunction } from '../../utils'
+import { get, isFn } from '../../utils'
 import { HistoryProps, BaseHistory, HashHistory, BrowserHistory } from './history'
 
 export { HistoryProps, BaseHistory, HashHistory, BrowserHistory }

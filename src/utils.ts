@@ -1,17 +1,23 @@
 
+const isSet = val => typeof val !== 'undefined' && val !== null
+const isPojo = obj => !isSet(obj.constructor) || obj.constructor === Object
+
 export function set(to, from) {
-  for (const i in from) {
-    to[i] = from[i]
+  const keys = Object.keys(from)
+  let i = keys.length
+  while (i--) {
+    const key = keys[i]
+    to[key] = from[key]
   }
   return to
 }
 
 export function merge(to, from) {
-  return set(set(to ? new to.constructor() : {}, to), from)
+  return set(set(isPojo(to) ? {} : new to.constructor(), to), from)
 }
 
-export function setDeep(path, value, from) {
-  const to = from ? new from.constructor() : {}
+export function setDeep(path: string[], value, from) {
+  const to = isPojo(from) ? {} : new from.constructor()
   return 0 === path.length
     ? value
     : ((to[path[0]] =
@@ -21,14 +27,15 @@ export function setDeep(path, value, from) {
       merge(from, to))
 }
 
-export function get(path, from) {
-  for (let i = 0; i < path.length; i++) {
+export function get(path: string[], from: any) {
+  let len = path.length
+  for (let i = 0; i < len; i++) {
     from = from[path[i]]
   }
   return from
 }
 
-export function isFunction(data): data is Function {
+export function isFn(data): data is Function {
   return 'function' === typeof data
 }
 
