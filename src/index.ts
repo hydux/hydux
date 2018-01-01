@@ -5,7 +5,7 @@ import { set, merge, setDeep, get, isFn, noop } from './utils'
 export { CmdType, Sub, ActionResult, ActionState, ActionCmdResult, ActionType, ActionsType }
 
 export type Init<S, A> = () => S | [S, CmdType<A>]
-export type View<S, A> = (appState: S) => ((actions: A) => any)
+export type View<S, A> = (appState: S, actions: A) => any
 export type Subscribe<S, A> = (state: S) => CmdType<A>
 export type OnUpdate<S, A> = <M>(data: { prevAppState: S, nextAppState: S, msgData: M, action: string }) => void
 
@@ -31,7 +31,7 @@ export interface AppProps<State, Actions> {
  */
 export function runAction<A, State, Actions>(action: (msg: A) => any, msg: A, state: State, actions: Actions): ActionCmdResult<State, Actions> {
   let result = action(msg)
-  isFn(result) && (result = result(state))
+  isFn(result) && (result = result(state, actions)) &&
   isFn(result) && (result = result(actions))
   // action can be a function that return a promise or undefined(callback)
   if (
@@ -74,7 +74,7 @@ export default function app<State, Actions>(props: AppProps<State, Actions>) {
       appState = state
     }
     let view
-    if (isFn(view = props.view(appState))) {
+    if (isFn(view = props.view(appState, appActions))) {
       view = view(appActions)
     }
     try {

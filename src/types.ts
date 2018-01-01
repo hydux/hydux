@@ -6,12 +6,10 @@ export type ActionCmdResult<State, Actions> = [ActionState<State>, CmdType<Actio
 
 export type ActionResult<State, Actions> = ActionState<State> | Promise<any> | ActionCmdResult<State, Actions>
 
-export type ActionType<Data, State, Actions> = (
-  data: Data
-) =>
-  | ((state: State) => ActionResult<State, Actions>)
-  | ((state: State) => ((actions: Actions) => ActionResult<State, Actions>))
+export type ActionType<Data, State, Actions> =
+  (data: Data) =>
   | ActionResult<State, Actions>
+  | ((state: State, actions: Actions) => ActionResult<State, Actions>)
 
 /** The interface for actions (exposed when implementing actions).
  *

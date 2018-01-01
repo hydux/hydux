@@ -19,20 +19,29 @@ export function h<Props>(
   }
   return _h(type, props, ...children)
 }
-
-export default function withPicodom<State, Actions>(container = document.body): (app: App<State, Actions>) => App<State, Actions> {
+export default function withPicodom<State, Actions>(container = document.body, options: {
+  raf?: boolean
+} = { raf: true }): (app: App<State, Actions>) => App<State, Actions> {
   let rafId
   return app => props => app({
     ...props,
     onRender(view) {
       props.onRender && props.onRender(view)
+      // fix duplicate node in hmr
+      const render = () =>
+        patch(
+          (container as any).__HYDUX_PICO_NODE__,
+          ((container as any).__HYDUX_PICO_NODE__ = view),
+          container,
+        )
+
+      if (!options.raf) {
+        return render()
+      }
       if (rafId) {
         window.cancelAnimationFrame(rafId)
       }
-      rafId = window.requestAnimationFrame(
-        // fix duplicate node in hmr
-        () => patch((container as any).__HYDUX_PICO_NODE__, ((container as any).__HYDUX_PICO_NODE__ = view), container)
-      )
+      rafId = window.requestAnimationFrame(render)
     }
   })
 }
