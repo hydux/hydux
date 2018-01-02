@@ -48,7 +48,7 @@ export default function withLogger<State, Actions>(options: {
         const prevState = get(path, data.prevAppState)
         const nextState = get(path, data.nextAppState)
         if (filter(data.action)) {
-          logger(data.prevAppState, { name: data.action, data: data.msgData }, nextState)
+          logger(prevState, { name: data.action, data: data.msgData }, nextState)
         }
         if (windowInspectKey) {
           scope[windowInspectKey] = data
