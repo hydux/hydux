@@ -70,14 +70,18 @@ export type RouterState<State extends Object> = State & {
 
 export function mkLink(history: History, h) {
   const React = { createElement: h }
-  return function Link(props, children) {
+  return function Link({ to, onClick, replace = false, ...props }: { to: string, onClick?: (e: MouseEvent) => void, replace?: boolean } , children) {
     function handleClick(e: MouseEvent) {
-      history.push(props.to)
+      if (replace) {
+        history.replace(to)
+      } else {
+        history.push(to)
+      }
       e.preventDefault()
       e.stopPropagation()
-      props.onClick && props.onClick(e)
+      onClick && onClick(e)
     }
-    return <a href={props.to} {...props} onclick={handleClick} onClick={handleClick}>{children}</a>
+    return <a href={to} {...props} onclick={handleClick} onClick={handleClick}>{children}</a>
   }
 }
 
@@ -143,11 +147,11 @@ export default function withRouter<State, Actions>({
       actions: {
         ...(props.actions as any),
         history: ({
-          push: path => history.push(path),
-          replace: path => history.replace(path),
-          go: (delta) => history.go(delta),
-          back: () => history.back(),
-          forward: () => history.forward(),
+          push: path => (history.push(path), void 0),
+          replace: path => (history.replace(path), void 0),
+          go: (delta) => (history.go(delta), void 0),
+          back: () => (history.back(), void 0),
+          forward: () => (history.forward(), void 0),
         } as History),
         [ROUTE_ACTION]: (loc: Location<any, any>) => {
           if (loc.template) {

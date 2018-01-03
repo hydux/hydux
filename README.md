@@ -153,17 +153,17 @@ actions: {
   add: n => state => ({ count: state.count + n }),
   // (msg: Msg) => (state: State) => (actions: Actions) => void
   // update the state by state and other same level actions
-  add12: () => state => actions => actions.add(12),
+  add12: () => (state, actions) => actions.add(12),
   // (msg: Msg) => (state: State) => (actions: Actions) => [state, CmdType<State, Actions>]
   // update the state by side effects
-  remoteAdd: () => state => actions =>
-    [state,
+  remoteAdd: () => (state, actions) =>
+    [ state,
       Cmd.ofPromise(
         () => fetch('http://your.server/some/path'),
         null,
         actions.add,
         console.log
-      )],
+      ) ],
 }
 ```
 

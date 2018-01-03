@@ -2,18 +2,6 @@
 # yarn lockfile v1
 
 
-"@hyperapp/logger@^0.3.1":
-  version "0.3.1"
-  resolved "http://registry.npm.taobao.org/@hyperapp/logger/download/@hyperapp/logger-0.3.1.tgz#c4006a7c3740a490cf6aa89a2a8951a961f0d1fd"
-
-"@hyperapp/router@^0.3.0":
-  version "0.3.0"
-  resolved "http://registry.npm.taobao.org/@hyperapp/router/download/@hyperapp/router-0.3.0.tgz#530648e974193f59a14f1a9c76128a7462de9cf0"
-
-"@types/es6-promise@^0.0.33":
-  version "0.0.33"
-  resolved "http://registry.npm.taobao.org/@types/es6-promise/download/@types/es6-promise-0.0.33.tgz#280a707e62b1b6bef1a86cc0861ec63cd06c7ff3"
-
 "@types/node@^8.0.55":
   version "8.0.55"
   resolved "http://registry.npm.taobao.org/@types/node/download/@types/node-8.0.55.tgz#015966c0af809216b8a46cc527b5c211994d36f0"
@@ -1377,10 +1365,6 @@ es6-map@^0.1.3:
     es6-set "~0.1.5"
     es6-symbol "~3.1.1"
     event-emitter "~0.3.5"
-
-es6-promise@^4.1.1:
-  version "4.1.1"
-  resolved "http://registry.npm.taobao.org/es6-promise/download/es6-promise-4.1.1.tgz#8811e90915d9a0dba36274f0b242dbda78f9c92a"
 
 es6-set@~0.1.5:
   version "0.1.5"
@@ -3346,10 +3330,6 @@ performance-now@^0.2.0:
 performance-now@^2.1.0:
   version "2.1.0"
   resolved "http://registry.npm.taobao.org/performance-now/download/performance-now-2.1.0.tgz#6309f4e0e5fa913ec1c69307ae364b4b377c9e7b"
-
-picodom@^1.0.2:
-  version "1.0.2"
-  resolved "http://registry.npm.taobao.org/picodom/download/picodom-1.0.2.tgz#f37c037cb7ce7f3ddced3efe96e5a1c77132c3cd"
 
 pify@^2.0.0:
   version "2.3.0"

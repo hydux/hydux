@@ -22,7 +22,7 @@ describe('core api', () => {
     ctx = logger<any, any>()(app)({
       init: () => state,
       actions: {},
-      view: state => actions => ({ type: 'view', state }),
+      view: (state, actions) => ({ type: 'view', state }),
       onRender: view => renderResult = view
     })
     assert.deepStrictEqual(ctx.getState(), state, 'nested state should work')
@@ -80,7 +80,7 @@ describe('core api', () => {
         upN: n => state => ({ count: state.count + n }),
         down: _ => state => ({ count: state.count - 1 }),
         reset: _ => ({ count: 1 }),
-        up12: _ => state => actions => actions.upN(12),
+        up12: _ => (state, actions) => actions.upN(12),
         upLaterByPromise: n => state => actions => new Promise(resolve =>
           setTimeout(() => resolve(actions.upN(n)), 10)),
         upLater: () => state => actions => [state, Cmd.ofPromise(

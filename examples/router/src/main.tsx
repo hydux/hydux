@@ -17,31 +17,22 @@ const history = new BrowserHistory()
 const routes: Routes<State, Actions> = {
   '/': loc => state => ({
     ...state,
-    page: {
-      page: 'Home',
-      data: { text: 'aaa' },
-    }
+    page: 'Home'
   }),
   '/user/:id': loc => state => ({
     ...state,
     page: {
       page: 'User',
-      data: { user: { name: 'xxx', id: loc.params.id } },
+      id: loc.params.id,
     }
   }),
   '/counter': loc => state => ({
     ...state,
-    page: {
-      page: 'Counter',
-      data: Counter.init(),
-    }
+    page: 'Counter'
   }),
   '*': loc => state => ({
     ...state,
-    page: {
-      page: '404',
-      data: null,
-    }
+    page: '404'
   })
 }
 
@@ -62,17 +53,12 @@ let Link = mkLink(history, React.createElement)
 const actions = {
   counter: Counter.actions,
 }
-type HomeState = {
-  text: string
-}
-type UserState = {
-  user: { name: string, id: string }
-}
+
 type Page =
-| { page: 'Home', data: HomeState }
-| { page: 'User', data: UserState }
-| { page: 'Counter', data: CounterState }
-| { page: '404', data: null }
+| 'Home'
+| 'Counter'
+| { page: 'User', id: number }
+| '404'
 
 type State = {
   counter: CounterState,
@@ -81,7 +67,7 @@ type State = {
 
 const state: State = {
   counter: Counter.init(),
-  page: { page: 'Home', data: { text: 'Home' } },
+  page: 'Home',
 }
 
 type Actions = typeof actions
@@ -89,19 +75,22 @@ const NoMatch = () => <div>404</div>
 const Home = () => <div>Home</div>
 const Users = () => <div>Users</div>
 
-const renderRoutes = (page: Page) => (actions: Actions) => {
-  switch (page.page) {
+const renderRoutes = (state: State, actions: Actions) => {
+  switch (state.page) {
     case 'Home':
-      return <div>{page.data.text}</div>
-    case 'User':
-      return <div>{page.data.user.name}({page.data.user.id})</div>
+      return <div>Home</div>
     case 'Counter':
-      return Counter.view(page.data)(actions.counter)
+      return Counter.view(state.counter, actions.counter)
     case '404':
       return <NoMatch />
+    default:
+      switch (state.page.page) {
+        case 'User':
+          return <div>User: {state.page.id}</div>
+      }
   }
 }
-const view = (state: State) => (actions: RouterActions<Actions>) => (
+const view = (state: State, actions: RouterActions<Actions>) => (
   <main>
     <style>{`
         a {
@@ -114,12 +103,16 @@ const view = (state: State) => (actions: RouterActions<Actions>) => (
     <Link to="/accounts">Accounts</Link>
     <Link to="/counter">Counter</Link>
     <Link to="/404">404</Link>
-    {renderRoutes(state.page)(actions)}
+    {renderRoutes(state, actions)}
   </main>
 )
 
-export default app({
+const ctx = app({
   init: () => state,
   actions,
   view,
 })
+
+if (process.env.NODE_ENV === 'development') {
+  (window as any).ctx = ctx
+}

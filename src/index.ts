@@ -5,7 +5,7 @@ import { set, merge, setDeep, get, isFn, noop } from './utils'
 export { CmdType, Sub, ActionResult, ActionState, ActionCmdResult, ActionType, ActionsType }
 
 export type Init<S, A> = () => S | [S, CmdType<A>]
-export type View<S, A> = (appState: S, actions: A) => any
+export type View<S, A> = (state: S, actions: A) => any
 export type Subscribe<S, A> = (state: S) => CmdType<A>
 export type OnUpdate<S, A> = <M>(data: { prevAppState: S, nextAppState: S, msgData: M, action: string }) => void
 
