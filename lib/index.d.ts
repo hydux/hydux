@@ -34,7 +34,7 @@ export declare type App<State, Actions> = (props: AppProps<State, Actions>) => a
 export default function app<State, Actions>(props: AppProps<State, Actions>): {
     actions: Actions;
     getState(): State;
-    render: (state?: State) => void;
+    render: (state?: State) => any;
     init: Init<State, Actions>;
     view: View<State, Actions>;
     subscribe?: Subscribe<State, Actions> | undefined;
