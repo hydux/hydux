@@ -3,7 +3,7 @@ import Cmd, { CmdType, Sub } from './cmd';
 import { noop } from './utils';
 export { CmdType, Sub, ActionResult, ActionState, ActionCmdResult, ActionType, ActionsType };
 export declare type Init<S, A> = () => S | [S, CmdType<A>];
-export declare type View<S, A> = (appState: S) => ((actions: A) => any);
+export declare type View<S, A> = (state: S, actions: A) => any;
 export declare type Subscribe<S, A> = (state: S) => CmdType<A>;
 export declare type OnUpdate<S, A> = <M>(data: {
     prevAppState: S;
@@ -21,6 +21,15 @@ export interface AppProps<State, Actions> {
     onError?: (err: Error) => void;
     onUpdate?: OnUpdate<State, Actions>;
 }
+/**
+ * run action and return a normalized result ([State, CmdType<>]),
+ * this is useful to write High-Order-Action, which take an action and return a wrapped action.
+ * @param action
+ * @param msg
+ * @param state
+ * @param actions
+ */
+export declare function runAction<A, State, Actions>(action: (msg: A) => any, msg: A, state: State, actions: Actions): ActionCmdResult<State, Actions>;
 export declare type App<State, Actions> = (props: AppProps<State, Actions>) => any;
 export default function app<State, Actions>(props: AppProps<State, Actions>): {
     actions: Actions;

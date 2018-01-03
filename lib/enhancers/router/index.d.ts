@@ -27,7 +27,11 @@ export declare type RouterActions<Actions extends Object> = Actions & {
 export declare type RouterState<State extends Object> = State & {
     location: Location<any, any>;
 };
-export declare function mkLink(history: History, h: any): (props: any, children: any) => JSX.Element;
+export declare function mkLink(history: History, h: any): ({to, onClick, replace, ...props}: {
+    to: string;
+    onClick?: ((e: MouseEvent) => void) | undefined;
+    replace?: boolean | undefined;
+}, children: any) => JSX.Element;
 export declare type Routes<State, Actions> = {
     [key: string]: ActionType<Location<any, any>, State, Actions>;
 };
