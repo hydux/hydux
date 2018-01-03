@@ -34,7 +34,7 @@ export default {
     down: () => state => ({ count: state.count - 1 }),
     up: () => state => ({ count: state.count + 1 })
   },
-  view: (state: State) => (actions: Actions) =>
+  view: (state: State, actions: Actions) =>
     <div>
       <h1>{state.count}</h1>
       <button onclick={actions.down}>–</button>
@@ -78,12 +78,12 @@ const state = {
   counter2: Counter.init(),
 }
 
-const view = (state: State) => (actions: Actions) =>
+const view = (state: State, actions: Actions) =>
     <main>
       <h1>Counter1:</h1>
-      {Counter.view(state.counter1)(actions.counter1)}
+      {Counter.view(state.counter1, actions.counter1)}
       <h1>Counter2:</h1>
-      {Counter.view(state.counter2)(actions.counter2)}
+      {Counter.view(state.counter2, actions.counter2)}
     </main>
 
 export default app({
