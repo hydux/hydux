@@ -3,9 +3,9 @@ import { Cmd, noop, ActionsType, ActionType } from '../../../src/index'
 const initState = { count: 0 }
 const init = () => initState
 const actions = {
-  down: () => state => ({ count: state.count - 1 }),
-  up: () => state => ({ count: state.count + 1 }),
-  upN: n => state => ({ count: state.count + n }),
+  down: () => (state: State) => ({ count: state.count - 1 }),
+  up: () => (state: State) => ({ count: state.count + 1 }),
+  upN: n => (state: State) => ({ count: state.count + n }),
   upLater: (() => (state: State, actions: Actions) =>
     [ state,
       Cmd.ofPromise(

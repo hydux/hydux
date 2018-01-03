@@ -53,7 +53,7 @@ export default function app<State, Actions>(props: AppProps<State, Actions>) {
   // const appEvents = props.events || {}
   const appActions = {} as Actions
   const appSubscribe = props.subscribe || (_ => Cmd.none)
-  const render = props.onRender || console.log
+  const render = props.onRender || noop
   const onError = props.onError || noop
   // const appMiddlewares = props.middlewares || []
   let [appState, cmd] = runAction(props.init, void 0, void 0 as any as State, appActions) as [State, CmdType<Actions>]
