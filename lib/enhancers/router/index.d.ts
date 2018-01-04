@@ -39,7 +39,7 @@ export interface RouterAppProps<State, Actions> extends AppProps<State, Actions>
     view: View<RouterState<State>, RouterActions<Actions>>;
     onUpdate?: OnUpdate<RouterState<State>, RouterActions<Actions>>;
 }
-export default function withRouter<State, Actions>({history, routes}?: {
+export default function withRouter<State, Actions>(props?: {
     history?: BaseHistory;
     routes?: Routes<State, Actions>;
 }): (app: App<State, Actions>) => (props: RouterAppProps<State, Actions>) => any;

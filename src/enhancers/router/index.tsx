@@ -94,13 +94,14 @@ export interface RouterAppProps<State, Actions> extends AppProps<State, Actions>
   onUpdate?: OnUpdate<RouterState<State>, RouterActions<Actions>>,
 }
 
-export default function withRouter<State, Actions>({
-  history = new HashHistory(),
-  routes = {},
-}: {
+export default function withRouter<State, Actions>(props: {
   history?: BaseHistory,
   routes?: Routes<State, Actions>,
 } = {}) {
+  const {
+    history = new HashHistory(),
+    routes = {},
+  } = props
   let timer
   return (app: App<State, Actions>) => (props: RouterAppProps<State, Actions>) => {
     function pathToLoc(path) {

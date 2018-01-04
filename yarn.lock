@@ -3374,7 +3374,7 @@ trim-newlines@^1.0.0:
   version "1.0.0"
   resolved "http://registry.npm.taobao.org/trim-newlines/download/trim-newlines-1.0.0.tgz#5887966bb582a4503a41eb524f7d35011815a613"
 
-tslib@^1.0.0, tslib@^1.7.1:
+tslib@^1.0.0, tslib@^1.7.1, tslib@^1.8.1:
   version "1.8.1"
   resolved "http://registry.npm.taobao.org/tslib/download/tslib-1.8.1.tgz#6946af2d1d651a7b1863b531d6e5afa41aa44eac"
 
