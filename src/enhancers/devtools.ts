@@ -74,10 +74,10 @@ export default function withDevtools<State, Actions>(options): (app: App<State, 
           ? Cmd.batch([sub], props.subscribe(model))
           : [sub]
       },
-      onError: err => {
-        props.onError && props.onError(err)
-        connection.error(err.message)
-      }
+      // onError: err => {
+      //   props.onError && props.onError(err)
+      //   connection.error(err.message)
+      // }
     })
     return ctx
   }

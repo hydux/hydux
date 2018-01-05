@@ -1,6 +1,6 @@
 import { ActionResult, ActionState, ActionCmdResult, ActionType, ActionsType } from './types'
 import Cmd, { CmdType, Sub } from './cmd'
-import { set, merge, setDeep, get, isFn, noop, isPojo } from './utils'
+import { set, merge, setDeep, get, isFn, noop, isPojo, clone } from './utils'
 
 export { CmdType, Sub, ActionResult, ActionState, ActionCmdResult, ActionType, ActionsType }
 
@@ -18,33 +18,35 @@ export interface AppProps<State, Actions> {
   subscribe?: Subscribe<State, Actions>,
   // middlewares: ((action: MyAction<any, State, Actions>, key: string, path: string[]) => MyAction<any, State, Actions>)[],
   onRender?: (view: any) => void,
-  onError?: (err: Error) => void,
   onUpdate?: OnUpdate<State, Actions>,
 }
 /**
  * run action and return a normalized result ([State, CmdType<>]),
  * this is useful to write High-Order-Action, which take an action and return a wrapped action.
- * @param action
- * @param msg
+ * @param result result of `action(msg: Data)`
  * @param state
  * @param actions
  */
-export function runAction<A, State, Actions>(action: (msg: A) => any, msg: A, state: State, actions: Actions): ActionCmdResult<State, Actions> {
-  let result = action(msg)
-  isFn(result) && (result = result(state, actions)) &&
-  isFn(result) && (result = result(actions))
+export function runAction<State, Actions>(
+  result: ActionResult<State, Actions>,
+  state: State,
+  actions: Actions
+): ActionCmdResult<State, Actions> {
+  let _result: any = result
+  isFn(_result) && (_result = _result(state, actions)) &&
+  isFn(_result) && (_result = _result(actions))
   // action can be a function that return a promise or undefined(callback)
   if (
-    result === undefined ||
-    (result.then && isFn(result.then))
+    _result === undefined ||
+    (_result.then && isFn(_result.then))
   ) {
     return [state, Cmd.none]
   }
 
-  if (result instanceof Array) {
-    return result as any
+  if (_result instanceof Array) {
+    return _result as any
   }
-  return [result, Cmd.none]
+  return [_result, Cmd.none]
 }
 
 export type App<State, Actions> = (props: AppProps<State, Actions>) => any
@@ -54,9 +56,8 @@ export default function app<State, Actions>(props: AppProps<State, Actions>) {
   const appActions = {} as Actions
   const appSubscribe = props.subscribe || (_ => Cmd.none)
   const render = props.onRender || noop
-  const onError = props.onError || noop
   // const appMiddlewares = props.middlewares || []
-  let [appState, cmd] = runAction(props.init, void 0, void 0 as any as State, appActions) as [State, CmdType<Actions>]
+  let [appState, cmd] = runAction(props.init(), void 0 as any as State, appActions) as [State, CmdType<Actions>]
   init(appState, appActions, props.actions, [])
   cmd.forEach(sub => sub(appActions))
   appRender(appState)
@@ -77,12 +78,7 @@ export default function app<State, Actions>(props: AppProps<State, Actions>) {
     if (isFn(view = props.view(appState, appActions))) {
       view = view(appActions)
     }
-    try {
-      return render(view)
-    } catch (err) {
-      console.error(err)
-      onError(err)
-    }
+    return render(view)
   }
 
   function init(state, actions, from: ActionsType<State, Actions> | ActionType<any, State, Actions>, path: string[]) {
@@ -92,18 +88,13 @@ export default function app<State, Actions>(props: AppProps<State, Actions>) {
       }
       const subFrom = from[key]
       if (isFn(subFrom)) {
-        actions[key] = function(msgData) {
+        actions[key] = function(...msgData) {
           state = get(path, appState)
           // action = appMiddlewares.reduce((action, fn) => fn(action, key, path), action)
           let nextState = state
           let nextAppState = appState
           let cmd = Cmd.none
-          try {
-            [nextState, cmd] = runAction(subFrom, msgData, state, actions)
-          } catch (error) {
-            console.error(error)
-            onError(error)
-          }
+          ;[nextState, cmd] = runAction(subFrom.apply(from, msgData), state, actions)
 
           if (props.onUpdate) {
             nextAppState = setDeep(path, merge(state, nextState), appState)
@@ -126,7 +117,7 @@ export default function app<State, Actions>(props: AppProps<State, Actions>) {
       } else if (typeof subFrom === 'object' && subFrom) {
         init(
           state[key] || (state[key] = {}),
-          (actions[key] = subFrom.constructor ? new subFrom.constructor() : {}),
+          (actions[key] = clone(subFrom)),
           subFrom,
           path.concat(key)
         )

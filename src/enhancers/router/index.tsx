@@ -205,6 +205,7 @@ export function parseNestedRoutes<State, Actions>(routes: NestedRoutes<State, Ac
     let children = routes.children || []
     newRoutes[routes.path] = {
       ...routes,
+      parents: (routes as any).parents || [],
       children: children.map(r => ({ ...r, parents: void 0, children: void 0 }))
     }
     children

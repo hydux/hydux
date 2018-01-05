@@ -16,6 +16,10 @@ export function merge(to, from) {
   return set(set(isPojo(to) ? {} : new to.constructor(), to), from)
 }
 
+export function clone(from) {
+  return set(isPojo(from) ? {} : new from.constructor(), from)
+}
+
 export function setDeep(path: string[], value, from) {
   const to = isPojo(from) ? {} : new from.constructor()
   return 0 === path.length

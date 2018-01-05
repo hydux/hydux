@@ -61,8 +61,6 @@ describe('core api', () => {
     ctx = app<any, any>({
       init: () => ({ count: 1 }),
       actions: {
-        xx: 'aaa' as any, // invalid actions
-        _actions: new Date() as any, // invalid actions
         up: _ => state => ({ count: state.count + 1 }),
         down: _ => state => ({ count: state.count - 1 }),
         reset: _ => ({ count: 1 }),
@@ -71,6 +69,38 @@ describe('core api', () => {
       onRender: view => renderResult = view
     })
     testCounter(ctx, renderResult)
+  })
+
+  it('complex actions', () => {
+    let state
+    let renderResult
+    class ClassActions {
+      _inc: number
+      constructor(inc) {
+        this._inc = inc
+      }
+      up = () => (state) => {
+        console.log('up in class', state, this._inc)
+        return ({ count: state.count + this._inc })
+      }
+    }
+    let ctx = app<any, any>({
+      init: () => ({ count: 1, classActions: { count: 1 } }),
+      actions: {
+        classActions: new ClassActions(10) as any,
+        xx: 'aaa' as any, // invalid actions, would be ignored
+        _actions: new Date() as any, // invalid actions, would be ignored
+        up: _ => state => ({ count: state.count + 1 }),
+        down: _ => state => ({ count: state.count - 1 }),
+        reset: _ => ({ count: 1 }),
+      },
+      view: state => actions => actions,
+      onRender: view => renderResult = view
+    })
+    testCounter(ctx, renderResult)
+    assert.deepEqual(ctx.getState().classActions.count, 1, 'classActions state work')
+    ctx.actions.classActions.up()
+    assert.deepEqual(ctx.getState().classActions.count, 11, 'classActions should work')
   })
 
   it('nested async actions', async () => {
