@@ -1,6 +1,6 @@
 
 const isSet = val => typeof val !== 'undefined' && val !== null
-const isPojo = obj => !isSet(obj.constructor) || obj.constructor === Object
+export const isPojo = obj => !isSet(obj.constructor) || obj.constructor === Object
 
 export function set(to, from) {
   const keys = Object.keys(from)

@@ -1,3 +1,4 @@
+export declare const isPojo: (obj: any) => boolean;
 export declare function set(to: any, from: any): any;
 export declare function merge(to: any, from: any): any;
 export declare function setDeep(path: string[], value: any, from: any): any;

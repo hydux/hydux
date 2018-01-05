@@ -1,6 +1,6 @@
 import { ActionResult, ActionState, ActionCmdResult, ActionType, ActionsType } from './types'
 import Cmd, { CmdType, Sub } from './cmd'
-import { set, merge, setDeep, get, isFn, noop } from './utils'
+import { set, merge, setDeep, get, isFn, noop, isPojo } from './utils'
 
 export { CmdType, Sub, ActionResult, ActionState, ActionCmdResult, ActionType, ActionsType }
 
@@ -87,46 +87,50 @@ export default function app<State, Actions>(props: AppProps<State, Actions>) {
 
   function init(state, actions, from: ActionsType<State, Actions> | ActionType<any, State, Actions>, path: string[]) {
     for (const key in from) {
-      isFn(from[key])
-        ? ((key, action: ActionType<any, State, Actions>) => {
-          actions[key] = function(msgData) {
-            state = get(path, appState)
-            // action = appMiddlewares.reduce((action, fn) => fn(action, key, path), action)
-            let nextState = state
-            let nextAppState = appState
-            let cmd = Cmd.none
-            try {
-              [nextState, cmd] = runAction(action, msgData, state, actions)
-            } catch (error) {
-              console.error(error)
-              onError(error)
-            }
-
-            if (props.onUpdate) {
-              nextAppState = setDeep(path, merge(state, nextState), appState)
-              props.onUpdate({
-                prevAppState: appState,
-                nextAppState,
-                msgData,
-                action: path.concat(key).join('.')
-              })
-            }
-
-            if (nextState !== state) {
-              appState = nextAppState !== appState
-                ? nextAppState
-                : setDeep(path, merge(state, nextState), appState)
-              appRender(appState)
-            }
-            cmd.forEach(sub => sub(actions))
+      if (/^_/.test(key)) {
+        continue
+      }
+      const subFrom = from[key]
+      if (isFn(subFrom)) {
+        actions[key] = function(msgData) {
+          state = get(path, appState)
+          // action = appMiddlewares.reduce((action, fn) => fn(action, key, path), action)
+          let nextState = state
+          let nextAppState = appState
+          let cmd = Cmd.none
+          try {
+            [nextState, cmd] = runAction(subFrom, msgData, state, actions)
+          } catch (error) {
+            console.error(error)
+            onError(error)
           }
-        })(key, from[key])
-        : init(
-            state[key] || (state[key] = {}),
-            (actions[key] = {}),
-            from[key],
-            path.concat(key)
-          )
+
+          if (props.onUpdate) {
+            nextAppState = setDeep(path, merge(state, nextState), appState)
+            props.onUpdate({
+              prevAppState: appState,
+              nextAppState,
+              msgData,
+              action: path.concat(key).join('.')
+            })
+          }
+
+          if (nextState !== state) {
+            appState = nextAppState !== appState
+              ? nextAppState
+              : setDeep(path, merge(state, nextState), appState)
+            appRender(appState)
+          }
+          cmd.forEach(sub => sub(actions))
+        }
+      } else if (typeof subFrom === 'object' && subFrom) {
+        init(
+          state[key] || (state[key] = {}),
+          (actions[key] = subFrom.constructor ? new subFrom.constructor() : {}),
+          subFrom,
+          path.concat(key)
+        )
+      }
     }
   }
 }

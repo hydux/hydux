@@ -61,6 +61,8 @@ describe('core api', () => {
     ctx = app<any, any>({
       init: () => ({ count: 1 }),
       actions: {
+        xx: 'aaa' as any, // invalid actions
+        _actions: new Date() as any, // invalid actions
         up: _ => state => ({ count: state.count + 1 }),
         down: _ => state => ({ count: state.count - 1 }),
         reset: _ => ({ count: 1 }),
