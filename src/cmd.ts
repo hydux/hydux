@@ -36,10 +36,11 @@ function ofFn<A, T, State, Actions>(
     _ => {
       try {
         let result = task(args)
-        if (result && succeedAction) {
+        if (succeedAction) {
           succeedAction(result)
         }
       } catch (e) {
+        console.error(e)
         failedAction && failedAction(e)
       }
     }

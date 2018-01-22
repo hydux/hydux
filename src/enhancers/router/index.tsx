@@ -1,5 +1,5 @@
 import { ActionType, ActionsType } from './../../types'
-import { AppProps, App, Init, View, Subscribe, OnUpdate } from './../../index'
+import { AppProps, App, Init, View, Subscribe, OnUpdate, runAction } from './../../index'
 import Cmd, { CmdType } from './../../cmd'
 import { get, isFn } from '../../utils'
 import { HistoryProps, BaseHistory, HashHistory, BrowserHistory } from './history'
@@ -9,10 +9,10 @@ const ROUTE_ACTION = '@@hydux-router/CHANGE_LOCATION'
 export interface Query { [key: string]: string | string[] }
 export interface Location<P, Q extends Query> {
   template: string | null
-  pathname: string,
-  params: P,
-  query: Q,
-  search: string,
+  pathname: string
+  params: P
+  query: Q
+  search: string
 }
 
 export interface History {
@@ -123,24 +123,19 @@ export default function withRouter<State, Actions>(props: {
         if (!(result instanceof Array)) {
           result = [result, Cmd.none]
         }
-
-        const loc = pathToLoc(history.current())
-        let cmd = result[1]
-        if (loc) {
-          cmd = Cmd.batch(
-            result[1],
-            Cmd.ofSub<RouterActions<Actions>>(
-              actions => actions[ROUTE_ACTION](loc)
-            )
+        const loc: Location<any, any> = pathToLoc(history.current())
+        let cmd = Cmd.batch(
+          result[1],
+          Cmd.ofSub<RouterActions<Actions>>(
+            actions => actions[ROUTE_ACTION](loc)
           )
-        }
+        )
         return [{ ...result[0] as any, location: loc }, cmd]
       },
       subscribe: state => Cmd.batch(
         Cmd.ofSub<RouterActions<Actions>>(actions => {
           history.listen(path => {
-            const loc = pathToLoc(path)
-            actions[ROUTE_ACTION](loc)
+            actions[ROUTE_ACTION](pathToLoc(path))
           })
         }),
         props.subscribe ? props.subscribe(state) : Cmd.none
@@ -150,21 +145,23 @@ export default function withRouter<State, Actions>(props: {
         history: ({
           push: path => (history.push(path), void 0),
           replace: path => (history.replace(path), void 0),
-          go: (delta) => (history.go(delta), void 0),
+          go: delta => (history.go(delta), void 0),
           back: () => (history.back(), void 0),
           forward: () => (history.forward(), void 0),
         } as History),
-        [ROUTE_ACTION]: (loc: Location<any, any>) => {
+        [ROUTE_ACTION]: (loc: Location<any, any>) => (state: State, actions: Actions) => {
+          const lastLoc: Location<any, any> = pathToLoc(history.last())
+          history._setLoc(loc)
           if (loc.template) {
-            return routes[loc.template](loc)
+            let [nextState, cmd] = runAction(routes[loc.template](loc), state, actions)
+            return [{ ...(nextState as object), location: loc }, cmd]
           } else {
-            return state => ({ ...state, location: loc })
+            return { ...(state as any), location: loc }
           }
         },
       }
     })
   }
-
 }
 
 export interface NestedRoutes<State, Actions> {

@@ -28,7 +28,7 @@ export interface AppProps<State, Actions> {
  * @param actions
  */
 export function runAction<State, Actions>(
-  result: ActionResult<State, Actions>,
+  result: ActionResult<State, Actions> | ((state: State, actions: Actions) => ActionResult<State, Actions>),
   state: State,
   actions: Actions
 ): ActionCmdResult<State, Actions> {

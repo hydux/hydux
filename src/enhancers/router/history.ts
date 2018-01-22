@@ -1,7 +1,10 @@
+import { Location, Query } from './index'
 
 export type HistoryProps = { basePath: string }
 
 export abstract class BaseHistory {
+  public location: Location<any, any>
+  public lastLocation: Location<any, any>
   protected props: HistoryProps
   protected _last: string[]
   protected listeners: ((path: string) => void)[] = []
@@ -9,7 +12,7 @@ export abstract class BaseHistory {
     this.props = { basePath: '', ...props }
     this._last = [this.current()]
     this.listeners.push(path => {
-      this._last = this._last.slice(-1).concat(path)
+      this._last = [this._last[this._last.length - 1], path]
     })
   }
   last = () => this._last[0]
@@ -20,6 +23,10 @@ export abstract class BaseHistory {
   go = delta => history.go(delta)
   back = () => history.back()
   forward = () => history.forward()
+  public _setLoc<P = any, Q extends Query = any>(loc: Location<P, Q>) {
+    this.lastLocation = this.location || loc
+    this.location = loc
+  }
   protected handleChange(path = this.current()) {
     this.listeners.forEach(f => f(path))
   }
