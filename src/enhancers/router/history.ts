@@ -51,7 +51,7 @@ export class HashHistory extends BaseHistory {
     })
   }
   current() {
-    return location.hash.slice(this.props.hash.length + this.props.basePath.length)
+    return location.hash.slice(this.props.hash.length + this.props.basePath.length) || '/'
   }
   push(path) {
     const url = this.props.hash + this.props.basePath + path

@@ -5,7 +5,7 @@ import { get, isFn } from '../../utils'
 import { HistoryProps, BaseHistory, HashHistory, BrowserHistory } from './history'
 
 export { HistoryProps, BaseHistory, HashHistory, BrowserHistory }
-const ROUTE_ACTION = '@@hydux-router/CHANGE_LOCATION'
+const CHANGE_LOCATION = '@@hydux-router/CHANGE_LOCATION'
 export interface Query { [key: string]: string | string[] }
 export interface Location<P, Q extends Query> {
   template: string | null
@@ -127,7 +127,7 @@ export default function withRouter<State, Actions>(props: {
         let cmd = Cmd.batch(
           result[1],
           Cmd.ofSub<RouterActions<Actions>>(
-            actions => actions[ROUTE_ACTION](loc)
+            actions => actions[CHANGE_LOCATION](loc)
           )
         )
         return [{ ...result[0] as any, location: loc }, cmd]
@@ -135,7 +135,7 @@ export default function withRouter<State, Actions>(props: {
       subscribe: state => Cmd.batch(
         Cmd.ofSub<RouterActions<Actions>>(actions => {
           history.listen(path => {
-            actions[ROUTE_ACTION](pathToLoc(path))
+            actions[CHANGE_LOCATION](pathToLoc(path))
           })
         }),
         props.subscribe ? props.subscribe(state) : Cmd.none
@@ -149,8 +149,7 @@ export default function withRouter<State, Actions>(props: {
           back: () => (history.back(), void 0),
           forward: () => (history.forward(), void 0),
         } as History),
-        [ROUTE_ACTION]: (loc: Location<any, any>) => (state: State, actions: Actions) => {
-          const lastLoc: Location<any, any> = pathToLoc(history.last())
+        [CHANGE_LOCATION]: (loc: Location<any, any>) => (state: State, actions: Actions) => {
           history._setLoc(loc)
           if (loc.template) {
             let [nextState, cmd] = runAction(routes[loc.template](loc), state, actions)
