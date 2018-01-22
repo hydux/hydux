@@ -1,7 +1,10 @@
+import { Location, Query } from './index';
 export declare type HistoryProps = {
     basePath: string;
 };
 export declare abstract class BaseHistory {
+    location: Location<any, any>;
+    lastLocation: Location<any, any>;
     protected props: HistoryProps;
     protected _last: string[];
     protected listeners: ((path: string) => void)[];
@@ -14,6 +17,7 @@ export declare abstract class BaseHistory {
     go: (delta: any) => void;
     back: () => void;
     forward: () => void;
+    _setLoc<P = any, Q extends Query = any>(loc: Location<P, Q>): void;
     protected handleChange(path?: string): void;
 }
 export declare type HashHistoryProps = HistoryProps & {

@@ -27,7 +27,7 @@ export interface AppProps<State, Actions> {
  * @param state
  * @param actions
  */
-export declare function runAction<State, Actions>(result: ActionResult<State, Actions>, state: State, actions: Actions): ActionCmdResult<State, Actions>;
+export declare function runAction<State, Actions>(result: ActionResult<State, Actions> | ((state: State, actions: Actions) => ActionResult<State, Actions>), state: State, actions: Actions): ActionCmdResult<State, Actions>;
 export declare type App<State, Actions> = (props: AppProps<State, Actions>) => any;
 export default function app<State, Actions>(props: AppProps<State, Actions>): {
     actions: Actions;
