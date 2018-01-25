@@ -70,7 +70,7 @@ export function wrapAction<S, A, PS, PA>(
     return wrapper(nactions, parentState, parentActions)
   }
   wrapped[PASS_PARENT_ACTIONS] = true
-  return wrapped
+  return wrapped as (state: S, actions: A) => ActionResult<S, A>
 }
 
 export type App<State, Actions> = (props: AppProps<State, Actions>) => any
