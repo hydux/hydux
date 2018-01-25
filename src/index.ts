@@ -1,8 +1,10 @@
-import { ActionResult, ActionState, ActionCmdResult, ActionType, ActionsType } from './types'
+import { ActionResult, ActionState, ActionCmdResult, ActionType, ActionsType, UnknownArgsActionType, NormalAction, NormalActionCmdResult } from './types'
 import Cmd, { CmdType, Sub } from './cmd'
 import { set, merge, setDeep, get, isFn, noop, isPojo, clone } from './utils'
 
-export { CmdType, Sub, ActionResult, ActionState, ActionCmdResult, ActionType, ActionsType }
+const PASS_PARENT_ACTIONS = '__PASS_PARENT_ACTIONS__'
+
+export { CmdType, Sub, ActionResult, ActionState, ActionCmdResult, ActionType, ActionsType, UnknownArgsActionType }
 
 export type Init<S, A> = () => S | [S, CmdType<A>]
 export type View<S, A> = (state: S, actions: A) => any
@@ -27,13 +29,15 @@ export interface AppProps<State, Actions> {
  * @param state
  * @param actions
  */
-export function runAction<State, Actions>(
-  result: ActionResult<State, Actions> | ((state: State, actions: Actions) => ActionResult<State, Actions>),
-  state: State,
-  actions: Actions
-): ActionCmdResult<State, Actions> {
+export function runAction<S, A, PS, PA>(
+  result: ActionResult<S, A> | ((state: S, actions: A) => ActionResult<S, A>),
+  state: S,
+  actions: A,
+  parentState?: PS,
+  parentActions?: PA,
+): NormalActionCmdResult<S, A> {
   let _result: any = result
-  isFn(_result) && (_result = _result(state, actions)) &&
+  isFn(_result) && (_result = _result(state, actions, parentState, parentActions)) &&
   isFn(_result) && (_result = _result(actions))
   // action can be a function that return a promise or undefined(callback)
   if (
@@ -42,11 +46,31 @@ export function runAction<State, Actions>(
   ) {
     return [state, Cmd.none]
   }
-
   if (_result instanceof Array) {
-    return _result as any
+    return [_result[0] || state, _result[1] || Cmd.none]
   }
   return [_result, Cmd.none]
+}
+
+/**
+ * Wrap a child action with parentState, parentActions.
+ * @param action The action to be wrapped
+ * @param wrapper
+ * @param parentState
+ * @param parentActions
+ */
+export function wrapAction<S, A, PS, PA>(
+  action: UnknownArgsActionType<S, A>,
+  wrapper: (action: NormalAction<any, S, A>, parentState: PS, parentActions: PA) => ActionResult<S, A>,
+  parentState?: PS,
+  parentActions?: PA,
+) {
+  const wrapped = (state: S, actions: A, parentState: PS, parentActions: PA) => {
+    const nactions = (...args) => runAction(action(...args), state, actions)
+    return wrapper(nactions, parentState, parentActions)
+  }
+  wrapped[PASS_PARENT_ACTIONS] = true
+  return wrapped
 }
 
 export type App<State, Actions> = (props: AppProps<State, Actions>) => any
@@ -66,6 +90,9 @@ export default function app<State, Actions>(props: AppProps<State, Actions>) {
   return {
     ...props,
     actions: appActions,
+    get state() {
+      return appState
+    },
     getState() { return appState },
     render: appRender,
   }
@@ -91,10 +118,22 @@ export default function app<State, Actions>(props: AppProps<State, Actions>) {
         actions[key] = function(...msgData) {
           state = get(path, appState)
           // action = appMiddlewares.reduce((action, fn) => fn(action, key, path), action)
-          let nextState = state
-          let nextAppState = appState
+          let [nextState, nextAppState] = [state, appState]
           let cmd = Cmd.none
-          ;[nextState, cmd] = runAction(subFrom.apply(from, msgData), state, actions)
+          let [parentState, parentActions] = [undefined, undefined]
+          const actionResult = subFrom(...msgData)
+          if (actionResult && actionResult[PASS_PARENT_ACTIONS]) {
+            const pPath = path.slice(0, -1)
+            parentActions = get(pPath, appActions)
+            parentState = get(pPath, appState)
+          }
+          [nextState, cmd] = runAction(
+            actionResult,
+            state,
+            actions,
+            parentState,
+            parentActions
+          )
 
           if (props.onUpdate) {
             nextAppState = setDeep(path, merge(state, nextState), appState)

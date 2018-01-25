@@ -153,7 +153,7 @@ export default function withRouter<State, Actions>(props: {
           history._setLoc(loc)
           if (loc.template) {
             let [nextState, cmd] = runAction(routes[loc.template](loc), state, actions)
-            return [{ ...(nextState as object), location: loc }, cmd]
+            return [{ ...(nextState as any as object), location: loc }, cmd]
           } else {
             return { ...(state as any), location: loc }
           }

@@ -123,6 +123,41 @@ app({
 })
 ```
 
+## Parent-Child Components Communication
+
+In Elm, we can intercept child component's message in parent component, because child's update function is called in parent's update function. But how can we do this in hydux?
+
+```js
+import * as assert from 'assert'
+import app, { Cmd, wrapAction, noop } from '../index'
+import Counter from './counter'
+
+const initState = {
+  counter1: Counter.init(),
+  counter2: Counter.init(),
+}
+const actions = {
+  counter2: counter.actions,
+  counter1: {
+    ...counter.actions,
+    upN: (n: number) => wrapAction(counter.actions.upN, (action, parentState: State, parentActions: Actions) => {
+      const [state, cmd] = action(n + 1)
+      assert.equal(state.count, parentState.counter1.count + n + 1, 'call child action work')
+      return [state, Cmd.batch(cmd, Cmd.ofFn(() => parentActions.counter2.up()))]
+    })
+  },
+}
+type State = typeof initState
+type Actions = typeof actions
+let ctx = app<typeof initState, typeof actions>({
+  init: () => initState,
+  actions,
+  view: noop,
+  onRender: noop
+})
+
+```
+
 ## API
 
 ### app(props: AppProps<State, Actions>)

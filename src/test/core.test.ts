@@ -1,9 +1,47 @@
+import { noop } from './../utils'
 import * as assert from 'assert'
-import app, { Cmd } from '../index'
+import app, { Cmd, wrapAction } from '../index'
 import logger from '../enhancers/logger'
 function sleep(ns) {
   return new Promise(resolve => setTimeout(resolve, ns))
 }
+
+const Counter = {
+  init: () => ({ count: 1 }),
+  actions: {
+    up: () => state => ({ count: state.count + 1 }),
+    upN: (n: number) => (state: CounterState, actions: CounterActions) => ({ count: state.count + n }),
+    down: () => state => ({ count: state.count - 1 }),
+    reset: () => ({ count: 1 }),
+    up12: () => (state, actions) => actions.upN(12),
+    upLaterByPromise: n => state => actions => new Promise(resolve =>
+      setTimeout(() => resolve(actions.upN(n)), 10)),
+    upLater: () => state => actions => [state, Cmd.ofPromise(
+      () => new Promise(resolve => setTimeout(() => resolve(), 10)),
+      void 0,
+      actions.up,
+    )],
+    upLaterObj: () => state => actions => ({
+      state,
+      cmd: Cmd.ofPromise(
+        () => new Promise(resolve => setTimeout(() => resolve(), 10)),
+        void 0,
+        actions.up,
+      )
+    }),
+    upLaterWithBatchedCmd: () => state => actions => [state, Cmd.batch([
+      Cmd.ofPromise(
+        () => new Promise(resolve => setTimeout(() => resolve(), 10)),
+        void 0,
+        actions.up,
+      )
+    ])]
+  }
+}
+let _dummyState = Counter.init()
+type CounterState = typeof _dummyState
+type CounterActions = typeof Counter.actions
+
 describe('core api', () => {
   it('init', () => {
     let ctx
@@ -104,42 +142,19 @@ describe('core api', () => {
   })
 
   it('nested async actions', async () => {
-    const counter = {
-      init: () => ({ count: 1 }),
-      actions: {
-        up: _ => state => ({ count: state.count + 1 }),
-        upN: n => state => ({ count: state.count + n }),
-        down: _ => state => ({ count: state.count - 1 }),
-        reset: _ => ({ count: 1 }),
-        up12: _ => (state, actions) => actions.upN(12),
-        upLaterByPromise: n => state => actions => new Promise(resolve =>
-          setTimeout(() => resolve(actions.upN(n)), 10)),
-        upLater: () => state => actions => [state, Cmd.ofPromise(
-          () => new Promise(resolve => setTimeout(() => resolve(), 10)),
-          void 0,
-          actions.up,
-        )],
-        upLaterWithBatchedCmd: () => state => actions => [state, Cmd.batch([
-          Cmd.ofPromise(
-            () => new Promise(resolve => setTimeout(() => resolve(), 10)),
-            void 0,
-            actions.up,
-          )
-        ])]
-      }
-    }
-    let ctx
     let state
     let renderResult
-    ctx = app<any, any>({
-      init: () => ({
-        counter1: counter.init(),
-        counter2: counter.init(),
-      }),
-      actions: {
-        counter1: counter.actions,
-        counter2: counter.actions,
-      },
+    const _state = {
+      counter1: Counter.init(),
+      counter2: Counter.init(),
+    }
+    const actions = {
+      counter1: Counter.actions,
+      counter2: Counter.actions,
+    }
+    let ctx = app<typeof _state, typeof actions>({
+      init: () => _state,
+      actions,
       view: state => actions => actions,
       onRender: view => renderResult = view
     })
@@ -168,5 +183,35 @@ describe('core api', () => {
     assert(ctx.getState().counter1.count === 7, 'upLaterWithBatchedCmd should work 7')
     ctx.actions.counter1.up12()
     assert(ctx.getState().counter1.count === 19, 'up12 should work 19')
+  })
+
+  it('parent actions', () => {
+    const initState = {
+      counter1: Counter.init(),
+      counter2: Counter.init(),
+    }
+    const actions = {
+      counter2: Counter.actions,
+      counter1: {
+        ...Counter.actions,
+        upN: (n: number) => wrapAction(Counter.actions.upN, (action, parentState: State, parentActions: Actions) => {
+          const [state, cmd] = action(n + 1)
+          assert.equal(state.count, parentState.counter1.count + n + 1, 'call child action work')
+          return [state, Cmd.batch(cmd, Cmd.ofFn(() => parentActions.counter2.up()))]
+        })
+      },
+    }
+    type State = typeof initState
+    type Actions = typeof actions
+    let ctx = app<typeof initState, typeof actions>({
+      init: () => initState,
+      actions,
+      view: state => actions => actions,
+      onRender: noop
+    })
+
+    ctx.actions.counter1.upN(1)
+    assert.equal(ctx.getState().counter1.count, 3, 'counter1 upN work')
+    assert.equal(ctx.getState().counter2.count, 2, 'counter2 upN work')
   })
 })

@@ -1,7 +1,7 @@
-import { ActionResult, ActionState, ActionCmdResult, ActionType, ActionsType } from './types';
+import { ActionResult, ActionState, ActionCmdResult, ActionType, ActionsType, UnknownArgsActionType, NormalAction, NormalActionCmdResult } from './types';
 import Cmd, { CmdType, Sub } from './cmd';
 import { noop } from './utils';
-export { CmdType, Sub, ActionResult, ActionState, ActionCmdResult, ActionType, ActionsType };
+export { CmdType, Sub, ActionResult, ActionState, ActionCmdResult, ActionType, ActionsType, UnknownArgsActionType };
 export declare type Init<S, A> = () => S | [S, CmdType<A>];
 export declare type View<S, A> = (state: S, actions: A) => any;
 export declare type Subscribe<S, A> = (state: S) => CmdType<A>;
@@ -27,10 +27,19 @@ export interface AppProps<State, Actions> {
  * @param state
  * @param actions
  */
-export declare function runAction<State, Actions>(result: ActionResult<State, Actions> | ((state: State, actions: Actions) => ActionResult<State, Actions>), state: State, actions: Actions): ActionCmdResult<State, Actions>;
+export declare function runAction<S, A, PS, PA>(result: ActionResult<S, A> | ((state: S, actions: A) => ActionResult<S, A>), state: S, actions: A, parentState?: PS, parentActions?: PA): NormalActionCmdResult<S, A>;
+/**
+ * Wrap a child action with parentState, parentActions.
+ * @param action The action to be wrapped
+ * @param wrapper
+ * @param parentState
+ * @param parentActions
+ */
+export declare function wrapAction<S, A, PS, PA>(action: UnknownArgsActionType<S, A>, wrapper: (action: NormalAction<any, S, A>, parentState: PS, parentActions: PA) => ActionResult<S, A>, parentState?: PS, parentActions?: PA): (state: S, actions: A, parentState: PS, parentActions: PA) => ActionResult<S, A>;
 export declare type App<State, Actions> = (props: AppProps<State, Actions>) => any;
 export default function app<State, Actions>(props: AppProps<State, Actions>): {
     actions: Actions;
+    state: State;
     getState(): State;
     render: (state?: State) => any;
     init: Init<State, Actions>;

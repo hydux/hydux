@@ -32,16 +32,23 @@ function ofFn<A, T, State, Actions>(
     succeedAction = args as any
     args = void 0
   }
+  const fn = () => {
+    const result = task(args)
+    if (succeedAction) {
+      succeedAction(result)
+    }
+  }
   return [
     _ => {
-      try {
-        let result = task(args)
-        if (succeedAction) {
-          succeedAction(result)
+      if (failedAction) {
+        try {
+          fn()
+        } catch (e) {
+          console.error(e)
+          failedAction(e)
         }
-      } catch (e) {
-        console.error(e)
-        failedAction && failedAction(e)
+      } else { // don't wrap in try cache, get better DX in `Pause on exceptions`
+        fn()
       }
     }
   ]
