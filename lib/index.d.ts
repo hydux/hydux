@@ -35,7 +35,7 @@ export declare function runAction<S, A, PS, PA>(result: ActionResult<S, A> | ((s
  * @param parentState
  * @param parentActions
  */
-export declare function wrapAction<S, A, PS, PA>(action: UnknownArgsActionType<S, A>, wrapper: (action: NormalAction<any, S, A>, parentState: PS, parentActions: PA) => ActionResult<S, A>, parentState?: PS, parentActions?: PA): (state: S, actions: A, parentState: PS, parentActions: PA) => ActionResult<S, A>;
+export declare function wrapAction<S, A, PS, PA>(action: UnknownArgsActionType<S, A>, wrapper: (action: NormalAction<any, S, A>, parentState: PS, parentActions: PA) => ActionResult<S, A>, parentState?: PS, parentActions?: PA): (state: S, actions: A) => ActionResult<S, A>;
 export declare type App<State, Actions> = (props: AppProps<State, Actions>) => any;
 export default function app<State, Actions>(props: AppProps<State, Actions>): {
     actions: Actions;
