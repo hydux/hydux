@@ -2,8 +2,6 @@ import { ActionResult, ActionState, ActionCmdResult, ActionType, ActionsType, Un
 import Cmd, { CmdType, Sub } from './cmd'
 import { set, merge, setDeep, get, isFn, noop, isPojo, clone } from './utils'
 
-const PASS_PARENT_ACTIONS = '__PASS_PARENT_ACTIONS__'
-
 export { CmdType, Sub, ActionResult, ActionState, ActionCmdResult, ActionType, ActionsType, UnknownArgsActionType }
 
 export type Init<S, A> = () => S | [S, CmdType<A>]
@@ -69,7 +67,6 @@ export function wrapAction<S, A, PS, PA>(
     const nactions = (...args) => runAction(action(...args), state, actions)
     return wrapper(nactions, parentState, parentActions)
   }
-  wrapped[PASS_PARENT_ACTIONS] = true
   return wrapped as (state: S, actions: A) => ActionResult<S, A>
 }
 
@@ -122,7 +119,7 @@ export default function app<State, Actions>(props: AppProps<State, Actions>) {
           let cmd = Cmd.none
           let [parentState, parentActions] = [undefined, undefined]
           const actionResult = subFrom(...msgData)
-          if (actionResult && actionResult[PASS_PARENT_ACTIONS]) {
+          if (isFn(actionResult) && actionResult.length > 2) {
             const pPath = path.slice(0, -1)
             parentActions = get(pPath, appActions)
             parentState = get(pPath, appState)
