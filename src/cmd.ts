@@ -1,7 +1,7 @@
 import { ActionResult, ActionType, ActionsType } from './types'
 import { isFn } from './utils'
 export interface Sub<Actions> {
-  (actions: Actions): void
+  (actions: Actions): any
 }
 export type CmdType<Actions> = Sub<Actions>[]
 
@@ -37,18 +37,19 @@ function ofFn<A, T, State, Actions>(
     if (succeedAction) {
       succeedAction(result)
     }
+    return result
   }
   return [
     _ => {
       if (failedAction) {
         try {
-          fn()
+          return fn()
         } catch (e) {
           console.error(e)
           failedAction(e)
         }
       } else { // don't wrap in try cache, get better DX in `Pause on exceptions`
-        fn()
+        return fn()
       }
     }
   ]
@@ -82,11 +83,10 @@ function ofPromise<A, T, State, Actions>(
     args = void 0
   }
   return [
-    _ => {
+    _ =>
       task(args)
-      .then(succeedAction)
-      .catch(failedAction)
-    }
+        .then(succeedAction)
+        .catch(failedAction)
   ]
 }
 export default {

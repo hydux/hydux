@@ -8,6 +8,7 @@ export type Init<S, A> = () => S | [S, CmdType<A>]
 export type View<S, A> = (state: S, actions: A) => any
 export type Subscribe<S, A> = (state: S) => CmdType<A>
 export type OnUpdate<S, A> = <M>(data: { prevAppState: S, nextAppState: S, msgData: M, action: string }) => void
+export type OnUpdateStart<S, A> = <M>(data: { action: string }) => void
 
 export { Cmd, noop }
 
@@ -19,6 +20,7 @@ export interface AppProps<State, Actions> {
   // middlewares: ((action: MyAction<any, State, Actions>, key: string, path: string[]) => MyAction<any, State, Actions>)[],
   onRender?: (view: any) => void,
   onUpdate?: OnUpdate<State, Actions>,
+  onUpdateStart?: OnUpdateStart<State, Actions>,
 }
 /**
  * run action and return a normalized result ([State, CmdType<>]),
@@ -59,15 +61,15 @@ export function runAction<S, A, PS, PA>(
  */
 export function wrapAction<S, A, PS, PA>(
   action: UnknownArgsActionType<S, A>,
-  wrapper: (action: NormalAction<any, S, A>, parentState: PS, parentActions: PA) => ActionResult<S, A>,
+  wrapper: (action: NormalAction<any, S, A>, state: S, actions: A, parentState: PS, parentActions: PA) => ActionResult<S, A>,
   parentState?: PS,
   parentActions?: PA,
 ) {
   const wrapped = (state: S, actions: A, parentState: PS, parentActions: PA) => {
     const nactions = (...args) => runAction(action(...args), state, actions)
-    return wrapper(nactions, parentState, parentActions)
+    return wrapper(nactions, state, actions, parentState, parentActions)
   }
-  return wrapped as (state: S, actions: A) => ActionResult<S, A>
+  return wrapped as any
 }
 
 export type App<State, Actions> = (props: AppProps<State, Actions>) => any

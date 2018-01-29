@@ -184,22 +184,22 @@ describe('core api', () => {
     ctx.actions.counter1.up12()
     assert(ctx.getState().counter1.count === 19, 'up12 should work 19')
   })
-
   it('parent actions', () => {
     const initState = {
       counter1: Counter.init(),
       counter2: Counter.init(),
     }
+    const counter1Actions: CounterActions = {
+      ...Counter.actions,
+      upN: (n: number) => wrapAction(Counter.actions.upN, (action, _, __, parentState: State, parentActions: Actions) => {
+        const [state, cmd] = action(n + 1)
+        assert.equal(state.count, parentState.counter1.count + n + 1, 'call child action work')
+        return [state, Cmd.batch(cmd, Cmd.ofFn(() => parentActions.counter2.up()))]
+      }),
+    }
     const actions = {
       counter2: Counter.actions,
-      counter1: {
-        ...Counter.actions,
-        upN: (n: number) => wrapAction(Counter.actions.upN, (action, parentState: State, parentActions: Actions) => {
-          const [state, cmd] = action(n + 1)
-          assert.equal(state.count, parentState.counter1.count + n + 1, 'call child action work')
-          return [state, Cmd.batch(cmd, Cmd.ofFn(() => parentActions.counter2.up()))]
-        })
-      },
+      counter1: counter1Actions,
     }
     type State = typeof initState
     type Actions = typeof actions
