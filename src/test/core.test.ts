@@ -191,7 +191,7 @@ describe('core api', () => {
     }
     const counter1Actions: CounterActions = {
       ...Counter.actions,
-      upN: (n: number) => wrapAction(Counter.actions.upN, (action, _, __, parentState: State, parentActions: Actions) => {
+      upN: (n: number) => wrapAction(Counter.actions.upN, (action, parentState: State, parentActions: Actions, _, __) => {
         const [state, cmd] = action(n + 1)
         assert.equal(state.count, parentState.counter1.count + n + 1, 'call child action work')
         return [state, Cmd.batch(cmd, Cmd.ofFn(() => parentActions.counter2.up()))]

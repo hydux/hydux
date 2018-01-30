@@ -61,13 +61,13 @@ export function runAction<S, A, PS, PA>(
  */
 export function wrapAction<S, A, PS, PA>(
   action: UnknownArgsActionType<S, A>,
-  wrapper: (action: NormalAction<any, S, A>, state: S, actions: A, parentState: PS, parentActions: PA) => ActionResult<S, A>,
+  wrapper: (action: NormalAction<any, S, A>, parentState: PS, parentActions: PA, state: S, actions: A) => ActionResult<S, A>,
   parentState?: PS,
   parentActions?: PA,
 ) {
   const wrapped = (state: S, actions: A, parentState: PS, parentActions: PA) => {
     const nactions = (...args) => runAction(action(...args), state, actions)
-    return wrapper(nactions, state, actions, parentState, parentActions)
+    return wrapper(nactions, parentState, parentActions, state, actions)
   }
   return wrapped as any
 }
