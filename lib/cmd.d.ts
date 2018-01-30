@@ -1,6 +1,6 @@
 import { ActionType } from './types';
 export interface Sub<Actions> {
-    (actions: Actions): void;
+    (actions: Actions): any;
 }
 export declare type CmdType<Actions> = Sub<Actions>[];
 declare const _default: {

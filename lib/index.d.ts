@@ -11,6 +11,9 @@ export declare type OnUpdate<S, A> = <M>(data: {
     msgData: M;
     action: string;
 }) => void;
+export declare type OnUpdateStart<S, A> = <M>(data: {
+    action: string;
+}) => void;
 export { Cmd, noop };
 export interface AppProps<State, Actions> {
     init: Init<State, Actions>;
@@ -19,6 +22,7 @@ export interface AppProps<State, Actions> {
     subscribe?: Subscribe<State, Actions>;
     onRender?: (view: any) => void;
     onUpdate?: OnUpdate<State, Actions>;
+    onUpdateStart?: OnUpdateStart<State, Actions>;
 }
 /**
  * run action and return a normalized result ([State, CmdType<>]),
@@ -35,7 +39,7 @@ export declare function runAction<S, A, PS, PA>(result: ActionResult<S, A> | ((s
  * @param parentState
  * @param parentActions
  */
-export declare function wrapAction<S, A, PS, PA>(action: UnknownArgsActionType<S, A>, wrapper: (action: NormalAction<any, S, A>, parentState: PS, parentActions: PA) => ActionResult<S, A>, parentState?: PS, parentActions?: PA): (state: S, actions: A) => ActionResult<S, A>;
+export declare function wrapAction<S, A, PS, PA>(action: UnknownArgsActionType<S, A>, wrapper: (action: NormalAction<any, S, A>, parentState: PS, parentActions: PA, state: S, actions: A) => ActionResult<S, A>, parentState?: PS, parentActions?: PA): any;
 export declare type App<State, Actions> = (props: AppProps<State, Actions>) => any;
 export default function app<State, Actions>(props: AppProps<State, Actions>): {
     actions: Actions;
@@ -47,4 +51,5 @@ export default function app<State, Actions>(props: AppProps<State, Actions>): {
     subscribe?: Subscribe<State, Actions> | undefined;
     onRender?: ((view: any) => void) | undefined;
     onUpdate?: OnUpdate<State, Actions> | undefined;
+    onUpdateStart?: OnUpdateStart<State, Actions> | undefined;
 };
