@@ -12,7 +12,7 @@
     "build:dist": "webpack -p --progress --profile",
     "test": "mocha --require espower-typescript/guess \"src/test/**/*.ts\"",
     "test:watch": "npm run test -- -w --watch-extensions ts,tsx",
-    "doc": "typedoc --theme minimal --out ./docs --exclude ./test ./src && touch ./docs/.nojekyll",
+    "doc": "typedoc --theme minimal --exclude \"**/test/*.ts\"  --excludeNotExported --excludePrivate --out ./docs ./src && touch ./docs/.nojekyll",
     "preversion": "npm run test && npm run build && npm run build:dist && git add -A"
   },
   "pre-commit": [

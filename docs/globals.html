@@ -915,73 +915,81 @@ img { max-width: 100%; }
 	<div class="content-wrap">
 		<div class="tsd-panel tsd-typography">
 			<h1 id="hydux">Hydux</h1>
-			<p>An Elm-like state manager inspired by <a href="https://github.com/hyperapp/hyperapp">Hyperapp</a>, <a href="https://github.com/fable-elmish/elmish">Elmish</a>, Elm, Redux, etc. Working with any vdom library!</p>
-			<h2 id="why">Why</h2>
-			<p>After trying <a href="https://fable.io">Fable</a> + <a href="https://github.com/fable-elmish/elmish">Elmish</a> for a while, I need to write a small web App in my company, for many reasons I cannot choose some fancy stuff like <a href="https://fable.io">Fable</a> + <a href="https://github.com/fable-elmish/elmish">Elmish</a>, simply speaking, I need to use the mainstream JS stack but don&#39;t want to bear Redux&#39;s cumbersome, complex toolchain, etc anymore.</p>
-			<p>After some digging around, hyperapp looks really good to me, but I quickly find out it doesn&#39;t work with React, and many libraries don&#39;t work with the newest API. So I create this to support <strong>different</strong> vdom libraries, like React, <a href="https://github.com/picodom/picodom">picodom</a>, Preact, <a href="https://github.com/infernojs/inferno">inferno</a> or what ever you want, just need to write a simple enhancer!</p>
-			<p>Also, to avoid breaking change, we have <strong>built-in</strong> support for HMR, logger, persist, Redux Devtools, you know you want it!</p>
+			<p><a href="https://travis-ci.org/hydux/hydux"><img src="https://travis-ci.org/hydux/hydux.svg?branch=master" alt="Build Status"></a> <a href="https://www.npmjs.com/package/hydux"><img src="https://img.shields.io/npm/v/hydux.svg" alt="npm"></a> <a href="https://www.npmjs.com/package/hydux"><img src="https://img.shields.io/npm/dm/hydux.svg" alt="npm"></a></p>
+			<p>A React-Compatible fork of <a href="https://github.com/hyperapp/hyperapp">Hyperapp</a>, inspired by <a href="https://github.com/fable-elmish/elmish">Elmish</a>, Elm, Redux, etc. Working with any vdom library!</p>
+			<h2 id="features">Features</h2>
+			<ul>
+				<li><a href="https://github.com/hyperapp/hyperapp">hyperapp</a> compatible API</li>
+				<li>Support any vdom library, including react (<a href="https://github.com/hydux/hydux-react">official support</a>)</li>
+				<li><a href="https://github.com/hydux/hydux-react-router">Official support for react-router</a></li>
+				<li>Hot reload (hmr), logger, persist, <a href="https://github.com/zalmoxisus/redux-devtools-extension">Redux Devtools with time traveling</a>, <a href="https://github.com/picodom/picodom">picodom</a>(1kb vdom), <strong>**All in One**</strong>, easily setup all these fancy stuff without pain!</li>
+				<li>Elm-like side effect manager and subscribe API</li>
+			</ul>
+			<p><img src="media/timetravel.gif" alt=""></p>
+			<h2 id="-try-it-online-https-codepen-io-zaaack-pen-zpgodl-"><a href="https://codepen.io/zaaack/pen/zPgodL">Try it online!</a></h2>
 			<h2 id="install">Install</h2>
 			<pre><code class="lang-sh">yarn add hydux <span class="hljs-comment"># or npm i hydux</span>
 </code></pre>
 			<h2 id="quick-example">Quick Example</h2>
 			<p>Let&#39;s say we got a counter, like this.</p>
-			<pre><code class="lang-js"><span class="hljs-keyword">const</span> counter = {
-  <span class="hljs-attr">init</span>: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> { <span class="hljs-attr">count</span>: <span class="hljs-number">1</span> },
-  <span class="hljs-attr">actions</span>: {
-    <span class="hljs-attr">down</span>: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> state =&gt; ({ <span class="hljs-attr">count</span>: state.count - <span class="hljs-number">1</span> }),
-    <span class="hljs-attr">up</span>: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> state =&gt; ({ <span class="hljs-attr">count</span>: state.count + <span class="hljs-number">1</span> })
+			<pre><code class="lang-js">// Counter.js
+export default {
+  init: () =&gt; ({ count: 1 }),
+  actions: {
+    down: () =&gt; state =&gt; ({ count: state.count - 1 }),
+    up: () =&gt; state =&gt; ({ count: state.count + 1 })
   },
-  <span class="hljs-attr">view</span>: <span class="hljs-function">(<span class="hljs-params">state: State</span>) =&gt;</span> (actions: Actions) =&gt;
-    <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>{state.count}<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">onclick</span>=<span class="hljs-string">{actions.down}</span>&gt;</span>–<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">onclick</span>=<span class="hljs-string">{actions.up}</span>&gt;</span>+<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
-    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
+  view: (state: State, actions: Actions) =&gt;
+    &lt;div&gt;
+      &lt;h1&gt;{state.count}&lt;/h1&gt;
+      &lt;button onclick={actions.down}&gt;–&lt;/button&gt;
+      &lt;button onclick={actions.up}&gt;+&lt;/button&gt;
+    &lt;/div&gt;
 }
 </code></pre>
 			<p>Then we can compose it in Elm way, you can easily reuse your components.</p>
-			<pre><code class="lang-js"><span class="hljs-keyword">import</span> _app <span class="hljs-keyword">from</span> <span class="hljs-string">'hydux'</span>
-<span class="hljs-keyword">import</span> withPersist <span class="hljs-keyword">from</span> <span class="hljs-string">'hydux/lib/enhancers/persist'</span>
-<span class="hljs-keyword">import</span> withPicodom, { h, React } <span class="hljs-keyword">from</span> <span class="hljs-string">'hydux/lib/enhancers/picodom-render'</span>
-<span class="hljs-keyword">import</span> Counter <span class="hljs-keyword">from</span> <span class="hljs-string">'./counter'</span>
+			<pre><code class="lang-js">import _app from 'hydux'
+import withPersist from 'hydux/lib/enhancers/persist'
+import withPicodom, { h, React } from 'hydux/lib/enhancers/picodom-render'
+import Counter from './counter'
 
-<span class="hljs-comment">// let app = withPersist&lt;State, Actions&gt;({</span>
-<span class="hljs-comment">//   key: 'my-counter-app/v1'</span>
-<span class="hljs-comment">// })(_app)</span>
+// let app = withPersist&lt;State, Actions&gt;({
+//   key: 'my-counter-app/v1'
+// })(_app)
 
-<span class="hljs-comment">// use built-in 1kb picodom to render the view.</span>
-<span class="hljs-keyword">let</span> app = withPicodom()(_app)
+// use built-in 1kb picodom to render the view.
+let app = withPicodom()(_app)
 
-<span class="hljs-keyword">if</span> (process.env.NODE_ENV === <span class="hljs-string">'development'</span>) {
-  <span class="hljs-comment">// built-in dev tools, without pain.</span>
-  <span class="hljs-keyword">const</span> devTools = <span class="hljs-built_in">require</span>(<span class="hljs-string">'hydux/lib/enhancers/devtools'</span>).default
-  <span class="hljs-keyword">const</span> logger = <span class="hljs-built_in">require</span>(<span class="hljs-string">'hydux/lib/enhancers/logger'</span>).default
-  <span class="hljs-keyword">const</span> hmr = <span class="hljs-built_in">require</span>(<span class="hljs-string">'hydux/lib/enhancers/hmr'</span>).default
+if (process.env.NODE_ENV === 'development') {
+  // built-in dev tools, without pain.
+  const devTools = require('hydux/lib/enhancers/devtools').default
+  const logger = require('hydux/lib/enhancers/logger').default
+  const hmr = require('hydux/lib/enhancers/hmr').default
   app = logger()(app)
   app = devTools()(app)
   app = hmr()(app)
 }
 
-<span class="hljs-keyword">const</span> actions = {
-  <span class="hljs-attr">counter1</span>: Counter.actions,
-  <span class="hljs-attr">counter2</span>: Counter.actions,
+const actions = {
+  counter1: Counter.actions,
+  counter2: Counter.actions,
 }
 
-<span class="hljs-keyword">const</span> state = {
-  <span class="hljs-attr">counter1</span>: Counter.init(),
-  <span class="hljs-attr">counter2</span>: Counter.init(),
+const state = {
+  counter1: Counter.init(),
+  counter2: Counter.init(),
 }
 
-<span class="hljs-keyword">const</span> view = <span class="hljs-function">(<span class="hljs-params">state: State</span>) =&gt;</span> (actions: Actions) =&gt;
-    <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">main</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>Counter1:<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span>
-      {Counter.view(state.counter1)(actions.counter1)}
-      <span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>Counter2:<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span>
-      {Counter.view(state.counter2)(actions.counter2)}
-    <span class="hljs-tag">&lt;/<span class="hljs-name">main</span>&gt;</span></span>
+const view = (state: State, actions: Actions) =&gt;
+    &lt;main&gt;
+      &lt;h1&gt;Counter1:&lt;/h1&gt;
+      {Counter.view(state.counter1, actions.counter1)}
+      &lt;h1&gt;Counter2:&lt;/h1&gt;
+      {Counter.view(state.counter2, actions.counter2)}
+    &lt;/main&gt;
 
-<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> app({
-  <span class="hljs-attr">init</span>: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> state,
+export default app({
+  init: () =&gt; state,
   actions,
   view,
 })
@@ -992,7 +1000,7 @@ img { max-width: 100%; }
 			<pre><code class="lang-js"><span class="hljs-keyword">import</span> app, { Cmd } <span class="hljs-keyword">from</span> <span class="hljs-string">'hydux'</span>
 
 <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">upLater</span>(<span class="hljs-params">n</span>) </span>{
-  <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Promise</span>(<span class="hljs-function"><span class="hljs-params">resolve</span> =&gt;</span> setTimeout(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> resolve(n), <span class="hljs-number">1000</span>))
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Promise</span>(<span class="hljs-function"><span class="hljs-params">resolve</span> =&gt;</span> setTimeout(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> resolve(n + <span class="hljs-number">10</span>), <span class="hljs-number">1000</span>))
 }
 app({
   <span class="hljs-attr">init</span>: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> ({ <span class="hljs-attr">count</span>: <span class="hljs-number">1</span>}),
@@ -1000,10 +1008,11 @@ app({
     <span class="hljs-attr">down</span>: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> state =&gt; ({ <span class="hljs-attr">count</span>: state.count - <span class="hljs-number">1</span> }),
     <span class="hljs-attr">up</span>: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> state =&gt; ({ <span class="hljs-attr">count</span>: state.count + <span class="hljs-number">1</span> }),
     <span class="hljs-attr">upN</span>: <span class="hljs-function"><span class="hljs-params">n</span> =&gt;</span> state =&gt; ({ <span class="hljs-attr">count</span>: state.count + n }),
-    <span class="hljs-attr">upLater</span>: <span class="hljs-function"><span class="hljs-params">_</span> =&gt;</span> state =&gt; actions<span class="hljs-comment">/* actions of same level */</span> =&gt; [
+    <span class="hljs-attr">upLater</span>: <span class="hljs-function"><span class="hljs-params">n</span> =&gt;</span> state =&gt; actions<span class="hljs-comment">/* actions of same level */</span> =&gt; [
       state, <span class="hljs-comment">// don't change the state, won't trigger view update</span>
       Cmd.ofPromise(
-        upLater <span class="hljs-comment">/* a function with single parameter and return a promise */</span>,n <span class="hljs-comment">/* the parameter of the funciton */</span>,
+        upLater <span class="hljs-comment">/* a function with single parameter and return a promise */</span>,
+        n <span class="hljs-comment">/* the parameter of the funciton */</span>,
         actions.upN <span class="hljs-comment">/* success handler, optional */</span>,
         <span class="hljs-built_in">console</span>.error <span class="hljs-comment">/* error handler, optional */</span> )
     ]
@@ -1011,6 +1020,88 @@ app({
   <span class="hljs-attr">view</span>: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {<span class="hljs-comment">/*...*/</span>} ,
 })
 </code></pre>
+			<h2 id="parent-child-components-communication">Parent-Child Components Communication</h2>
+			<p>In Elm, we can intercept child component&#39;s message in parent component, because child&#39;s update function is called in parent&#39;s update function. But how can we do this in hydux?</p>
+			<pre><code class="lang-js"><span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> assert <span class="hljs-keyword">from</span> <span class="hljs-string">'assert'</span>
+<span class="hljs-keyword">import</span> app, { Cmd, wrapAction, noop } <span class="hljs-keyword">from</span> <span class="hljs-string">'../index'</span>
+<span class="hljs-keyword">import</span> Counter <span class="hljs-keyword">from</span> <span class="hljs-string">'./counter'</span>
+
+<span class="hljs-keyword">const</span> initState = {
+  <span class="hljs-attr">counter1</span>: Counter.init(),
+  <span class="hljs-attr">counter2</span>: Counter.init(),
+}
+<span class="hljs-keyword">const</span> actions = {
+  <span class="hljs-attr">counter2</span>: counter.actions,
+  <span class="hljs-attr">counter1</span>: {
+    ...counter.actions,
+    <span class="hljs-attr">upN</span>: <span class="hljs-function">(<span class="hljs-params">n: number</span>) =&gt;</span> wrapAction(counter.actions.upN, (action, <span class="hljs-attr">parentState</span>: State, <span class="hljs-attr">parentActions</span>: Actions) =&gt; {
+      <span class="hljs-keyword">const</span> [state, cmd] = action(n + <span class="hljs-number">1</span>)
+      assert.equal(state.count, parentState.counter1.count + n + <span class="hljs-number">1</span>, <span class="hljs-string">'call child action work'</span>)
+      <span class="hljs-keyword">return</span> [state, Cmd.batch(cmd, Cmd.ofFn(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> parentActions.counter2.up()))]
+    })
+  },
+}
+type State = <span class="hljs-keyword">typeof</span> initState
+type Actions = <span class="hljs-keyword">typeof</span> actions
+<span class="hljs-keyword">let</span> ctx = app&lt;<span class="hljs-keyword">typeof</span> initState, <span class="hljs-keyword">typeof</span> actions&gt;({
+  <span class="hljs-attr">init</span>: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> initState,
+  actions,
+  <span class="hljs-attr">view</span>: noop,
+  <span class="hljs-attr">onRender</span>: noop
+})
+</code></pre>
+			<h2 id="api">API</h2>
+			<h3 id="app-props-appprops-state-actions-">app(props: AppProps<State, Actions>)</h3>
+			<p>Run your app.</p>
+			<h4 id="appprops-state-actions-">AppProps<State, Actions></h4>
+			<h5 id="init-state-state-cmdtype-">init: () =&gt; State | [ State, CmdType ]</h5>
+			<p>An function to get the initial state of your app, you can return a tuple including side effects like an action.</p>
+			<h5 id="actions">actions</h5>
+			<p>The actions of your app, you can only using actions to update your state.</p>
+			<p>Actions result should be the state or the same level state if this is a nested action. You can also return undefined/Promise to support async task, but this is highly <strong>not</strong> recommanded, you should using Cmd to manager your side effects.</p>
+			<p>Actions can be nested, here are some legally action signatures:</p>
+			<pre><code class="lang-js">init: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> ({ <span class="hljs-attr">count</span>: <span class="hljs-number">1</span> })
+actions: {
+  <span class="hljs-comment">// (msg: Msg) =&gt; (state: State), update the state by msg</span>
+  reset: <span class="hljs-function"><span class="hljs-params">n</span> =&gt;</span> ({ <span class="hljs-attr">count</span>: <span class="hljs-number">1</span> })
+  <span class="hljs-comment">// (msg: Msg) =&gt; (state: State) =&gt; (state: State)</span>
+  <span class="hljs-comment">// update the state by msg and current state</span>
+  add: <span class="hljs-function"><span class="hljs-params">n</span> =&gt;</span> state =&gt; ({ <span class="hljs-attr">count</span>: state.count + n }),
+  <span class="hljs-comment">// (msg: Msg) =&gt; (state: State) =&gt; (actions: Actions) =&gt; void</span>
+  <span class="hljs-comment">// update the state by state and other same level actions</span>
+  add12: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> (state, actions) =&gt; actions.add(<span class="hljs-number">12</span>),
+  <span class="hljs-comment">// (msg: Msg) =&gt; (state: State) =&gt; (actions: Actions) =&gt; [state, CmdType&lt;State, Actions&gt;]</span>
+  <span class="hljs-comment">// update the state by side effects</span>
+  remoteAdd: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> (state, actions) =&gt;
+    [ state,
+      Cmd.ofPromise(
+        <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> fetch(<span class="hljs-string">'http://your.server/some/path'</span>),
+        <span class="hljs-literal">null</span>,
+        actions.add,
+        <span class="hljs-built_in">console</span>.log
+      ) ],
+}
+</code></pre>
+			<h5 id="subscribe-state-state-cmdtype-state-actions-">subscribe: ?((state: State) =&gt; CmdType<State, Actions>)</h5>
+			<p>subscribe is a function return a CmdType, you can subscribe side effects like web socket messages, location changes in here.</p>
+			<h5 id="onerror-error-error-void-">onError: ?((error: Error) =&gt; void)</h5>
+			<p>Error handler, optional.</p>
+			<h5 id="onrender-view-any-void-">onRender: ?((view: any) =&gt; void)</h5>
+			<p>Custom renderer, optional. Used by vdom adaptors like hydux-react or <code>hydux/lib/enhancers/picodom-render.js</code>.</p>
+			<h5 id="onupdate-data-void-">onUpdate: ?((data) =&gt; void)</h5>
+			<p>Update listener, optional, used by something like <code>hydux/lib/enhancers/logger.js</code>, <code>hydux/lib/enhancers/devtools.js</code></p>
+			<h4 id="cmd">Cmd</h4>
+			<p>Elm-like side effects manager.</p>
+			<h5 id="cmd-none">Cmd.none</h5>
+			<p>Empty side effects.</p>
+			<h5 id="cmd-ofpromise-a-t-task-arg-a-promise-t-arg-a-succeedhandler-result-t-void-failedhandler-err-error-void-cmdtype-state-actions-">Cmd.ofPromise<A, T>(task: (arg: A) =&gt; Promise<T>, (arg: A), succeedHandler: (result: T) =&gt; void, failedHandler: (err: Error) =&gt; void): CmdType<State, Actions></h5>
+			<p>Cmd from a function that return a promise.</p>
+			<h5 id="cmd-offn-a-t-task-arg-a-t-arg-a-succeedhandler-result-t-void-failedhandler-err-error-void-cmdtype-state-actions-">Cmd.ofFn<A, T>(task: (arg:A) =&gt; T, (arg: A), succeedHandler: (result: T) =&gt; void, failedHandler: (err: Error) =&gt; void): CmdType<State, Actions></h5>
+			<p>Cmd from a function that could throw an error.</p>
+			<h5 id="cmd-ofsub-sub-actions-actions-void-cmdtype-state-actions-">Cmd.ofSub(sub: (actions: Actions) =&gt; void): CmdType<State, Actions></h5>
+			<p>Cmd from a sub.</p>
+			<h5 id="cmd-batch-args-cmdtype-state-actions-cmdtype-state-actions-cmdtype-state-actions-">Cmd.batch(...args: CmdType<State,Actions>[] | CmdType<State,Actions>[][]): CmdType<State,Actions></h5>
+			<p>Cmd from a cmd array.</p>
 			<h2 id="counter-app">Counter App</h2>
 			<pre><code class="lang-sh">git <span class="hljs-built_in">clone</span> https://github.com/hydux/hydux.git
 <span class="hljs-built_in">cd</span> examples/counter
@@ -1018,6 +1109,10 @@ yarn <span class="hljs-comment"># or npm i</span>
 npm start
 </code></pre>
 			<p>Now open <a href="http://localhost:8080">http://localhost:8080</a> and hack!</p>
+			<h2 id="why">Why</h2>
+			<p>After trying <a href="https://fable.io">Fable</a> + <a href="https://github.com/fable-elmish/elmish">Elmish</a> for several month, I need to write a small web App in my company, for many reasons I cannot choose some fancy stuff like <a href="https://fable.io">Fable</a> + <a href="https://github.com/fable-elmish/elmish">Elmish</a>, simply speaking, I need to use the mainstream JS stack but don&#39;t want to bear Redux&#39;s cumbersome, complex toolchain, etc anymore.</p>
+			<p>After some digging around, hyperapp looks really good to me, but I quickly find out it doesn&#39;t work with React, and many libraries don&#39;t work with the newest API. So I create this to support <strong><strong>different</strong></strong> vdom libraries, like React(<a href="https://github.io/hydux/hydux-react">official support</a>), <a href="https://github.com/picodom/picodom">picodom</a>(<a href="https://github.com/hydux/hydux/blob/master/src/enhancers/picodom-render.ts">built-in</a>), Preact, <a href="https://github.com/infernojs/inferno">inferno</a> or what ever you want, just need to write a simple enhancer!</p>
+			<p>Also, to avoid breaking change, we have <strong><strong>built-in</strong></strong> support for HMR, logger, persist, <a href="https://github.com/zalmoxisus/redux-devtools-extension">Redux Devtools</a>, you know you want it!</p>
 			<h2 id="license">License</h2>
 			<p>MIT</p>
 		</div>
@@ -1034,9 +1129,9 @@ npm start
 							<li class="tsd-kind-external-module"><a href="modules/_enhancers_logger_.html" class="tsd-kind-icon">"enhancers/logger"</a></li>
 							<li class="tsd-kind-external-module"><a href="modules/_enhancers_persist_.html" class="tsd-kind-icon">"enhancers/persist"</a></li>
 							<li class="tsd-kind-external-module"><a href="modules/_enhancers_picodom_render_.html" class="tsd-kind-icon">"enhancers/picodom-<wbr>render"</a></li>
-							<li class="tsd-kind-external-module"><a href="modules/_enhancers_router_.html" class="tsd-kind-icon">"enhancers/router"</a></li>
+							<li class="tsd-kind-external-module"><a href="modules/_enhancers_router_history_.html" class="tsd-kind-icon">"enhancers/router/history"</a></li>
+							<li class="tsd-kind-external-module"><a href="modules/_enhancers_router_index_.html" class="tsd-kind-icon">"enhancers/router/index"</a></li>
 							<li class="tsd-kind-external-module"><a href="modules/_index_.html" class="tsd-kind-icon">"index"</a></li>
-							<li class="tsd-kind-external-module"><a href="modules/_test_core_test_.html" class="tsd-kind-icon">"test/core.test"</a></li>
 							<li class="tsd-kind-external-module"><a href="modules/_types_.html" class="tsd-kind-icon">"types"</a></li>
 							<li class="tsd-kind-external-module"><a href="modules/_utils_.html" class="tsd-kind-icon">"utils"</a></li>
 						</ul>

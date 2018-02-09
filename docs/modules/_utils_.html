@@ -910,10 +910,16 @@ img { max-width: 100%; }
 <nav class="tsd-navigation secondary">
 	<ul>
 		<li class=" tsd-kind-function tsd-parent-kind-external-module">
+			<a href="_utils_.html#clone" class="tsd-kind-icon">clone</a>
+		</li>
+		<li class=" tsd-kind-function tsd-parent-kind-external-module">
 			<a href="_utils_.html#get" class="tsd-kind-icon">get</a>
 		</li>
 		<li class=" tsd-kind-function tsd-parent-kind-external-module">
-			<a href="_utils_.html#isfunction" class="tsd-kind-icon">is<wbr>Function</a>
+			<a href="_utils_.html#isfn" class="tsd-kind-icon">is<wbr>Fn</a>
+		</li>
+		<li class=" tsd-kind-function tsd-parent-kind-external-module">
+			<a href="_utils_.html#ispojo" class="tsd-kind-icon">is<wbr>Pojo</a>
 		</li>
 		<li class=" tsd-kind-function tsd-parent-kind-external-module">
 			<a href="_utils_.html#merge" class="tsd-kind-icon">merge</a>
@@ -938,8 +944,10 @@ img { max-width: 100%; }
 					<section class="tsd-index-section ">
 						<h3>Functions</h3>
 						<ul class="tsd-index-list">
+							<li class="tsd-kind-function tsd-parent-kind-external-module"><a href="_utils_.html#clone" class="tsd-kind-icon">clone</a></li>
 							<li class="tsd-kind-function tsd-parent-kind-external-module"><a href="_utils_.html#get" class="tsd-kind-icon">get</a></li>
-							<li class="tsd-kind-function tsd-parent-kind-external-module"><a href="_utils_.html#isfunction" class="tsd-kind-icon">is<wbr>Function</a></li>
+							<li class="tsd-kind-function tsd-parent-kind-external-module"><a href="_utils_.html#isfn" class="tsd-kind-icon">is<wbr>Fn</a></li>
+							<li class="tsd-kind-function tsd-parent-kind-external-module"><a href="_utils_.html#ispojo" class="tsd-kind-icon">is<wbr>Pojo</a></li>
 							<li class="tsd-kind-function tsd-parent-kind-external-module"><a href="_utils_.html#merge" class="tsd-kind-icon">merge</a></li>
 							<li class="tsd-kind-function tsd-parent-kind-external-module"><a href="_utils_.html#noop" class="tsd-kind-icon">noop</a></li>
 							<li class="tsd-kind-function tsd-parent-kind-external-module"><a href="_utils_.html#set" class="tsd-kind-icon">set</a></li>
@@ -952,22 +960,45 @@ img { max-width: 100%; }
 		<section class="tsd-panel-group tsd-member-group ">
 			<h2>Functions</h2>
 			<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-external-module">
-				<a name="get" class="tsd-anchor"></a>
-				<h3>get</h3>
+				<a name="clone" class="tsd-anchor"></a>
+				<h3>clone</h3>
 				<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module">
-					<li class="tsd-signature tsd-kind-icon">get<span class="tsd-signature-symbol">(</span>path<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span>, from<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span></li>
+					<li class="tsd-signature tsd-kind-icon">clone<span class="tsd-signature-symbol">(</span>from<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span></li>
 				</ul>
 				<ul class="tsd-descriptions">
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/hydux/hydux/blob/2b033df/src/utils.ts#L24">utils.ts:24</a></li>
+								<li>Defined in <a href="https://github.com/hydux/hydux/blob/ddb36d8/src/utils.ts#L19">utils.ts:19</a></li>
 							</ul>
 						</aside>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
-								<h5>path: <span class="tsd-signature-type">any</span></h5>
+								<h5>from: <span class="tsd-signature-type">any</span></h5>
+							</li>
+						</ul>
+						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">any</span></h4>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-external-module">
+				<a name="get" class="tsd-anchor"></a>
+				<h3>get</h3>
+				<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module">
+					<li class="tsd-signature tsd-kind-icon">get<span class="tsd-signature-symbol">(</span>path<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span>, from<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span></li>
+				</ul>
+				<ul class="tsd-descriptions">
+					<li class="tsd-description">
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/hydux/hydux/blob/ddb36d8/src/utils.ts#L34">utils.ts:34</a></li>
+							</ul>
+						</aside>
+						<h4 class="tsd-parameters-title">Parameters</h4>
+						<ul class="tsd-parameters">
+							<li>
+								<h5>path: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
 							</li>
 							<li>
 								<h5>from: <span class="tsd-signature-type">any</span></h5>
@@ -978,22 +1009,45 @@ img { max-width: 100%; }
 				</ul>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-external-module">
-				<a name="isfunction" class="tsd-anchor"></a>
-				<h3>is<wbr>Function</h3>
+				<a name="isfn" class="tsd-anchor"></a>
+				<h3>is<wbr>Fn</h3>
 				<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module">
-					<li class="tsd-signature tsd-kind-icon">is<wbr>Function<span class="tsd-signature-symbol">(</span>data<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					<li class="tsd-signature tsd-kind-icon">is<wbr>Fn<span class="tsd-signature-symbol">(</span>data<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
 				</ul>
 				<ul class="tsd-descriptions">
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/hydux/hydux/blob/2b033df/src/utils.ts#L31">utils.ts:31</a></li>
+								<li>Defined in <a href="https://github.com/hydux/hydux/blob/ddb36d8/src/utils.ts#L42">utils.ts:42</a></li>
 							</ul>
 						</aside>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>data: <span class="tsd-signature-type">any</span></h5>
+							</li>
+						</ul>
+						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-external-module">
+				<a name="ispojo" class="tsd-anchor"></a>
+				<h3>is<wbr>Pojo</h3>
+				<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module">
+					<li class="tsd-signature tsd-kind-icon">is<wbr>Pojo<span class="tsd-signature-symbol">(</span>obj<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+				</ul>
+				<ul class="tsd-descriptions">
+					<li class="tsd-description">
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/hydux/hydux/blob/ddb36d8/src/utils.ts#L3">utils.ts:3</a></li>
+							</ul>
+						</aside>
+						<h4 class="tsd-parameters-title">Parameters</h4>
+						<ul class="tsd-parameters">
+							<li>
+								<h5>obj: <span class="tsd-signature-type">any</span></h5>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
@@ -1010,7 +1064,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/hydux/hydux/blob/2b033df/src/utils.ts#L9">utils.ts:9</a></li>
+								<li>Defined in <a href="https://github.com/hydux/hydux/blob/ddb36d8/src/utils.ts#L15">utils.ts:15</a></li>
 							</ul>
 						</aside>
 						<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1036,7 +1090,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/hydux/hydux/blob/2b033df/src/utils.ts#L35">utils.ts:35</a></li>
+								<li>Defined in <a href="https://github.com/hydux/hydux/blob/ddb36d8/src/utils.ts#L46">utils.ts:46</a></li>
 							</ul>
 						</aside>
 						<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1059,7 +1113,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/hydux/hydux/blob/2b033df/src/utils.ts#L2">utils.ts:2</a></li>
+								<li>Defined in <a href="https://github.com/hydux/hydux/blob/ddb36d8/src/utils.ts#L5">utils.ts:5</a></li>
 							</ul>
 						</aside>
 						<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1079,19 +1133,19 @@ img { max-width: 100%; }
 				<a name="setdeep" class="tsd-anchor"></a>
 				<h3>set<wbr>Deep</h3>
 				<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module">
-					<li class="tsd-signature tsd-kind-icon">set<wbr>Deep<span class="tsd-signature-symbol">(</span>path<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span>, value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span>, from<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span></li>
+					<li class="tsd-signature tsd-kind-icon">set<wbr>Deep<span class="tsd-signature-symbol">(</span>path<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span>, value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span>, from<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span></li>
 				</ul>
 				<ul class="tsd-descriptions">
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/hydux/hydux/blob/2b033df/src/utils.ts#L13">utils.ts:13</a></li>
+								<li>Defined in <a href="https://github.com/hydux/hydux/blob/ddb36d8/src/utils.ts#L23">utils.ts:23</a></li>
 							</ul>
 						</aside>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
-								<h5>path: <span class="tsd-signature-type">any</span></h5>
+								<h5>path: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
 							</li>
 							<li>
 								<h5>value: <span class="tsd-signature-type">any</span></h5>

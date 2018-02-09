@@ -158,7 +158,7 @@ let ctx = app<typeof initState, typeof actions>({
 
 ```
 
-## API
+## [API](https://hydux.github.io/hydux)
 
 ### app(props: AppProps<State, Actions>)
 
@@ -206,10 +206,6 @@ actions: {
 
 subscribe is a function return a CmdType, you can subscribe side effects like web socket messages, location changes in here.
 
-##### onError: ?((error: Error) => void)
-
-Error handler, optional.
-
 ##### onRender: ?((view: any) => void)
 
 Custom renderer, optional. Used by vdom adaptors like hydux-react or `hydux/lib/enhancers/picodom-render.js`.
@@ -241,6 +237,13 @@ Cmd from a sub.
 ##### Cmd.batch(...args: CmdType<State,Actions>[] | CmdType<State,Actions>[][]): CmdType<State,Actions>
 
 Cmd from a cmd array.
+
+## Ecosystem
+
+* [hydux-react](https://github.com/hydux/hydux-react): Hydux's react integration
+* [hydux-react–router](https://github.com/hydux/hydux-react–router): Hydux's react-router integration
+* [hydux-mutator](https://github.com/hydux/hydux-mutator): A statically-typed immutable update help package, which also contains immutable collections.
+* [hydux-transition](https://github.com/hydux/hydux-transition): A css transition library inspired by [animajs](http://animejs.com/) timeline, follow **The Elm Architecture**.
 
 ## Counter App
 
