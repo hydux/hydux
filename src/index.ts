@@ -1,4 +1,4 @@
-import { ActionResult, ActionState, ActionCmdResult, ActionType, ActionsType, UnknownArgsActionType, NormalAction, NormalActionCmdResult } from './types'
+import { ActionResult, ActionState, ActionCmdResult, ActionType, ActionsType, UnknownArgsActionType, NormalAction } from './types'
 import Cmd, { CmdType, Sub } from './cmd'
 import { set, merge, setDeep, get, isFn, noop, isPojo, clone } from './utils'
 
@@ -35,23 +35,53 @@ export function runAction<S, A, PS, PA>(
   actions: A,
   parentState?: PS,
   parentActions?: PA,
-): NormalActionCmdResult<S, A> {
-  let _result: any = result
-  isFn(_result) && (_result = _result(state, actions, parentState, parentActions)) &&
-  isFn(_result) && (_result = _result(actions))
+): ActionCmdResult<S, A> {
+  let rst: any = result
+  isFn(rst) && (rst = rst(state, actions, parentState, parentActions)) &&
+  isFn(rst) && (rst = rst(actions))
   // action can be a function that return a promise or undefined(callback)
   if (
-    _result === undefined ||
-    (_result.then && isFn(_result.then))
+    rst === undefined ||
+    (rst.then && isFn(rst.then))
   ) {
     return [state, Cmd.none]
   }
-  if (_result instanceof Array) {
-    return [_result[0] || state, _result[1] || Cmd.none]
+  if (rst instanceof Array) {
+    return [rst[0] || state, rst[1] || Cmd.none]
   }
-  return [_result, Cmd.none]
+  return [rst, Cmd.none]
 }
 
+export function wrapAction<S, A, PS, PA, A1>(
+  action: (a1: A1) => (s: S, a: A) => any,
+  wrapper?: (action: (a1: A1) => ActionCmdResult<S, A>, parentState: PS, parentActions: PA, state: S, actions: A) => ActionResult<S, A>,
+  parentState?: PS,
+  parentActions?: PA,
+)
+export function wrapAction<S, A, PS, PA, A1, A2>(
+  action: (a1: A1, a2: A2) => (s: S, a: A) => any,
+  wrapper?: (action: (a1: A1, a2: A2) => ActionCmdResult<S, A>, parentState: PS, parentActions: PA, state: S, actions: A) => ActionResult<S, A>,
+  parentState?: PS,
+  parentActions?: PA,
+)
+export function wrapAction<S, A, PS, PA, A1, A2, A3>(
+  action: (a1: A1, a2: A2, a3: A3) => (s: S, a: A) => any,
+  wrapper?: (action: (a1: A1, a2: A2, a3: A3) => ActionCmdResult<S, A>, parentState: PS, parentActions: PA, state: S, actions: A) => ActionResult<S, A>,
+  parentState?: PS,
+  parentActions?: PA,
+)
+export function wrapAction<S, A, PS, PA, A1, A2, A3, A4>(
+  action: (a1: A1, a2: A2, a3: A3, a4: A4) => (s: S, a: A) => any,
+  wrapper?: (action: (a1: A1, a2: A2, a3: A3, a4: A4) => ActionCmdResult<S, A>, parentState: PS, parentActions: PA, state: S, actions: A) => ActionResult<S, A>,
+  parentState?: PS,
+  parentActions?: PA,
+)
+export function wrapAction<S, A, PS, PA, A1, A2, A3, A4, A5>(
+  action: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5) => (s: S, a: A) => any,
+  wrapper?: (action: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5) => ActionCmdResult<S, A>, parentState: PS, parentActions: PA, state: S, actions: A) => ActionResult<S, A>,
+  parentState?: PS,
+  parentActions?: PA,
+)
 /**
  * Wrap a child action with parentState, parentActions.
  * @param action The action to be wrapped
@@ -60,18 +90,20 @@ export function runAction<S, A, PS, PA>(
  * @param parentActions
  */
 export function wrapAction<S, A, PS, PA>(
-  action: UnknownArgsActionType<S, A>,
-  wrapper: (action: NormalAction<any, S, A>, parentState: PS, parentActions: PA, state: S, actions: A) => ActionResult<S, A>,
+  action: (UnknownArgsActionType<S, A>),
+  wrapper?: (action: NormalAction<any, S, A>, parentState: PS, parentActions: PA, state: S, actions: A) => ActionResult<S, A>,
   parentState?: PS,
   parentActions?: PA,
-) {
+): any {
+  if (!wrapper) {
+    return action
+  }
   const wrapped = (state: S, actions: A, parentState: PS, parentActions: PA) => {
     const nactions = (...args) => runAction(action(...args), state, actions)
     return wrapper(nactions, parentState, parentActions, state, actions)
   }
-  return wrapped as any
+  return wrapped
 }
-
 export type App<State, Actions> = (props: AppProps<State, Actions>) => any
 
 export default function app<State, Actions>(props: AppProps<State, Actions>) {

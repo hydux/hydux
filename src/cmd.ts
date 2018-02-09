@@ -85,7 +85,13 @@ function ofPromise<A, T, State, Actions>(
   return [
     _ =>
       task(args)
-        .then(succeedAction)
+        .then(res => {
+          try {
+            succeedAction && succeedAction(res)
+          } catch (error) {
+            console.error(error)
+          }
+        })
         .catch(failedAction)
   ]
 }

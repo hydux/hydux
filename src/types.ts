@@ -2,11 +2,9 @@ import { CmdType } from './cmd'
 
 export type ActionState<State> = Partial<State> | null | void
 
-export type ActionCmdResult<State, Actions> = [ActionState<State>, CmdType<Actions>]
+export type ActionCmdResult<State, Actions> = [State, CmdType<Actions>]
 
-export type NormalActionCmdResult<State, Actions> = [State, CmdType<Actions>]
-
-export type NormalAction<D, S, A> = (...args: any[]) => NormalActionCmdResult<S, A>
+export type NormalAction<D, S, A> = (...args: any[]) => ActionCmdResult<S, A>
 
 export type ActionResult<State, Actions> = ActionState<State> | Promise<any> | ActionCmdResult<State, Actions>
 

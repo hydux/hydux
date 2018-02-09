@@ -10,6 +10,7 @@ export declare abstract class BaseHistory {
     protected listeners: ((path: string) => void)[];
     constructor(props?: Partial<HistoryProps>);
     last: () => string;
+    abstract getRealPath(path: string): string;
     abstract current(): string;
     abstract push(path: string): void;
     abstract replace(path: string): void;
@@ -26,12 +27,14 @@ export declare type HashHistoryProps = HistoryProps & {
 export declare class HashHistory extends BaseHistory {
     props: HashHistoryProps;
     constructor(props?: Partial<HashHistoryProps>);
+    getRealPath(path: string): string;
     current(): string;
     push(path: any): void;
     replace(path: any): void;
 }
 export declare class BrowserHistory extends BaseHistory {
     constructor(props?: Partial<HistoryProps>);
+    getRealPath(path: string): string;
     current(): string;
     push(path: any): void;
     replace(path: any): void;

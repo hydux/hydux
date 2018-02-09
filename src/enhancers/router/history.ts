@@ -16,6 +16,7 @@ export abstract class BaseHistory {
     })
   }
   last = () => this._last[0]
+  abstract getRealPath(path: string): string
   abstract current(): string
   abstract push(path: string): void
   abstract replace(path: string): void
@@ -50,15 +51,17 @@ export class HashHistory extends BaseHistory {
       this.handleChange()
     })
   }
+  getRealPath(path: string) {
+    return this.props.hash + this.props.basePath + path
+  }
   current() {
     return location.hash.slice(this.props.hash.length + this.props.basePath.length) || '/'
   }
   push(path) {
-    const url = this.props.hash + this.props.basePath + path
-    location.assign(url)
+    location.assign(this.getRealPath(path))
   }
   replace(path) {
-    location.replace(this.props.hash + this.props.basePath + path)
+    location.replace(this.getRealPath(path))
   }
 }
 
@@ -69,17 +72,19 @@ export class BrowserHistory extends BaseHistory {
       this.handleChange()
     })
   }
+  getRealPath(path: string) {
+    return this.props.basePath + path
+  }
   current() {
     return location.pathname.slice(this.props.basePath.length)
     + location.search
   }
-
   push(path) {
-    history.pushState(null, '', this.props.basePath + path)
+    history.pushState(null, '', this.getRealPath(path))
     this.handleChange(path)
   }
   replace(path) {
-    history.replaceState(null, '', this.props.basePath + path)
+    history.replaceState(null, '', this.getRealPath(path))
     this.handleChange(path)
   }
 }
