@@ -241,9 +241,9 @@ Cmd from a cmd array.
 ## Ecosystem
 
 * [hydux-react](https://github.com/hydux/hydux-react): Hydux's react integration
-* [hydux-react–router](https://github.com/hydux/hydux-react–router): Hydux's react-router integration
+* [hydux-react-router](https://github.com/hydux/hydux-react-router): Hydux's react-router integration
 * [hydux-mutator](https://github.com/hydux/hydux-mutator): A statically-typed immutable update help package, which also contains immutable collections.
-* [hydux-transition](https://github.com/hydux/hydux-transition): A css transition library inspired by [animajs](http://animejs.com/) timeline, follow **The Elm Architecture**.
+* [hydux-transitions](https://github.com/hydux/hydux-transitions): A css transition library inspired by [animajs](http://animejs.com/)'s timeline, follow **The Elm Architecture**.
 
 ## Counter App
 
