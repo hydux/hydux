@@ -1,5 +1,5 @@
 import { App } from './../index';
-export default function withLogger<State, Actions>(options?: {
+export declare type Options<State> = {
     logger?: (prevState: State, action: {
         name: string;
         data: any;
@@ -8,4 +8,5 @@ export default function withLogger<State, Actions>(options?: {
     filter?: (actionPath: string) => boolean;
     logActionTime?: boolean;
     logRenderTime?: boolean;
-}): (app: App<State, Actions>) => App<State, Actions>;
+};
+export default function withLogger<State, Actions>(options?: Options<State>): (app: App<State, Actions>) => App<State, Actions>;
