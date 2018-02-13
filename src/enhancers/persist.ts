@@ -1,14 +1,14 @@
 import { AppProps, App } from './../index'
 import Cmd from './../cmd'
 import { get } from '../utils'
-
-export default function withPersist<State, Actions>(props: {
+export type Options = {
   store?: Storage,
   serialize?: (data: any) => string,
   deserialize?: (str: string) => any,
   debounce?: number,
   key?: string,
-} = {}): (app: App<State, Actions>) => App<State, Actions> {
+}
+export default function withPersist<State, Actions>(props: Options = {}): (app: App<State, Actions>) => App<State, Actions> {
   const {
     store = localStorage,
     serialize = JSON.stringify,

@@ -7,14 +7,14 @@ function defaultLogger (prevState, action, nextState, extra) {
   console.log('%c next state', 'color: #4CAF50; font-weight: bold;', nextState)
   console.groupEnd()
 }
-
-export default function withLogger<State, Actions>(options: {
+export type Options<State> = {
   logger?: (prevState: State, action: { name: string, data: any }, nextState: State, extra: any[]) => void,
   windowInspectKey?: string,
   filter?: (actionPath: string) => boolean,
   logActionTime?: boolean,
   logRenderTime?: boolean,
-} = {}): (app: App<State, Actions>) => App<State, Actions> {
+}
+export default function withLogger<State, Actions>(options: Options<State> = {}): (app: App<State, Actions>) => App<State, Actions> {
   const {
     logger = defaultLogger,
     windowInspectKey = '__HYDUX_STATE__',
