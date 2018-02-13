@@ -102,11 +102,11 @@ export default {
   ofSub<Actions>(sub: Sub<Actions>): CmdType<Actions> {
     return [sub]
   },
-  batch<State, Actions>(...cmds: (CmdType<Actions> | CmdType<Actions>[])[]): CmdType<Actions> {
+  batch<Actions>(...cmds: (CmdType<any> | CmdType<any>[])[]): CmdType<Actions> {
     const _concat = Array.prototype.concat
     return _concat.apply([], _concat.apply([], cmds))
   },
-  map<State, Actions, SubActions>(map: (action: Actions) => SubActions, cmd: CmdType<SubActions>): CmdType<Actions> {
+  map<Actions, SubActions>(map: (action: Actions) => SubActions, cmd: CmdType<SubActions>): CmdType<Actions> {
     return cmd.map(sub => actions => sub(map(actions)))
   }
 }
