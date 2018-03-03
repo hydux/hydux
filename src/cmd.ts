@@ -5,20 +5,20 @@ export interface Sub<Actions> {
 }
 export type CmdType<Actions> = Sub<Actions>[]
 
-function ofFn<A, T, State, Actions>(
+export function ofFn<A, T, State, Actions>(
   task: (args: A) => T,
   args: A,
   succeedAction?: ActionType<T, State, Actions>,
   failedAction?: ActionType<Error, State, Actions>
 ): CmdType<Actions>
 
-function ofFn<A, T, State, Actions>(
+export function ofFn<A, T, State, Actions>(
   task?: () => T,
   succeedAction?: ActionType<T, State, Actions>,
   failedAction?: ActionType<Error, State, Actions>
 ): CmdType<Actions>
 
-function ofFn<A, T, State, Actions>(
+export function ofFn<A, T, State, Actions>(
   task?: (args?: A) => T,
   args?: A,
   succeedAction?: ActionType<T, State, Actions>,
@@ -55,20 +55,20 @@ function ofFn<A, T, State, Actions>(
   ]
 }
 
-function ofPromise<A, T, State, Actions>(
+export function ofPromise<A, T, State, Actions>(
   task: (arg: A) => Promise<T>,
   args: A,
   succeedAction?: ActionType<T, State, Actions>,
   failedAction?: ActionType<Error, State, Actions>
 ): CmdType<Actions>
 
-function ofPromise<A, T, State, Actions>(
+export function ofPromise<A, T, State, Actions>(
   task?: () => Promise<T>,
   succeedAction?: ActionType<T, State, Actions>,
   failedAction?: ActionType<Error, State, Actions>
 ): CmdType<Actions>
 
-function ofPromise<A, T, State, Actions>(
+export function ofPromise<A, T, State, Actions>(
   task: (args?: A) => Promise<T>,
   args?: A,
   succeedAction?: ActionType<T, State, Actions>,
@@ -95,18 +95,19 @@ function ofPromise<A, T, State, Actions>(
         .catch(failedAction)
   ]
 }
+export const ofSub = <Actions>(sub: Sub<Actions>): CmdType<Actions> => [sub]
+const _concat = Array.prototype.concat
+export const batch = <Actions>(...cmds: (CmdType<any> | CmdType<any>[])[]): CmdType<Actions> => _concat.apply([], _concat.apply([], cmds))
+export const map = <Actions, SubActions>(map: (action: Actions) => SubActions, cmd: CmdType<SubActions>): CmdType<Actions> => {
+  return cmd.map(sub => actions => sub(map(actions)))
+}
+export const none = ([] as Array<Sub<any>>)
+
 export default {
-  none: ([] as Array<Sub<any>>),
-  ofPromise,
+  none,
   ofFn,
-  ofSub<Actions>(sub: Sub<Actions>): CmdType<Actions> {
-    return [sub]
-  },
-  batch<Actions>(...cmds: (CmdType<any> | CmdType<any>[])[]): CmdType<Actions> {
-    const _concat = Array.prototype.concat
-    return _concat.apply([], _concat.apply([], cmds))
-  },
-  map<Actions, SubActions>(map: (action: Actions) => SubActions, cmd: CmdType<SubActions>): CmdType<Actions> {
-    return cmd.map(sub => actions => sub(map(actions)))
-  }
+  ofPromise,
+  ofSub,
+  batch,
+  map,
 }

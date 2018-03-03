@@ -1,16 +1,16 @@
 import { ActionResult, ActionState, ActionCmdResult, ActionType, ActionsType, UnknownArgsActionType, NormalAction } from './types'
 import Cmd, { CmdType, Sub } from './cmd'
 import { set, merge, setDeep, get, isFn, noop, isPojo, clone } from './utils'
+export * from './helpers'
+export * from './types'
 
-export { CmdType, Sub, ActionResult, ActionState, ActionCmdResult, ActionType, ActionsType, UnknownArgsActionType }
+export { Cmd, CmdType, Sub, ActionResult, noop, isFn, isPojo }
 
 export type Init<S, A> = () => S | [S, CmdType<A>]
 export type View<S, A> = (state: S, actions: A) => any
 export type Subscribe<S, A> = (state: S) => CmdType<A>
 export type OnUpdate<S, A> = <M>(data: { prevAppState: S, nextAppState: S, msgData: M, action: string }) => void
 export type OnUpdateStart<S, A> = <M>(data: { action: string }) => void
-
-export { Cmd, noop }
 
 export interface AppProps<State, Actions> {
   init: Init<State, Actions>,
@@ -52,31 +52,31 @@ export function runAction<S, A, PS, PA>(
   return [rst, Cmd.none]
 }
 
-export function wrapAction<S, A, PS, PA, A1>(
+export function withParents<S, A, PS, PA, A1>(
   action: (a1: A1) => (s: S, a: A) => any,
   wrapper?: (action: (a1: A1) => ActionCmdResult<S, A>, parentState: PS, parentActions: PA, state: S, actions: A) => ActionResult<S, A>,
   parentState?: PS,
   parentActions?: PA,
 )
-export function wrapAction<S, A, PS, PA, A1, A2>(
+export function withParents<S, A, PS, PA, A1, A2>(
   action: (a1: A1, a2: A2) => (s: S, a: A) => any,
   wrapper?: (action: (a1: A1, a2: A2) => ActionCmdResult<S, A>, parentState: PS, parentActions: PA, state: S, actions: A) => ActionResult<S, A>,
   parentState?: PS,
   parentActions?: PA,
 )
-export function wrapAction<S, A, PS, PA, A1, A2, A3>(
+export function withParents<S, A, PS, PA, A1, A2, A3>(
   action: (a1: A1, a2: A2, a3: A3) => (s: S, a: A) => any,
   wrapper?: (action: (a1: A1, a2: A2, a3: A3) => ActionCmdResult<S, A>, parentState: PS, parentActions: PA, state: S, actions: A) => ActionResult<S, A>,
   parentState?: PS,
   parentActions?: PA,
 )
-export function wrapAction<S, A, PS, PA, A1, A2, A3, A4>(
+export function withParents<S, A, PS, PA, A1, A2, A3, A4>(
   action: (a1: A1, a2: A2, a3: A3, a4: A4) => (s: S, a: A) => any,
   wrapper?: (action: (a1: A1, a2: A2, a3: A3, a4: A4) => ActionCmdResult<S, A>, parentState: PS, parentActions: PA, state: S, actions: A) => ActionResult<S, A>,
   parentState?: PS,
   parentActions?: PA,
 )
-export function wrapAction<S, A, PS, PA, A1, A2, A3, A4, A5>(
+export function withParents<S, A, PS, PA, A1, A2, A3, A4, A5>(
   action: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5) => (s: S, a: A) => any,
   wrapper?: (action: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5) => ActionCmdResult<S, A>, parentState: PS, parentActions: PA, state: S, actions: A) => ActionResult<S, A>,
   parentState?: PS,
@@ -89,7 +89,7 @@ export function wrapAction<S, A, PS, PA, A1, A2, A3, A4, A5>(
  * @param parentState
  * @param parentActions
  */
-export function wrapAction<S, A, PS, PA>(
+export function withParents<S, A, PS, PA>(
   action: (UnknownArgsActionType<S, A>),
   wrapper?: (action: NormalAction<any, S, A>, parentState: PS, parentActions: PA, state: S, actions: A) => ActionResult<S, A>,
   parentState?: PS,
@@ -104,9 +104,14 @@ export function wrapAction<S, A, PS, PA>(
   }
   return wrapped
 }
+/**
+ * @deprecated Deprecated for `withParents`
+ */
+export const wrapActions = withParents
+
 export type App<State, Actions> = (props: AppProps<State, Actions>) => any
 
-export default function app<State, Actions>(props: AppProps<State, Actions>) {
+export function app<State, Actions>(props: AppProps<State, Actions>) {
   // const appEvents = props.events || {}
   const appActions = {} as Actions
   const appSubscribe = props.subscribe || (_ => Cmd.none)
@@ -195,3 +200,5 @@ export default function app<State, Actions>(props: AppProps<State, Actions>) {
     }
   }
 }
+
+export default app

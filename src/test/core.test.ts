@@ -1,6 +1,6 @@
 import { noop } from './../utils'
 import * as assert from 'assert'
-import app, { Cmd, wrapAction } from '../index'
+import app, { Cmd, withParents } from '../index'
 import logger from '../enhancers/logger'
 function sleep(ns) {
   return new Promise(resolve => setTimeout(resolve, ns))
@@ -191,7 +191,7 @@ describe('core api', () => {
     }
     const counter1Actions: CounterActions = {
       ...Counter.actions,
-      upN: (n: number) => wrapAction(Counter.actions.upN, (action, parentState: State, parentActions: Actions, _, __) => {
+      upN: (n: number) => withParents(Counter.actions.upN, (action, parentState: State, parentActions: Actions, _, __) => {
         const [state, cmd] = action(n + 1)
         assert.equal(state.count, parentState.counter1.count + n + 1, 'call child action work')
         return [state, Cmd.batch(cmd, Cmd.ofFn(() => parentActions.counter2.up()))]
