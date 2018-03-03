@@ -57,8 +57,8 @@
     "webpack": "^3.10.0"
   },
   "dependencies": {
-    "picodom": "^1.0.2",
-    "tslib": "^1.8.1"
+    "tslib": "^1.8.1",
+    "ultradom": "^2.0.0"
   },
   "optionalDependencies": {
     "remotedev": "^0.2.7"

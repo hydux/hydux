@@ -3511,6 +3511,10 @@ uid-number@^0.0.6:
   version "0.0.6"
   resolved "http://registry.npm.taobao.org/uid-number/download/uid-number-0.0.6.tgz#0ea10e8035e8eb5b8e4449f06da1c730663baa81"
 
+ultradom@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/ultradom/-/ultradom-2.0.0.tgz#f1c9e72e762fc21c1024fd6746f12080ea632c3c"
+
 ultron@~1.1.0:
   version "1.1.1"
   resolved "http://registry.npm.taobao.org/ultron/download/ultron-1.1.1.tgz#9fe1536a10a664a65266a1e3ccf85fd36302bc9c"

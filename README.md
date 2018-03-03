@@ -9,7 +9,7 @@ A React-Compatible fork of [Hyperapp](https://github.com/hyperapp/hyperapp), ins
 * [hyperapp](https://github.com/hyperapp/hyperapp) compatible API
 * Support any vdom library, including react ([official support](https://github.com/hydux/hydux-react))
 * [Official support for react-router](https://github.com/hydux/hydux-react-router)
-* Hot reload (hmr), logger, persist, [Redux Devtools with time traveling](https://github.com/zalmoxisus/redux-devtools-extension), [picodom](https://github.com/picodom/picodom)(1kb vdom), **\*\*All in One\*\***, easily setup all these fancy stuff without pain!
+* Hot reload (hmr), logger, persist, [Redux Devtools with time traveling](https://github.com/zalmoxisus/redux-devtools-extension), [ultradom](https://github.com/jorgebucaran/ultradom)(1kb vdom), **\*\*All in One\*\***, easily setup all these fancy stuff without pain!
 * Elm-like side effect manager and subscribe API
 
 ![](media/timetravel.gif)
@@ -48,15 +48,15 @@ Then we can compose it in Elm way, you can easily reuse your components.
 ```js
 import _app from 'hydux'
 import withPersist from 'hydux/lib/enhancers/persist'
-import withPicodom, { h, React } from 'hydux/lib/enhancers/picodom-render'
+import withultradom, { h, React } from 'hydux/lib/enhancers/ultradom-render'
 import Counter from './counter'
 
 // let app = withPersist<State, Actions>({
 //   key: 'my-counter-app/v1'
 // })(_app)
 
-// use built-in 1kb picodom to render the view.
-let app = withPicodom()(_app)
+// use built-in 1kb ultradom to render the view.
+let app = withultradom()(_app)
 
 if (process.env.NODE_ENV === 'development') {
   // built-in dev tools, without pain.
@@ -158,7 +158,7 @@ let ctx = app<typeof initState, typeof actions>({
 
 ```
 
-## [API](https://hydux.github.io/hydux)
+## [API](https://hydux.github.io/hydux/api)
 
 ### app(props: AppProps<State, Actions>)
 
@@ -208,7 +208,7 @@ subscribe is a function return a CmdType, you can subscribe side effects like we
 
 ##### onRender: ?((view: any) => void)
 
-Custom renderer, optional. Used by vdom adaptors like hydux-react or `hydux/lib/enhancers/picodom-render.js`.
+Custom renderer, optional. Used by vdom adaptors like hydux-react or `hydux/lib/enhancers/ultradom-render.js`.
 
 ##### onUpdate: ?((data) => void)
 
@@ -261,7 +261,7 @@ Now open <http://localhost:8080> and hack!
 
 After trying [Fable](https://fable.io) + [Elmish](https://github.com/fable-elmish/elmish) for several month, I need to write a small web App in my company, for many reasons I cannot choose some fancy stuff like [Fable](https://fable.io) + [Elmish](https://github.com/fable-elmish/elmish), simply speaking, I need to use the mainstream JS stack but don't want to bear Redux's cumbersome, complex toolchain, etc anymore.
 
-After some digging around, hyperapp looks really good to me, but I quickly find out it doesn't work with React, and many libraries don't work with the newest API. So I create this to support ****different**** vdom libraries, like React([official support](https://github.io/hydux/hydux-react)), [picodom](https://github.com/picodom/picodom)([built-in](https://github.com/hydux/hydux/blob/master/src/enhancers/picodom-render.ts)), Preact, [inferno](https://github.com/infernojs/inferno) or what ever you want, just need to write a simple enhancer!
+After some digging around, hyperapp looks really good to me, but I quickly find out it doesn't work with React, and many libraries don't work with the newest API. So I create this to support ****different**** vdom libraries, like React([official support](https://github.io/hydux/hydux-react)), [ultradom](https://github.com/jorgebucaran/ultradom)([built-in](https://github.com/hydux/hydux/blob/master/src/enhancers/ultradom-render.ts)), Preact, [inferno](https://github.com/infernojs/inferno) or what ever you want, just need to write a simple enhancer!
 
 Also, to avoid breaking change, we have ****built-in**** support for HMR, logger, persist, [Redux Devtools](https://github.com/zalmoxisus/redux-devtools-extension), you know you want it!
 

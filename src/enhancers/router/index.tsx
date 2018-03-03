@@ -81,7 +81,8 @@ export function mkLink(history: History, h) {
       e.stopPropagation()
       onClick && onClick(e)
     }
-    return <a href={to} {...props} onclick={handleClick} onClick={handleClick}>{children}</a>
+    const Comp: any = 'a'
+    return <Comp href={to} {...props} onclick={handleClick} onClick={handleClick}>{children}</Comp>
   }
 }
 

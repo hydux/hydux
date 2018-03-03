@@ -21,9 +21,15 @@ export abstract class BaseHistory {
   abstract push(path: string): void
   abstract replace(path: string): void
   listen = listener => this.listeners.push(listener)
-  go = delta => history.go(delta)
-  back = () => history.back()
-  forward = () => history.forward()
+  go(delta) {
+    history.go(delta)
+  }
+  back() {
+    history.back()
+  }
+  forward() {
+    history.forward()
+  }
   public _setLoc<P = any, Q extends Query = any>(loc: Location<P, Q>) {
     this.lastLocation = this.location || loc
     this.location = loc
@@ -33,19 +39,17 @@ export abstract class BaseHistory {
   }
 }
 
-export type HashHistoryProps = HistoryProps & { hash: string }
+export interface HashHistoryProps extends HistoryProps {
+  hash: string
+}
 
 export class HashHistory extends BaseHistory {
-  props: HashHistoryProps
+  protected props: HashHistoryProps
   constructor(props: Partial<HashHistoryProps> = {}) {
-    props = {
-      hash: '#!',
-      ...props,
-    }
     super(props)
-    this.props = {
+    this.props = props = {
+      hash: '#!',
       ...this.props,
-      ...props,
     }
     window.addEventListener('hashchange', e => {
       this.handleChange()
@@ -86,5 +90,53 @@ export class BrowserHistory extends BaseHistory {
   replace(path) {
     history.replaceState(null, '', this.getRealPath(path))
     this.handleChange(path)
+  }
+}
+export interface MemoryHistoryProps extends HistoryProps {
+  initPath: string
+}
+export class MemoryHistory extends BaseHistory {
+  protected props: MemoryHistoryProps
+  private _stack: string[]
+  private _index: number = 0
+  constructor(props: Partial<MemoryHistoryProps> = {}) {
+    super(props)
+    this.props = props = {
+      initPath: '/',
+      ...this.props,
+    }
+    this._stack = [this.props.basePath + this.props.initPath]
+  }
+  getRealPath(path: string) {
+    return this.props.basePath + path
+  }
+  current() {
+    return this._stack[this._index].slice(this.props.basePath.length)
+  }
+  push(path) {
+    this._reset()
+    this._stack.push(this.props.basePath + path)
+    this.handleChange(path)
+  }
+  replace(path) {
+    this._reset()
+    this._stack[this._index] = this.props.basePath + path
+    this.handleChange(path)
+  }
+  go(delta) {
+    let next = this._index + delta
+    next = Math.min(next, this._stack.length - 1)
+    next = Math.max(next, 0)
+    this._index = next
+  }
+  back() {
+    this.go(-1)
+  }
+  forward() {
+    this.go(1)
+  }
+
+  private _reset() {
+    this._stack = this._stack.slice(0, this._index + 1)
   }
 }
