@@ -25,3 +25,6 @@ export type UnknownArgsActionType<State, Actions> =
 export type ActionsType<State, Actions> = {
   [P in keyof Actions]: ActionType<any, State, Actions> | ActionsType<any, Actions[P]>
 }
+
+export type AR<S, A> = ActionResult<S, A>
+export type ACR<S, A> = ActionCmdResult<S, A>

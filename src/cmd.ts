@@ -103,7 +103,7 @@ export const map = <Actions, SubActions>(map: (action: Actions) => SubActions, c
 }
 export const none = ([] as Array<Sub<any>>)
 
-export default {
+export const Cmd = {
   none,
   ofFn,
   ofPromise,
@@ -111,3 +111,5 @@ export default {
   batch,
   map,
 }
+
+export default Cmd

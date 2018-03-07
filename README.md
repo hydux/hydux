@@ -9,7 +9,7 @@ A React-Compatible fork of [Hyperapp](https://github.com/hyperapp/hyperapp), ins
 * [hyperapp](https://github.com/hyperapp/hyperapp) compatible API
 * Support any vdom library, including react ([official support](https://github.com/hydux/hydux-react))
 * [Official support for react-router](https://github.com/hydux/hydux-react-router)
-* Hot reload (hmr), logger, persist, [Redux Devtools with time traveling](https://github.com/zalmoxisus/redux-devtools-extension), [ultradom](https://github.com/jorgebucaran/ultradom)(1kb vdom), **\*\*All in One\*\***, easily setup all these fancy stuff without pain!
+* Hot reload (hmr), [router](examples/router), logger, persist, [Redux Devtools with time traveling](https://github.com/zalmoxisus/redux-devtools-extension), [ultradom](https://github.com/jorgebucaran/ultradom)(1kb vdom), **\*\*All in One\*\***, easily setup all these fancy stuff without pain!
 * Elm-like side effect manager and subscribe API
 
 ![](media/timetravel.gif)
@@ -48,7 +48,7 @@ Then we can compose it in Elm way, you can easily reuse your components.
 ```js
 import _app from 'hydux'
 import withPersist from 'hydux/lib/enhancers/persist'
-import withultradom, { h, React } from 'hydux/lib/enhancers/ultradom-render'
+import withUltradom, { h, React } from 'hydux/lib/enhancers/ultradom-render'
 import Counter from './counter'
 
 // let app = withPersist<State, Actions>({
@@ -56,7 +56,7 @@ import Counter from './counter'
 // })(_app)
 
 // use built-in 1kb ultradom to render the view.
-let app = withultradom()(_app)
+let app = withUltradom()(_app)
 
 if (process.env.NODE_ENV === 'development') {
   // built-in dev tools, without pain.
@@ -129,7 +129,7 @@ In Elm, we can intercept child component's message in parent component, because 
 
 ```js
 import * as assert from 'assert'
-import app, { Cmd, wrapAction, noop } from '../index'
+import app, { Cmd, withParents, noop } from '../index'
 import Counter from './counter'
 
 const initState = {
@@ -140,7 +140,7 @@ const actions = {
   counter2: counter.actions,
   counter1: {
     ...counter.actions,
-    upN: (n: number) => wrapAction(counter.actions.upN, (action, parentState: State, parentActions: Actions) => {
+    upN: (n: number) => withParents(counter.actions.upN, (action, parentState: State, parentActions: Actions) => {
       const [state, cmd] = action(n + 1)
       assert.equal(state.count, parentState.counter1.count + n + 1, 'call child action work')
       return [state, Cmd.batch(cmd, Cmd.ofFn(() => parentActions.counter2.up()))]

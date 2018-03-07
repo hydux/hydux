@@ -1,5 +1,8 @@
 import { h, React } from '../../../src/enhancers/picodom-render'
-import { Cmd, noop, ActionsType, ActionType } from '../../../src/index'
+// import { Cmd, noop, ActionsType, ActionType } from '../../../src/index'
+import * as Hydux from '../../../src/index'
+const { Cmd } = Hydux
+
 const initState = { count: 0 }
 const init = () => initState
 const actions = {
