@@ -26,14 +26,14 @@ const actions = {
   change: (e: MouseEvent) => (state: State) => ({ ...state, value: e.target['value'] })
 }
 
-const state = {
-  counter1: Counter.init(),
-  counter2: Counter.init(),
+const initState = {
+  counter1: Counter.initState(),
+  counter2: Counter.initState(),
   value: '',
 }
 
 type Actions = typeof actions
-type State = typeof state
+type State = typeof initState
 const view = (state: State, actions: Actions) =>
     <main>
       <h1>Counter11:</h1>
@@ -45,7 +45,7 @@ const view = (state: State, actions: Actions) =>
     </main>
 
 export default app({
-  init: () => state,
+  init: () => [initState, Hydux.Cmd.batch(Counter.initCmd(), Counter.initCmd())],
   actions,
   view,
 })

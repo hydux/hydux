@@ -14,4 +14,4 @@ export function dt<T extends string, D = undefined>(tag: T, data?: D) {
 
 export const never = (f: never) => f
 
-export const mkInit = <S, A>(state: S, cmd: Cmd.CmdType<A> = Cmd.none): ActionCmdResult<S, A> => [state, cmd]
+export const mkInit = <S, A>(state: S, cmd: Cmd.CmdType<A> = Cmd.none): () => ActionCmdResult<S, A> => () => [state, cmd]

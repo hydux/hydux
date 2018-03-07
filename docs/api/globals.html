@@ -922,7 +922,7 @@ img { max-width: 100%; }
 				<li><a href="https://github.com/hyperapp/hyperapp">hyperapp</a> compatible API</li>
 				<li>Support any vdom library, including react (<a href="https://github.com/hydux/hydux-react">official support</a>)</li>
 				<li><a href="https://github.com/hydux/hydux-react-router">Official support for react-router</a></li>
-				<li>Hot reload (hmr), logger, persist, <a href="https://github.com/zalmoxisus/redux-devtools-extension">Redux Devtools with time traveling</a>, <a href="https://github.com/picodom/picodom">picodom</a>(1kb vdom), <strong>**All in One**</strong>, easily setup all these fancy stuff without pain!</li>
+				<li>Hot reload (hmr), <a href="examples/router">router</a>, logger, persist, <a href="https://github.com/zalmoxisus/redux-devtools-extension">Redux Devtools with time traveling</a>, <a href="https://github.com/jorgebucaran/ultradom">ultradom</a>(1kb vdom), <strong>**All in One**</strong>, easily setup all these fancy stuff without pain!</li>
 				<li>Elm-like side effect manager and subscribe API</li>
 			</ul>
 			<p><img src="media/timetravel.gif" alt=""></p>
@@ -950,15 +950,15 @@ export default {
 			<p>Then we can compose it in Elm way, you can easily reuse your components.</p>
 			<pre><code class="lang-js">import _app from 'hydux'
 import withPersist from 'hydux/lib/enhancers/persist'
-import withPicodom, { h, React } from 'hydux/lib/enhancers/picodom-render'
+import withUltradom, { h, React } from 'hydux/lib/enhancers/ultradom-render'
 import Counter from './counter'
 
 // let app = withPersist&lt;State, Actions&gt;({
 //   key: 'my-counter-app/v1'
 // })(_app)
 
-// use built-in 1kb picodom to render the view.
-let app = withPicodom()(_app)
+// use built-in 1kb ultradom to render the view.
+let app = withUltradom()(_app)
 
 if (process.env.NODE_ENV === 'development') {
   // built-in dev tools, without pain.
@@ -1023,7 +1023,7 @@ app({
 			<h2 id="parent-child-components-communication">Parent-Child Components Communication</h2>
 			<p>In Elm, we can intercept child component&#39;s message in parent component, because child&#39;s update function is called in parent&#39;s update function. But how can we do this in hydux?</p>
 			<pre><code class="lang-js"><span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> assert <span class="hljs-keyword">from</span> <span class="hljs-string">'assert'</span>
-<span class="hljs-keyword">import</span> app, { Cmd, wrapAction, noop } <span class="hljs-keyword">from</span> <span class="hljs-string">'../index'</span>
+<span class="hljs-keyword">import</span> app, { Cmd, withParents, noop } <span class="hljs-keyword">from</span> <span class="hljs-string">'../index'</span>
 <span class="hljs-keyword">import</span> Counter <span class="hljs-keyword">from</span> <span class="hljs-string">'./counter'</span>
 
 <span class="hljs-keyword">const</span> initState = {
@@ -1034,7 +1034,7 @@ app({
   <span class="hljs-attr">counter2</span>: counter.actions,
   <span class="hljs-attr">counter1</span>: {
     ...counter.actions,
-    <span class="hljs-attr">upN</span>: <span class="hljs-function">(<span class="hljs-params">n: number</span>) =&gt;</span> wrapAction(counter.actions.upN, (action, <span class="hljs-attr">parentState</span>: State, <span class="hljs-attr">parentActions</span>: Actions) =&gt; {
+    <span class="hljs-attr">upN</span>: <span class="hljs-function">(<span class="hljs-params">n: number</span>) =&gt;</span> withParents(counter.actions.upN, (action, <span class="hljs-attr">parentState</span>: State, <span class="hljs-attr">parentActions</span>: Actions) =&gt; {
       <span class="hljs-keyword">const</span> [state, cmd] = action(n + <span class="hljs-number">1</span>)
       assert.equal(state.count, parentState.counter1.count + n + <span class="hljs-number">1</span>, <span class="hljs-string">'call child action work'</span>)
       <span class="hljs-keyword">return</span> [state, Cmd.batch(cmd, Cmd.ofFn(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> parentActions.counter2.up()))]
@@ -1050,7 +1050,7 @@ type Actions = <span class="hljs-keyword">typeof</span> actions
   <span class="hljs-attr">onRender</span>: noop
 })
 </code></pre>
-			<h2 id="api">API</h2>
+			<h2 id="-api-https-hydux-github-io-hydux-api-"><a href="https://hydux.github.io/hydux/api">API</a></h2>
 			<h3 id="app-props-appprops-state-actions-">app(props: AppProps<State, Actions>)</h3>
 			<p>Run your app.</p>
 			<h4 id="appprops-state-actions-">AppProps<State, Actions></h4>
@@ -1084,10 +1084,8 @@ actions: {
 </code></pre>
 			<h5 id="subscribe-state-state-cmdtype-state-actions-">subscribe: ?((state: State) =&gt; CmdType<State, Actions>)</h5>
 			<p>subscribe is a function return a CmdType, you can subscribe side effects like web socket messages, location changes in here.</p>
-			<h5 id="onerror-error-error-void-">onError: ?((error: Error) =&gt; void)</h5>
-			<p>Error handler, optional.</p>
 			<h5 id="onrender-view-any-void-">onRender: ?((view: any) =&gt; void)</h5>
-			<p>Custom renderer, optional. Used by vdom adaptors like hydux-react or <code>hydux/lib/enhancers/picodom-render.js</code>.</p>
+			<p>Custom renderer, optional. Used by vdom adaptors like hydux-react or <code>hydux/lib/enhancers/ultradom-render.js</code>.</p>
 			<h5 id="onupdate-data-void-">onUpdate: ?((data) =&gt; void)</h5>
 			<p>Update listener, optional, used by something like <code>hydux/lib/enhancers/logger.js</code>, <code>hydux/lib/enhancers/devtools.js</code></p>
 			<h4 id="cmd">Cmd</h4>
@@ -1102,6 +1100,13 @@ actions: {
 			<p>Cmd from a sub.</p>
 			<h5 id="cmd-batch-args-cmdtype-state-actions-cmdtype-state-actions-cmdtype-state-actions-">Cmd.batch(...args: CmdType<State,Actions>[] | CmdType<State,Actions>[][]): CmdType<State,Actions></h5>
 			<p>Cmd from a cmd array.</p>
+			<h2 id="ecosystem">Ecosystem</h2>
+			<ul>
+				<li><a href="https://github.com/hydux/hydux-react">hydux-react</a>: Hydux&#39;s react integration</li>
+				<li><a href="https://github.com/hydux/hydux-react-router">hydux-react-router</a>: Hydux&#39;s react-router integration</li>
+				<li><a href="https://github.com/hydux/hydux-mutator">hydux-mutator</a>: A statically-typed immutable update help package, which also contains immutable collections.</li>
+				<li><a href="https://github.com/hydux/hydux-transitions">hydux-transitions</a>: A css transition library inspired by <a href="http://animejs.com/">animajs</a>&#39;s timeline, follow <strong>The Elm Architecture</strong>.</li>
+			</ul>
 			<h2 id="counter-app">Counter App</h2>
 			<pre><code class="lang-sh">git <span class="hljs-built_in">clone</span> https://github.com/hydux/hydux.git
 <span class="hljs-built_in">cd</span> examples/counter
@@ -1111,7 +1116,7 @@ npm start
 			<p>Now open <a href="http://localhost:8080">http://localhost:8080</a> and hack!</p>
 			<h2 id="why">Why</h2>
 			<p>After trying <a href="https://fable.io">Fable</a> + <a href="https://github.com/fable-elmish/elmish">Elmish</a> for several month, I need to write a small web App in my company, for many reasons I cannot choose some fancy stuff like <a href="https://fable.io">Fable</a> + <a href="https://github.com/fable-elmish/elmish">Elmish</a>, simply speaking, I need to use the mainstream JS stack but don&#39;t want to bear Redux&#39;s cumbersome, complex toolchain, etc anymore.</p>
-			<p>After some digging around, hyperapp looks really good to me, but I quickly find out it doesn&#39;t work with React, and many libraries don&#39;t work with the newest API. So I create this to support <strong><strong>different</strong></strong> vdom libraries, like React(<a href="https://github.io/hydux/hydux-react">official support</a>), <a href="https://github.com/picodom/picodom">picodom</a>(<a href="https://github.com/hydux/hydux/blob/master/src/enhancers/picodom-render.ts">built-in</a>), Preact, <a href="https://github.com/infernojs/inferno">inferno</a> or what ever you want, just need to write a simple enhancer!</p>
+			<p>After some digging around, hyperapp looks really good to me, but I quickly find out it doesn&#39;t work with React, and many libraries don&#39;t work with the newest API. So I create this to support <strong><strong>different</strong></strong> vdom libraries, like React(<a href="https://github.io/hydux/hydux-react">official support</a>), <a href="https://github.com/jorgebucaran/ultradom">ultradom</a>(<a href="https://github.com/hydux/hydux/blob/master/src/enhancers/ultradom-render.ts">built-in</a>), Preact, <a href="https://github.com/infernojs/inferno">inferno</a> or what ever you want, just need to write a simple enhancer!</p>
 			<p>Also, to avoid breaking change, we have <strong><strong>built-in</strong></strong> support for HMR, logger, persist, <a href="https://github.com/zalmoxisus/redux-devtools-extension">Redux Devtools</a>, you know you want it!</p>
 			<h2 id="license">License</h2>
 			<p>MIT</p>
@@ -1131,6 +1136,8 @@ npm start
 							<li class="tsd-kind-external-module"><a href="modules/_enhancers_picodom_render_.html" class="tsd-kind-icon">"enhancers/picodom-<wbr>render"</a></li>
 							<li class="tsd-kind-external-module"><a href="modules/_enhancers_router_history_.html" class="tsd-kind-icon">"enhancers/router/history"</a></li>
 							<li class="tsd-kind-external-module"><a href="modules/_enhancers_router_index_.html" class="tsd-kind-icon">"enhancers/router/index"</a></li>
+							<li class="tsd-kind-external-module"><a href="modules/_enhancers_ultradom_render_.html" class="tsd-kind-icon">"enhancers/ultradom-<wbr>render"</a></li>
+							<li class="tsd-kind-external-module"><a href="modules/_helpers_.html" class="tsd-kind-icon">"helpers"</a></li>
 							<li class="tsd-kind-external-module"><a href="modules/_index_.html" class="tsd-kind-icon">"index"</a></li>
 							<li class="tsd-kind-external-module"><a href="modules/_types_.html" class="tsd-kind-icon">"types"</a></li>
 							<li class="tsd-kind-external-module"><a href="modules/_utils_.html" class="tsd-kind-icon">"utils"</a></li>

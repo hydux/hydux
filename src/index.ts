@@ -116,7 +116,7 @@ export function app<State, Actions>(props: AppProps<State, Actions>) {
   const appSubscribe = props.subscribe || (_ => Cmd.none)
   const render = props.onRender || noop
   // const appMiddlewares = props.middlewares || []
-  let [appState, cmd] = runAction(props.init(), void 0 as any as State, appActions) as [State, Cmd.CmdType<Actions>]
+  let [appState, cmd] = runAction(props.init(), void 0 as any as State, appActions) as [State, CmdType<Actions>]
   init(appState, appActions, props.actions, [])
   cmd.forEach(sub => sub(appActions))
   appRender(appState)

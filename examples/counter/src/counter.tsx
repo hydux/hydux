@@ -4,7 +4,6 @@ import * as Hydux from '../../../src/index'
 const { Cmd } = Hydux
 
 const initState = { count: 0 }
-const init = () => initState
 const actions = {
   down: () => state => ({ count: state.count - 1 }),
   up: () => state => ({ count: state.count + 1 }),
@@ -28,6 +27,11 @@ const view = (state: State, actions: Actions) =>
     <button onclick={actions.upLater}>+ later</button>
   </div>
 
-export default { init, actions, view }
+export default {
+  initState: () => initState,
+  initCmd: () => Cmd.none,
+  actions,
+  view,
+}
 export type Actions = typeof actions
 export type State = typeof initState
