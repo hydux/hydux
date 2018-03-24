@@ -948,48 +948,51 @@ export default {
 }
 </code></pre>
 			<p>Then we can compose it in Elm way, you can easily reuse your components.</p>
-			<pre><code class="lang-js">import _app from 'hydux'
-import withPersist from 'hydux/lib/enhancers/persist'
-import withUltradom, { h, React } from 'hydux/lib/enhancers/ultradom-render'
-import Counter from './counter'
+			<pre><code class="lang-js"><span class="hljs-keyword">import</span> _app <span class="hljs-keyword">from</span> <span class="hljs-string">'hydux'</span>
+<span class="hljs-keyword">import</span> withPersist <span class="hljs-keyword">from</span> <span class="hljs-string">'hydux/lib/enhancers/persist'</span>
+<span class="hljs-keyword">import</span> withUltradom, { h, React } <span class="hljs-keyword">from</span> <span class="hljs-string">'hydux/lib/enhancers/ultradom-render'</span>
+<span class="hljs-keyword">import</span> Counter <span class="hljs-keyword">from</span> <span class="hljs-string">'./counter'</span>
 
-// let app = withPersist&lt;State, Actions&gt;({
-//   key: 'my-counter-app/v1'
-// })(_app)
+<span class="hljs-comment">// let app = withPersist&lt;State, Actions&gt;({</span>
+<span class="hljs-comment">//   key: 'my-counter-app/v1'</span>
+<span class="hljs-comment">// })(_app)</span>
 
-// use built-in 1kb ultradom to render the view.
-let app = withUltradom()(_app)
+<span class="hljs-comment">// use built-in 1kb ultradom to render the view.</span>
+<span class="hljs-keyword">let</span> app = withUltradom()(_app)
 
-if (process.env.NODE_ENV === 'development') {
-  // built-in dev tools, without pain.
-  const devTools = require('hydux/lib/enhancers/devtools').default
-  const logger = require('hydux/lib/enhancers/logger').default
-  const hmr = require('hydux/lib/enhancers/hmr').default
+<span class="hljs-keyword">if</span> (process.env.NODE_ENV === <span class="hljs-string">'development'</span>) {
+  <span class="hljs-comment">// built-in dev tools, without pain.</span>
+  <span class="hljs-keyword">const</span> devTools = <span class="hljs-built_in">require</span>(<span class="hljs-string">'hydux/lib/enhancers/devtools'</span>).default
+  <span class="hljs-keyword">const</span> logger = <span class="hljs-built_in">require</span>(<span class="hljs-string">'hydux/lib/enhancers/logger'</span>).default
+  <span class="hljs-keyword">const</span> hmr = <span class="hljs-built_in">require</span>(<span class="hljs-string">'hydux/lib/enhancers/hmr'</span>).default
   app = logger()(app)
   app = devTools()(app)
   app = hmr()(app)
 }
 
-const actions = {
-  counter1: Counter.actions,
-  counter2: Counter.actions,
+<span class="hljs-keyword">const</span> actions = {
+  <span class="hljs-attr">counter1</span>: Counter.actions,
+  <span class="hljs-attr">counter2</span>: Counter.actions,
 }
 
-const state = {
-  counter1: Counter.init(),
-  counter2: Counter.init(),
+<span class="hljs-keyword">const</span> state = {
+  <span class="hljs-attr">counter1</span>: Counter.init(),
+  <span class="hljs-attr">counter2</span>: Counter.init(),
 }
 
-const view = (state: State, actions: Actions) =&gt;
-    &lt;main&gt;
-      &lt;h1&gt;Counter1:&lt;/h1&gt;
+<span class="hljs-keyword">const</span> view = (
+  state: State,
+  <span class="hljs-attr">actions</span>: Actions,
+) =&gt;
+    <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">main</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>Counter1:<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span>
       {Counter.view(state.counter1, actions.counter1)}
-      &lt;h1&gt;Counter2:&lt;/h1&gt;
+      <span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>Counter2:<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span>
       {Counter.view(state.counter2, actions.counter2)}
-    &lt;/main&gt;
+    <span class="hljs-tag">&lt;/<span class="hljs-name">main</span>&gt;</span></span>
 
-export default app({
-  init: () =&gt; state,
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> app({
+  <span class="hljs-attr">init</span>: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> state,
   actions,
   view,
 })
@@ -1008,7 +1011,10 @@ app({
     <span class="hljs-attr">down</span>: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> state =&gt; ({ <span class="hljs-attr">count</span>: state.count - <span class="hljs-number">1</span> }),
     <span class="hljs-attr">up</span>: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> state =&gt; ({ <span class="hljs-attr">count</span>: state.count + <span class="hljs-number">1</span> }),
     <span class="hljs-attr">upN</span>: <span class="hljs-function"><span class="hljs-params">n</span> =&gt;</span> state =&gt; ({ <span class="hljs-attr">count</span>: state.count + n }),
-    <span class="hljs-attr">upLater</span>: <span class="hljs-function"><span class="hljs-params">n</span> =&gt;</span> state =&gt; actions<span class="hljs-comment">/* actions of same level */</span> =&gt; [
+    <span class="hljs-attr">upLater</span>: <span class="hljs-function"><span class="hljs-params">n</span> =&gt;</span> (
+      state,
+      actions<span class="hljs-comment">/* actions of same level */</span>
+    ) =&gt; [
       state, <span class="hljs-comment">// don't change the state, won't trigger view update</span>
       Cmd.ofPromise(
         upLater <span class="hljs-comment">/* a function with single parameter and return a promise */</span>,
@@ -1034,16 +1040,25 @@ app({
   <span class="hljs-attr">counter2</span>: counter.actions,
   <span class="hljs-attr">counter1</span>: {
     ...counter.actions,
-    <span class="hljs-attr">upN</span>: <span class="hljs-function">(<span class="hljs-params">n: number</span>) =&gt;</span> withParents(counter.actions.upN, (action, <span class="hljs-attr">parentState</span>: State, <span class="hljs-attr">parentActions</span>: Actions) =&gt; {
-      <span class="hljs-keyword">const</span> [state, cmd] = action(n + <span class="hljs-number">1</span>)
-      assert.equal(state.count, parentState.counter1.count + n + <span class="hljs-number">1</span>, <span class="hljs-string">'call child action work'</span>)
-      <span class="hljs-keyword">return</span> [state, Cmd.batch(cmd, Cmd.ofFn(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> parentActions.counter2.up()))]
-    })
+    <span class="hljs-attr">upN</span>: (
+      n: number
+    ) =&gt; withParents(
+      counter.actions.upN,
+      (
+        action,
+        <span class="hljs-attr">parentState</span>: State,
+        <span class="hljs-attr">parentActions</span>: Actions,
+      ) =&gt; {
+        <span class="hljs-keyword">const</span> [state, cmd] = action(n + <span class="hljs-number">1</span>)
+        assert.equal(state.count, parentState.counter1.count + n + <span class="hljs-number">1</span>, <span class="hljs-string">'call child action work'</span>)
+        <span class="hljs-keyword">return</span> [state, Cmd.batch(cmd, Cmd.ofFn(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> parentActions.counter2.up()))]
+      }
+    )
   },
 }
 type State = <span class="hljs-keyword">typeof</span> initState
 type Actions = <span class="hljs-keyword">typeof</span> actions
-<span class="hljs-keyword">let</span> ctx = app&lt;<span class="hljs-keyword">typeof</span> initState, <span class="hljs-keyword">typeof</span> actions&gt;({
+<span class="hljs-keyword">let</span> ctx = app&lt;State, Actions&gt;({
   <span class="hljs-attr">init</span>: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> initState,
   actions,
   <span class="hljs-attr">view</span>: noop,
@@ -1060,30 +1075,31 @@ type Actions = <span class="hljs-keyword">typeof</span> actions
 			<p>The actions of your app, you can only using actions to update your state.</p>
 			<p>Actions result should be the state or the same level state if this is a nested action. You can also return undefined/Promise to support async task, but this is highly <strong>not</strong> recommanded, you should using Cmd to manager your side effects.</p>
 			<p>Actions can be nested, here are some legally action signatures:</p>
-			<pre><code class="lang-js">init: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> ({ <span class="hljs-attr">count</span>: <span class="hljs-number">1</span> })
-actions: {
-  <span class="hljs-comment">// (msg: Msg) =&gt; (state: State), update the state by msg</span>
-  reset: <span class="hljs-function"><span class="hljs-params">n</span> =&gt;</span> ({ <span class="hljs-attr">count</span>: <span class="hljs-number">1</span> })
-  <span class="hljs-comment">// (msg: Msg) =&gt; (state: State) =&gt; (state: State)</span>
-  <span class="hljs-comment">// update the state by msg and current state</span>
-  add: <span class="hljs-function"><span class="hljs-params">n</span> =&gt;</span> state =&gt; ({ <span class="hljs-attr">count</span>: state.count + n }),
-  <span class="hljs-comment">// (msg: Msg) =&gt; (state: State) =&gt; (actions: Actions) =&gt; void</span>
-  <span class="hljs-comment">// update the state by state and other same level actions</span>
-  add12: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> (state, actions) =&gt; actions.add(<span class="hljs-number">12</span>),
-  <span class="hljs-comment">// (msg: Msg) =&gt; (state: State) =&gt; (actions: Actions) =&gt; [state, CmdType&lt;State, Actions&gt;]</span>
-  <span class="hljs-comment">// update the state by side effects</span>
-  remoteAdd: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> (state, actions) =&gt;
-    [ state,
-      Cmd.ofPromise(
-        <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> fetch(<span class="hljs-string">'http://your.server/some/path'</span>),
-        <span class="hljs-literal">null</span>,
-        actions.add,
-        <span class="hljs-built_in">console</span>.log
-      ) ],
-}
+			<pre><code class="lang-js">app({
+  <span class="hljs-attr">init</span>: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> ({ <span class="hljs-attr">count</span>: <span class="hljs-number">1</span> }),
+  <span class="hljs-attr">actions</span>: {
+    <span class="hljs-comment">// (msg: Msg) =&gt; (state: State), update the state by msg</span>
+    reset: <span class="hljs-function"><span class="hljs-params">n</span> =&gt;</span> ({ <span class="hljs-attr">count</span>: <span class="hljs-number">1</span> })
+    <span class="hljs-comment">// (msg: Msg) =&gt; (state: State) =&gt; (state: State)</span>
+    <span class="hljs-comment">// update the state by msg and current state</span>
+    add: <span class="hljs-function"><span class="hljs-params">n</span> =&gt;</span> state =&gt; ({ <span class="hljs-attr">count</span>: state.count + n }),
+    <span class="hljs-comment">// (msg: Msg) =&gt; (state: State) =&gt; (actions: Actions) =&gt; void</span>
+    <span class="hljs-comment">// update the state by state and other same level actions</span>
+    add12: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> (state, actions) =&gt; actions.add(<span class="hljs-number">12</span>),
+    <span class="hljs-comment">// (msg: Msg) =&gt; (state: State) =&gt; (actions: Actions) =&gt; [state, CmdType&lt;State, Actions&gt;]</span>
+    <span class="hljs-comment">// update the state by side effects</span>
+    remoteAdd: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> (state, actions) =&gt;
+      [ state,
+        Cmd.ofPromise(
+          <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> fetch(<span class="hljs-string">'http://your.server/some/path'</span>),
+          <span class="hljs-literal">null</span>,
+          actions.add,
+          <span class="hljs-built_in">console</span>.log
+        ) ],
+  },
+  <span class="hljs-attr">view</span>: <span class="hljs-comment">//...</span>
+})
 </code></pre>
-			<h5 id="subscribe-state-state-cmdtype-state-actions-">subscribe: ?((state: State) =&gt; CmdType<State, Actions>)</h5>
-			<p>subscribe is a function return a CmdType, you can subscribe side effects like web socket messages, location changes in here.</p>
 			<h5 id="onrender-view-any-void-">onRender: ?((view: any) =&gt; void)</h5>
 			<p>Custom renderer, optional. Used by vdom adaptors like hydux-react or <code>hydux/lib/enhancers/ultradom-render.js</code>.</p>
 			<h5 id="onupdate-data-void-">onUpdate: ?((data) =&gt; void)</h5>

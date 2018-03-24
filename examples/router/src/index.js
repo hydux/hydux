@@ -1,5 +1,5 @@
 // @ts-nocheck
-const app = require('./main')
+var app = require('./main')
 
 if (module.hot) {
   module.hot.accept()

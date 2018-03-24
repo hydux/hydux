@@ -949,9 +949,32 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/hydux/hydux/blob/ac04c37/src/helpers.ts#L11">helpers.ts:11</a></li>
+								<li>Defined in <a href="https://github.com/hydux/hydux/blob/0cede50/src/helpers.ts#L33">helpers.ts:33</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>ADT Helper for TS
+									e.g.
+									```ts
+									type Msg =
+									| Dt&lt;&#39;fetchBook&#39;, number&gt;
+								| Dt&lt;&#39;updateBook&#39;, Book&gt;</p>
+							</div>
+							<p>let msg = dt(&#39;fetchBook&#39;, 1)
+								switch(msg.tag) {
+								case &#39;fetchBook&#39;:
+								//...
+								break
+								case &#39;updateBook&#39;:
+								//...
+								break
+								default:
+								never(msg.tag) // incomplete check from TS
+								break
+								}
+							```</p>
+						</div>
 						<h4 class="tsd-type-parameters-title">Type parameters</h4>
 						<ul class="tsd-type-parameters">
 							<li>
@@ -987,7 +1010,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/hydux/hydux/blob/ac04c37/src/helpers.ts#L17">helpers.ts:17</a></li>
+								<li>Defined in <a href="https://github.com/hydux/hydux/blob/0cede50/src/helpers.ts#L39">helpers.ts:39</a></li>
 							</ul>
 						</aside>
 						<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -1034,7 +1057,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/hydux/hydux/blob/ac04c37/src/helpers.ts#L15">helpers.ts:15</a></li>
+								<li>Defined in <a href="https://github.com/hydux/hydux/blob/0cede50/src/helpers.ts#L37">helpers.ts:37</a></li>
 							</ul>
 						</aside>
 						<h4 class="tsd-parameters-title">Parameters</h4>

@@ -23,7 +23,7 @@ if (process.env.NODE_ENV === 'development') {
 const actions = {
   counter1: Counter.actions,
   counter2: Counter.actions,
-  change: (e: MouseEvent) => (state: State) => ({ ...state, value: e.target['value'] })
+  change: (e: MouseEvent) => (state: State) => ({ ...state, value: e.target!['value'] })
 }
 
 const initState = {
@@ -36,7 +36,7 @@ type Actions = typeof actions
 type State = typeof initState
 const view = (state: State, actions: Actions) =>
     <main>
-      <h1>Counter11:</h1>
+      <h1>Counter1:</h1>
       {Counter.view(state.counter1, actions.counter1)}
       <h1>Counter2:</h1>
       {Counter.view(state.counter2, actions.counter2)}

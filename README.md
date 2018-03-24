@@ -113,7 +113,10 @@ app({
     down: () => state => ({ count: state.count - 1 }),
     up: () => state => ({ count: state.count + 1 }),
     upN: n => state => ({ count: state.count + n }),
-    upLater: n => state => actions/* actions of same level */ => [
+    upLater: n => (
+      state,
+      actions/* actions of same level */
+    ) => [
       state, // don't change the state, won't trigger view update
       Cmd.ofPromise(
         upLater /* a function with single parameter and return a promise */,
@@ -161,7 +164,7 @@ const actions = {
 }
 type State = typeof initState
 type Actions = typeof actions
-let ctx = app<typeof initState, typeof actions>({
+let ctx = app<State, Actions>({
   init: () => initState,
   actions,
   view: noop,
