@@ -78,7 +78,10 @@ const state = {
   counter2: Counter.init(),
 }
 
-const view = (state: State, actions: Actions) =>
+const view = (
+  state: State,
+  actions: Actions,
+) =>
     <main>
       <h1>Counter1:</h1>
       {Counter.view(state.counter1, actions.counter1)}
@@ -140,11 +143,20 @@ const actions = {
   counter2: counter.actions,
   counter1: {
     ...counter.actions,
-    upN: (n: number) => withParents(counter.actions.upN, (action, parentState: State, parentActions: Actions) => {
-      const [state, cmd] = action(n + 1)
-      assert.equal(state.count, parentState.counter1.count + n + 1, 'call child action work')
-      return [state, Cmd.batch(cmd, Cmd.ofFn(() => parentActions.counter2.up()))]
-    })
+    upN: (
+      n: number
+    ) => withParents(
+      counter.actions.upN,
+      (
+        action,
+        parentState: State,
+        parentActions: Actions,
+      ) => {
+        const [state, cmd] = action(n + 1)
+        assert.equal(state.count, parentState.counter1.count + n + 1, 'call child action work')
+        return [state, Cmd.batch(cmd, Cmd.ofFn(() => parentActions.counter2.up()))]
+      }
+    )
   },
 }
 type State = typeof initState
@@ -179,32 +191,31 @@ Actions result should be the state or the same level state if this is a nested a
 Actions can be nested, here are some legally action signatures:
 
 ```js
-init: () => ({ count: 1 })
-actions: {
-  // (msg: Msg) => (state: State), update the state by msg
-  reset: n => ({ count: 1 })
-  // (msg: Msg) => (state: State) => (state: State)
-  // update the state by msg and current state
-  add: n => state => ({ count: state.count + n }),
-  // (msg: Msg) => (state: State) => (actions: Actions) => void
-  // update the state by state and other same level actions
-  add12: () => (state, actions) => actions.add(12),
-  // (msg: Msg) => (state: State) => (actions: Actions) => [state, CmdType<State, Actions>]
-  // update the state by side effects
-  remoteAdd: () => (state, actions) =>
-    [ state,
-      Cmd.ofPromise(
-        () => fetch('http://your.server/some/path'),
-        null,
-        actions.add,
-        console.log
-      ) ],
-}
+app({
+  init: () => ({ count: 1 }),
+  actions: {
+    // (msg: Msg) => (state: State), update the state by msg
+    reset: n => ({ count: 1 })
+    // (msg: Msg) => (state: State) => (state: State)
+    // update the state by msg and current state
+    add: n => state => ({ count: state.count + n }),
+    // (msg: Msg) => (state: State) => (actions: Actions) => void
+    // update the state by state and other same level actions
+    add12: () => (state, actions) => actions.add(12),
+    // (msg: Msg) => (state: State) => (actions: Actions) => [state, CmdType<State, Actions>]
+    // update the state by side effects
+    remoteAdd: () => (state, actions) =>
+      [ state,
+        Cmd.ofPromise(
+          () => fetch('http://your.server/some/path'),
+          null,
+          actions.add,
+          console.log
+        ) ],
+  },
+  view: //...
+})
 ```
-
-##### subscribe: ?((state: State) => CmdType<State, Actions>)
-
-subscribe is a function return a CmdType, you can subscribe side effects like web socket messages, location changes in here.
 
 ##### onRender: ?((view: any) => void)
 
