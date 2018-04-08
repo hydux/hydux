@@ -70,7 +70,6 @@ describe('core api', () => {
   function testCounter(ctx, renderResult, path: string[] = []) {
     function getState() {
       let state = ctx.state
-      console.log('getState', state)
       for (const i in path) {
         state = state[path[i]]
       }
