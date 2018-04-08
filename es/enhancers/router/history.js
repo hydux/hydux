@@ -3,11 +3,11 @@ var BaseHistory = /** @class */ (function () {
     function BaseHistory(props) {
         if (props === void 0) { props = {}; }
         var _this = this;
+        this._last = [];
         this.listeners = [];
         this.last = function () { return _this._last[0]; };
         this.listen = function (listener) { return _this.listeners.push(listener); };
-        this.props = tslib_1.__assign({ basePath: '' }, props);
-        this._last = [this.current()];
+        this.props = props = tslib_1.__assign({ basePath: '' }, props);
         this.listeners.push(function (path) {
             _this._last = [_this._last[_this._last.length - 1], path];
         });
@@ -38,6 +38,7 @@ var HashHistory = /** @class */ (function (_super) {
         if (props === void 0) { props = {}; }
         var _this = _super.call(this, props) || this;
         _this.props = props = tslib_1.__assign({ hash: '#!' }, _this.props);
+        _this._last = [_this.current()];
         window.addEventListener('hashchange', function (e) {
             _this.handleChange();
         });
@@ -63,6 +64,7 @@ var BrowserHistory = /** @class */ (function (_super) {
     function BrowserHistory(props) {
         if (props === void 0) { props = {}; }
         var _this = _super.call(this, props) || this;
+        _this._last = [_this.current()];
         window.addEventListener('popstate', function (e) {
             _this.handleChange();
         });

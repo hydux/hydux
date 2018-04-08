@@ -29,4 +29,13 @@ export var mkInit = function (state, cmd) {
     if (cmd === void 0) { cmd = Cmd.none; }
     return function () { return [state, cmd]; };
 };
+export function compose() {
+    var fns = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+        fns[_i] = arguments[_i];
+    }
+    return function (arg) {
+        return fns.reduce(function (arg, fn) { return fn(arg); }, arg);
+    };
+}
 //# sourceMappingURL=helpers.js.map

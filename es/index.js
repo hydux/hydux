@@ -110,7 +110,7 @@ export function app(props) {
                         props.onUpdate({
                             prevAppState: appState,
                             nextAppState: nextAppState,
-                            msgData: msgData,
+                            msgData: subFrom.length ? msgData : [],
                             action: path.concat(key).join('.'),
                         });
                     }

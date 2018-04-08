@@ -56,7 +56,10 @@ export function mkLink(history, h) {
             onClick && onClick(e);
         }
         var Comp = 'a';
-        return React.createElement(Comp, tslib_1.__assign({ href: to }, props, { onclick: handleClick, onClick: handleClick }), children);
+        if ('children' in props) {
+            children = props.children;
+        }
+        return (React.createElement("a", tslib_1.__assign({ href: to }, props, { onClick: handleClick }), children));
     };
 }
 export default function withRouter(props) {

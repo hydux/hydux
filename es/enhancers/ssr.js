@@ -11,6 +11,10 @@ export default function withSSR(options) {
                 }
                 initCmd = result[1];
                 return [result[0], result[1]];
+            },
+            onRender: function () {
+                // ignore
+                return;
             } }));
         ctx.render = function (state) { return tslib_1.__awaiter(_this, void 0, void 0, function () {
             var view;
