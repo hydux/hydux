@@ -1,7 +1,8 @@
+import * as tslib_1 from "tslib";
 import Cmd from './cmd';
-import { merge, setDeep, get, isFn, noop, clone } from './utils';
+import { merge, setDeep, get, isFn, noop, isPojo, clone } from './utils';
 export * from './helpers';
-export { Cmd, noop };
+export { Cmd, noop, isFn, isPojo };
 /**
  * run action and return a normalized result ([State, CmdType<>]),
  * this is useful to write High-Order-Action, which take an action and return a wrapped action.
@@ -10,9 +11,11 @@ export { Cmd, noop };
  * @param actions
  */
 export function runAction(result, state, actions, parentState, parentActions) {
-    let rst = result;
-    isFn(rst) && (rst = rst(state, actions, parentState, parentActions)) &&
-        isFn(rst) && (rst = rst(actions));
+    var rst = result;
+    isFn(rst)
+        && (rst = rst(state, actions, parentState, parentActions))
+        && isFn(rst)
+        && (rst = rst(actions));
     // action can be a function that return a promise or undefined(callback)
     if (rst === undefined ||
         (rst.then && isFn(rst.then))) {
@@ -34,78 +37,100 @@ export function withParents(action, wrapper, parentState, parentActions) {
     if (!wrapper) {
         return action;
     }
-    const wrapped = (state, actions, parentState, parentActions) => {
-        const nactions = (...args) => runAction(action(...args), state, actions);
+    var wrapped = function (state, actions, parentState, parentActions) {
+        var nactions = function () {
+            var args = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i] = arguments[_i];
+            }
+            return runAction(action.apply(void 0, args), state, actions);
+        };
         return wrapper(nactions, parentState, parentActions, state, actions);
     };
     return wrapped;
 }
+/**
+ * @deprecated Deprecated for `withParents`
+ */
+export var wrapActions = withParents;
 export function app(props) {
     // const appEvents = props.events || {}
-    const appActions = {};
-    const appSubscribe = props.subscribe || (_ => Cmd.none);
-    const render = props.onRender || noop;
+    var appActions = {};
+    var appSubscribe = props.subscribe || (function (_) { return Cmd.none; });
+    var render = props.onRender || noop;
     // const appMiddlewares = props.middlewares || []
-    let [appState, cmd] = runAction(props.init(), void 0, appActions);
+    var _a = runAction(props.init(), void 0, appActions), appState = _a[0], cmd = _a[1];
     init(appState, appActions, props.actions, []);
-    cmd.forEach(sub => sub(appActions));
+    cmd.forEach(function (sub) { return sub(appActions); });
     appRender(appState);
-    appSubscribe(appState).forEach(sub => sub(appActions));
-    return Object.assign({}, props, { actions: appActions, get state() {
+    appSubscribe(appState).forEach(function (sub) { return sub(appActions); });
+    return tslib_1.__assign({ 
+        // getter should before spread operator,
+        // otherwise it would be copied and becomes normal property
+        get state() {
             return appState;
-        },
-        getState() { return appState; }, render: appRender });
-    function appRender(state = appState) {
+        } }, props, { actions: appActions, render: appRender });
+    function appRender(state) {
+        if (state === void 0) { state = appState; }
         if (state !== appState) {
             appState = state;
         }
-        let view;
-        if (isFn(view = props.view(appState, appActions))) {
+        var view = props.view(appState, appActions);
+        if (isFn(view)) {
             view = view(appActions);
         }
         return render(view);
     }
     function init(state, actions, from, path) {
-        for (const key in from) {
+        var _loop_1 = function (key) {
             if (/^_/.test(key)) {
-                continue;
+                return "continue";
             }
-            const subFrom = from[key];
+            var subFrom = from[key];
             if (isFn(subFrom)) {
-                actions[key] = function (...msgData) {
+                actions[key] = function () {
+                    var msgData = [];
+                    for (var _i = 0; _i < arguments.length; _i++) {
+                        msgData[_i] = arguments[_i];
+                    }
                     state = get(path, appState);
                     // action = appMiddlewares.reduce((action, fn) => fn(action, key, path), action)
-                    let [nextState, nextAppState] = [state, appState];
-                    let cmd = Cmd.none;
-                    let [parentState, parentActions] = [undefined, undefined];
-                    const actionResult = subFrom(...msgData);
+                    var _a = [state, appState], nextState = _a[0], nextAppState = _a[1];
+                    var cmd = Cmd.none;
+                    var _b = [undefined, undefined], parentState = _b[0], parentActions = _b[1];
+                    var actionResult = subFrom.apply(void 0, msgData);
                     if (isFn(actionResult) && actionResult.length > 2) {
-                        const pPath = path.slice(0, -1);
+                        var pPath = path.slice(0, -1);
                         parentActions = get(pPath, appActions);
                         parentState = get(pPath, appState);
                     }
-                    [nextState, cmd] = runAction(actionResult, state, actions, parentState, parentActions);
+                    _c = runAction(actionResult, state, actions, parentState, parentActions), nextState = _c[0], cmd = _c[1];
                     if (props.onUpdate) {
                         nextAppState = setDeep(path, merge(state, nextState), appState);
                         props.onUpdate({
                             prevAppState: appState,
-                            nextAppState,
-                            msgData,
-                            action: path.concat(key).join('.')
+                            nextAppState: nextAppState,
+                            msgData: msgData,
+                            action: path.concat(key).join('.'),
                         });
                     }
                     if (nextState !== state) {
-                        appState = nextAppState !== appState
-                            ? nextAppState
-                            : setDeep(path, merge(state, nextState), appState);
+                        appState =
+                            nextAppState !== appState
+                                ? nextAppState
+                                : setDeep(path, merge(state, nextState), appState);
                         appRender(appState);
                     }
-                    cmd.forEach(sub => sub(actions));
+                    cmd.forEach(function (sub) { return sub(actions); });
+                    var _c;
                 };
             }
             else if (typeof subFrom === 'object' && subFrom) {
                 init(state[key] || (state[key] = {}), (actions[key] = clone(subFrom)), subFrom, path.concat(key));
             }
+        };
+        for (var key in from) {
+            _loop_1(key);
         }
     }
 }

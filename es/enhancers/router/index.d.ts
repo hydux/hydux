@@ -1,7 +1,7 @@
 import { ActionType } from './../../types';
-import { AppProps, App, View, OnUpdate } from './../../index';
-import { HistoryProps, BaseHistory, HashHistory, BrowserHistory } from './history';
-export { HistoryProps, BaseHistory, HashHistory, BrowserHistory };
+import { AppProps, App, View, OnUpdate, Context } from './../../index';
+import { HistoryProps, BaseHistory, HashHistory, BrowserHistory, MemoryHistory, MemoryHistoryProps } from './history';
+export { HistoryProps, BaseHistory, HashHistory, BrowserHistory, MemoryHistory, MemoryHistoryProps, Context };
 export interface Query {
     [key: string]: string | string[];
 }
@@ -42,7 +42,7 @@ export interface RouterAppProps<State, Actions> extends AppProps<State, Actions>
 export default function withRouter<State, Actions>(props?: {
     history?: BaseHistory;
     routes?: Routes<State, Actions>;
-}): (app: App<State, Actions>) => (props: RouterAppProps<State, Actions>) => any;
+}): (app: App<State, Actions>) => (props: RouterAppProps<State, Actions>) => Context<State, Actions, any>;
 export interface NestedRoutes<State, Actions> {
     path: string;
     label?: string;

@@ -1,8 +1,9 @@
-import { ActionResult, ActionState, ActionCmdResult, ActionType, ActionsType, UnknownArgsActionType } from './types';
+import { ActionResult, ActionCmdResult, ActionsType } from './types';
 import Cmd, { CmdType, Sub } from './cmd';
-import { noop } from './utils';
+import { isFn, noop, isPojo } from './utils';
 export * from './helpers';
-export { CmdType, Sub, ActionResult, ActionState, ActionCmdResult, ActionType, ActionsType, UnknownArgsActionType };
+export * from './types';
+export { Cmd, CmdType, Sub, ActionResult, noop, isFn, isPojo };
 export declare type Init<S, A> = () => S | [S, CmdType<A>];
 export declare type View<S, A> = (state: S, actions: A) => any;
 export declare type Subscribe<S, A> = (state: S) => CmdType<A>;
@@ -15,7 +16,6 @@ export declare type OnUpdate<S, A> = <M>(data: {
 export declare type OnUpdateStart<S, A> = <M>(data: {
     action: string;
 }) => void;
-export { Cmd, noop };
 export interface AppProps<State, Actions> {
     init: Init<State, Actions>;
     view: View<State, Actions>;
@@ -38,17 +38,21 @@ export declare function withParents<S, A, PS, PA, A1, A2>(action: (a1: A1, a2: A
 export declare function withParents<S, A, PS, PA, A1, A2, A3>(action: (a1: A1, a2: A2, a3: A3) => (s: S, a: A) => any, wrapper?: (action: (a1: A1, a2: A2, a3: A3) => ActionCmdResult<S, A>, parentState: PS, parentActions: PA, state: S, actions: A) => ActionResult<S, A>, parentState?: PS, parentActions?: PA): any;
 export declare function withParents<S, A, PS, PA, A1, A2, A3, A4>(action: (a1: A1, a2: A2, a3: A3, a4: A4) => (s: S, a: A) => any, wrapper?: (action: (a1: A1, a2: A2, a3: A3, a4: A4) => ActionCmdResult<S, A>, parentState: PS, parentActions: PA, state: S, actions: A) => ActionResult<S, A>, parentState?: PS, parentActions?: PA): any;
 export declare function withParents<S, A, PS, PA, A1, A2, A3, A4, A5>(action: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5) => (s: S, a: A) => any, wrapper?: (action: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5) => ActionCmdResult<S, A>, parentState: PS, parentActions: PA, state: S, actions: A) => ActionResult<S, A>, parentState?: PS, parentActions?: PA): any;
-export declare type App<State, Actions> = (props: AppProps<State, Actions>) => any;
-export declare function app<State, Actions>(props: AppProps<State, Actions>): {
+/**
+ * @deprecated Deprecated for `withParents`
+ */
+export declare const wrapActions: typeof withParents;
+export interface Context<State, Actions, RenderReturn> {
     actions: Actions;
     state: State;
-    getState(): State;
-    render: (state?: State) => any;
     init: Init<State, Actions>;
     view: View<State, Actions>;
-    subscribe?: Subscribe<State, Actions> | undefined;
-    onRender?: ((view: any) => void) | undefined;
-    onUpdate?: OnUpdate<State, Actions> | undefined;
-    onUpdateStart?: OnUpdateStart<State, Actions> | undefined;
-};
+    subscribe?: Subscribe<State, Actions>;
+    onRender?: ((view: any) => RenderReturn);
+    onUpdate?: OnUpdate<State, Actions>;
+    onUpdateStart?: OnUpdateStart<State, Actions>;
+    render(state?: State): RenderReturn;
+}
+export declare type App<State, Actions> = (props: AppProps<State, Actions>) => Context<State, Actions, any>;
+export declare function app<State, Actions>(props: AppProps<State, Actions>): Context<State, Actions, any>;
 export default app;

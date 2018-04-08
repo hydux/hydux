@@ -15,7 +15,8 @@
     "test": "mocha --require ts-node/register \"src/test/**/*.ts\"",
     "test:watch": "npm run test -- -w --watch-extensions ts,tsx",
     "doc": "typedoc --theme minimal --exclude \"**/test/*.ts\"  --excludeNotExported --excludePrivate --out ./docs/api ./src && touch ./docs/.nojekyll",
-    "preversion": "npm run test && npm run build && npm run build:dist && git add -A"
+    "build:all": "run-s build build:dist build:es",
+    "preversion": "npm run test && npm run build:all && git add -A"
   },
   "pre-commit": [
     "test"
@@ -48,6 +49,7 @@
     "del-cli": "^1.1.0",
     "espower-typescript": "^8.1.2",
     "mocha": "^4.0.1",
+    "npm-run-all": "^4.1.2",
     "power-assert": "^1.4.4",
     "pre-commit": "^1.2.2",
     "source-map-loader": "^0.2.3",

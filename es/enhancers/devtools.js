@@ -1,28 +1,29 @@
+import * as tslib_1 from "tslib";
 import { connectViaExtension, extractState } from 'remotedev';
 import Cmd from '../cmd';
 export default function withDevtools(options) {
-    options = Object.assign({ remote: false, hostname: 'remotedev.io', port: 443, secure: true, getActionType: f => f, debounce: 10, filter: _ => true, jsonToState: f => f, stateToJson: f => f }, options);
-    const { jsonToState, stateToJson } = options;
-    const connection = connectViaExtension(options);
-    let timer;
-    return (app) => (props) => {
-        const ctx = app(Object.assign({}, props, { init: () => {
-                const result = props.init();
-                const state = (result instanceof Array) ? result[0] : result;
+    options = tslib_1.__assign({ remote: false, hostname: 'remotedev.io', port: 443, secure: true, getActionType: function (f) { return f; }, debounce: 10, filter: function (_) { return true; }, jsonToState: function (f) { return f; }, stateToJson: function (f) { return f; } }, options);
+    var jsonToState = options.jsonToState, stateToJson = options.stateToJson;
+    var connection = connectViaExtension(options);
+    var timer;
+    return function (app) { return function (props) {
+        var ctx = app(tslib_1.__assign({}, props, { init: function () {
+                var result = props.init();
+                var state = (result instanceof Array) ? result[0] : result;
                 connection.init(stateToJson(state));
                 return result;
-            }, onUpdate: (data) => {
+            }, onUpdate: function (data) {
                 props.onUpdate && props.onUpdate(data);
                 if (!options.filter(data.action)) {
                     return;
                 }
-                const send = () => connection.send({
+                var send = function () { return connection.send({
                     type: 'update',
                     msg: { data: data.msgData, type: data.action },
-                }, stateToJson(data.nextAppState));
+                }, stateToJson(data.nextAppState)); };
                 timer && clearTimeout(timer);
                 timer = setTimeout(send, options.debounce);
-            }, subscribe: (model) => {
+            }, subscribe: function (model) {
                 function sub(actions) {
                     connection.subscribe(function (msg) {
                         if (msg.type === 'DISPATCH') {
@@ -32,8 +33,8 @@ export default function withDevtools(options) {
                                     ctx.render(jsonToState(extractState(msg)));
                                     break;
                                 case 'IMPORT_STATE':
-                                    const states = msg.payload.nextLiftedState.computedStates;
-                                    const state = states[states.length - 1];
+                                    var states = msg.payload.nextLiftedState.computedStates;
+                                    var state = states[states.length - 1];
                                     ctx.render(jsonToState(state.state));
                                     connection.send(null, msg.payload.nextLiftedState);
                             }
@@ -45,6 +46,6 @@ export default function withDevtools(options) {
                     : [sub];
             } }));
         return ctx;
-    };
+    }; };
 }
 //# sourceMappingURL=devtools.js.map

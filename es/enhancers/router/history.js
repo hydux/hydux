@@ -1,112 +1,136 @@
-export class BaseHistory {
-    constructor(props = {}) {
+import * as tslib_1 from "tslib";
+var BaseHistory = /** @class */ (function () {
+    function BaseHistory(props) {
+        if (props === void 0) { props = {}; }
+        var _this = this;
         this.listeners = [];
-        this.last = () => this._last[0];
-        this.listen = listener => this.listeners.push(listener);
-        this.props = Object.assign({ basePath: '' }, props);
+        this.last = function () { return _this._last[0]; };
+        this.listen = function (listener) { return _this.listeners.push(listener); };
+        this.props = tslib_1.__assign({ basePath: '' }, props);
         this._last = [this.current()];
-        this.listeners.push(path => {
-            this._last = [this._last[this._last.length - 1], path];
+        this.listeners.push(function (path) {
+            _this._last = [_this._last[_this._last.length - 1], path];
         });
     }
-    go(delta) {
+    BaseHistory.prototype.go = function (delta) {
         history.go(delta);
-    }
-    back() {
+    };
+    BaseHistory.prototype.back = function () {
         history.back();
-    }
-    forward() {
+    };
+    BaseHistory.prototype.forward = function () {
         history.forward();
-    }
-    _setLoc(loc) {
+    };
+    BaseHistory.prototype._setLoc = function (loc) {
         this.lastLocation = this.location || loc;
         this.location = loc;
-    }
-    handleChange(path = this.current()) {
-        this.listeners.forEach(f => f(path));
-    }
-}
-export class HashHistory extends BaseHistory {
-    constructor(props = {}) {
-        super(props);
-        this.props = props = Object.assign({ hash: '#!' }, this.props);
-        window.addEventListener('hashchange', e => {
-            this.handleChange();
+    };
+    BaseHistory.prototype.handleChange = function (path) {
+        if (path === void 0) { path = this.current(); }
+        this.listeners.forEach(function (f) { return f(path); });
+    };
+    return BaseHistory;
+}());
+export { BaseHistory };
+var HashHistory = /** @class */ (function (_super) {
+    tslib_1.__extends(HashHistory, _super);
+    function HashHistory(props) {
+        if (props === void 0) { props = {}; }
+        var _this = _super.call(this, props) || this;
+        _this.props = props = tslib_1.__assign({ hash: '#!' }, _this.props);
+        window.addEventListener('hashchange', function (e) {
+            _this.handleChange();
         });
+        return _this;
     }
-    getRealPath(path) {
+    HashHistory.prototype.getRealPath = function (path) {
         return this.props.hash + this.props.basePath + path;
-    }
-    current() {
+    };
+    HashHistory.prototype.current = function () {
         return location.hash.slice(this.props.hash.length + this.props.basePath.length) || '/';
-    }
-    push(path) {
+    };
+    HashHistory.prototype.push = function (path) {
         location.assign(this.getRealPath(path));
-    }
-    replace(path) {
+    };
+    HashHistory.prototype.replace = function (path) {
         location.replace(this.getRealPath(path));
-    }
-}
-export class BrowserHistory extends BaseHistory {
-    constructor(props = {}) {
-        super(props);
-        window.addEventListener('popstate', e => {
-            this.handleChange();
+    };
+    return HashHistory;
+}(BaseHistory));
+export { HashHistory };
+var BrowserHistory = /** @class */ (function (_super) {
+    tslib_1.__extends(BrowserHistory, _super);
+    function BrowserHistory(props) {
+        if (props === void 0) { props = {}; }
+        var _this = _super.call(this, props) || this;
+        window.addEventListener('popstate', function (e) {
+            _this.handleChange();
         });
+        return _this;
     }
-    getRealPath(path) {
+    BrowserHistory.prototype.getRealPath = function (path) {
         return this.props.basePath + path;
-    }
-    current() {
+    };
+    BrowserHistory.prototype.current = function () {
         return location.pathname.slice(this.props.basePath.length)
             + location.search;
-    }
-    push(path) {
+    };
+    BrowserHistory.prototype.push = function (path) {
         history.pushState(null, '', this.getRealPath(path));
         this.handleChange(path);
-    }
-    replace(path) {
+    };
+    BrowserHistory.prototype.replace = function (path) {
         history.replaceState(null, '', this.getRealPath(path));
         this.handleChange(path);
+    };
+    return BrowserHistory;
+}(BaseHistory));
+export { BrowserHistory };
+var MemoryHistory = /** @class */ (function (_super) {
+    tslib_1.__extends(MemoryHistory, _super);
+    function MemoryHistory(props) {
+        if (props === void 0) { props = {}; }
+        var _this = _super.call(this, props) || this;
+        _this._stack = [];
+        _this._index = 0;
+        _this.props = props = tslib_1.__assign({ initPath: '/' }, _this.props);
+        // override initialization in super class
+        _this._stack = [_this.props.basePath + _this.props.initPath];
+        _this._last = [_this.current()];
+        return _this;
     }
-}
-export class MemoryHistory extends BaseHistory {
-    constructor(props = {}) {
-        super(props);
-        this._index = 0;
-        this.props = props = Object.assign({ initPath: '/' }, this.props);
-        this._stack = [this.props.basePath + this.props.initPath];
-    }
-    getRealPath(path) {
+    MemoryHistory.prototype.getRealPath = function (path) {
         return this.props.basePath + path;
-    }
-    current() {
+    };
+    MemoryHistory.prototype.current = function () {
         return this._stack[this._index].slice(this.props.basePath.length);
-    }
-    push(path) {
+    };
+    MemoryHistory.prototype.push = function (path) {
         this._reset();
         this._stack.push(this.props.basePath + path);
         this.handleChange(path);
-    }
-    replace(path) {
+    };
+    MemoryHistory.prototype.replace = function (path) {
         this._reset();
         this._stack[this._index] = this.props.basePath + path;
         this.handleChange(path);
-    }
-    go(delta) {
-        let next = this._index + delta;
+    };
+    MemoryHistory.prototype.go = function (delta) {
+        var next = this._index + delta;
         next = Math.min(next, this._stack.length - 1);
         next = Math.max(next, 0);
         this._index = next;
-    }
-    back() {
+    };
+    MemoryHistory.prototype.back = function () {
         this.go(-1);
-    }
-    forward() {
+    };
+    MemoryHistory.prototype.forward = function () {
         this.go(1);
-    }
-    _reset() {
+    };
+    MemoryHistory.prototype._reset = function () {
         this._stack = this._stack.slice(0, this._index + 1);
-    }
-}
+    };
+    return MemoryHistory;
+}(BaseHistory));
+export { MemoryHistory };
 //# sourceMappingURL=history.js.map

@@ -1,16 +1,16 @@
 import * as tslib_1 from "tslib";
 import { runAction } from './../../index';
 import Cmd from './../../cmd';
-import { BaseHistory, HashHistory, BrowserHistory } from './history';
-export { BaseHistory, HashHistory, BrowserHistory };
-const CHANGE_LOCATION = '@@hydux-router/CHANGE_LOCATION';
+import { BaseHistory, HashHistory, BrowserHistory, MemoryHistory, } from './history';
+export { BaseHistory, HashHistory, BrowserHistory, MemoryHistory, };
+var CHANGE_LOCATION = '@@hydux-router/CHANGE_LOCATION';
 export function parsePath(path) {
-    const splits = path.split('?');
-    const pathname = decodeURI(splits[0]);
-    const search = splits[1] ? '?' + splits[1] : '';
-    const query = search.slice(1).split('&').filter(Boolean)
-        .reduce((query, kv) => {
-        const [key, value] = kv.split('=').map(decodeURIComponent);
+    var splits = path.split('?');
+    var pathname = decodeURI(splits[0]);
+    var search = splits[1] ? '?' + splits[1] : '';
+    var query = search.slice(1).split('&').filter(Boolean)
+        .reduce(function (query, kv) {
+        var _a = kv.split('=').map(decodeURIComponent), key = _a[0], value = _a[1];
         if (query[key]) {
             query[key] = Array.prototype.concat.call([], query[key], value);
         }
@@ -19,18 +19,21 @@ export function parsePath(path) {
         }
         return query;
     }, {});
-    return { pathname, params: {}, query, search, template: null };
+    return { pathname: pathname, params: {}, query: query, search: search, template: null };
 }
-const isNotEmpty = s => s !== '';
+var isNotEmpty = function (s) { return s !== ''; };
 export function matchPath(pathname, fmt) {
-    let paramKeys = [];
-    let re = '^' + fmt.replace(/\/$/, '').replace(/([.%|(){}\[\]])/g, '\\$1').replace('*', '.*').replace(/\/\:([\w]+)/g, (m, name) => {
+    var paramKeys = [];
+    var re = '^' + fmt.replace(/\/$/, '').replace(/([.%|(){}\[\]])/g, '\\$1').replace('*', '.*').replace(/\/\:([\w]+)/g, function (m, name) {
         paramKeys.push(name);
         return '/([^/]+)';
     }) + '\/?$';
-    let match = pathname.match(new RegExp(re));
+    var match = pathname.match(new RegExp(re));
     if (match) {
-        const params = paramKeys.reduce((params, key, i) => (Object.assign({}, params, { [key]: match && match[i + 1] })), {});
+        var params = paramKeys.reduce(function (params, key, i) {
+            return (tslib_1.__assign({}, params, (_a = {}, _a[key] = match && match[i + 1], _a)));
+            var _a;
+        }, {});
         return [true, params];
     }
     else {
@@ -38,9 +41,9 @@ export function matchPath(pathname, fmt) {
     }
 }
 export function mkLink(history, h) {
-    const React = { createElement: h };
+    var React = { createElement: h };
     return function Link(_a, children) {
-        var { to, onClick, replace = false } = _a, props = tslib_1.__rest(_a, ["to", "onClick", "replace"]);
+        var to = _a.to, onClick = _a.onClick, _b = _a.replace, replace = _b === void 0 ? false : _b, props = tslib_1.__rest(_a, ["to", "onClick", "replace"]);
         function handleClick(e) {
             if (replace) {
                 history.replace(to);
@@ -52,18 +55,19 @@ export function mkLink(history, h) {
             e.stopPropagation();
             onClick && onClick(e);
         }
-        const Comp = 'a';
-        return React.createElement(Comp, Object.assign({ href: to }, props, { onclick: handleClick, onClick: handleClick }), children);
+        var Comp = 'a';
+        return React.createElement(Comp, tslib_1.__assign({ href: to }, props, { onclick: handleClick, onClick: handleClick }), children);
     };
 }
-export default function withRouter(props = {}) {
-    const { history = new HashHistory(), routes = {}, } = props;
-    let timer;
-    return (app) => (props) => {
+export default function withRouter(props) {
+    if (props === void 0) { props = {}; }
+    var _a = props.history, history = _a === void 0 ? new HashHistory() : _a, _b = props.routes, routes = _b === void 0 ? {} : _b;
+    var timer;
+    return function (app) { return function (props) {
         function pathToLoc(path) {
-            const loc = parsePath(path);
-            for (const key in routes) {
-                const [match, params] = matchPath(loc.pathname, key);
+            var loc = parsePath(path);
+            for (var key in routes) {
+                var _a = matchPath(loc.pathname, key), match = _a[0], params = _a[1];
                 if (match) {
                     loc.params = params;
                     loc.template = key;
@@ -72,37 +76,42 @@ export default function withRouter(props = {}) {
             }
             return loc;
         }
-        return app(Object.assign({}, props, { init: () => {
-                let result = props.init();
+        return app(tslib_1.__assign({}, props, { init: function () {
+                var result = props.init();
                 if (!(result instanceof Array)) {
                     result = [result, Cmd.none];
                 }
-                const loc = pathToLoc(history.current());
-                let cmd = Cmd.batch(result[1], Cmd.ofSub(actions => actions[CHANGE_LOCATION](loc)));
-                return [Object.assign({}, result[0], { location: loc }), cmd];
-            }, subscribe: state => Cmd.batch(Cmd.ofSub(actions => {
-                history.listen(path => {
+                var loc = pathToLoc(history.current());
+                var cmd = Cmd.batch(result[1], Cmd.ofSub(function (actions) { return actions[CHANGE_LOCATION](loc); }));
+                return [tslib_1.__assign({}, result[0], { location: loc }), cmd];
+            }, subscribe: function (state) { return Cmd.batch(Cmd.ofSub(function (actions) {
+                history.listen(function (path) {
                     actions[CHANGE_LOCATION](pathToLoc(path));
                 });
-            }), props.subscribe ? props.subscribe(state) : Cmd.none), actions: Object.assign({}, props.actions, { history: {
-                    push: path => (history.push(path), void 0),
-                    replace: path => (history.replace(path), void 0),
-                    go: delta => (history.go(delta), void 0),
-                    back: () => (history.back(), void 0),
-                    forward: () => (history.forward(), void 0),
-                }, [CHANGE_LOCATION]: (loc) => (state, actions) => {
-                    history._setLoc(loc);
-                    if (loc.template) {
-                        let [nextState, cmd] = runAction(routes[loc.template](loc), state, actions);
-                        return [Object.assign({}, nextState, { location: loc }), cmd];
-                    }
-                    else {
-                        return Object.assign({}, state, { location: loc });
-                    }
-                } }) }));
-    };
+            }), props.subscribe ? props.subscribe(state) : Cmd.none); }, actions: tslib_1.__assign({}, props.actions, (_a = { history: {
+                        push: function (path) { return (history.push(path), void 0); },
+                        replace: function (path) { return (history.replace(path), void 0); },
+                        go: function (delta) { return (history.go(delta), void 0); },
+                        back: function () { return (history.back(), void 0); },
+                        forward: function () { return (history.forward(), void 0); },
+                    } }, _a[CHANGE_LOCATION] = function (loc) { return function (state, actions) {
+                history._setLoc(loc);
+                if (loc.template) {
+                    var _a = runAction(routes[loc.template](loc), state, actions), nextState = _a[0], cmd = _a[1];
+                    return [tslib_1.__assign({}, nextState, { location: loc }), cmd];
+                }
+                else {
+                    return tslib_1.__assign({}, state, { location: loc });
+                }
+            }; }, _a)) }));
+        var _a;
+    }; };
 }
-export function join(...args) {
+export function join() {
+    var args = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+        args[_i] = arguments[_i];
+    }
     return args.join('/').replace(/\/+/g, '/');
 }
 /**
@@ -110,21 +119,21 @@ export function join(...args) {
  */
 export function parseNestedRoutes(routes) {
     function rec(routes, newRoutes) {
-        let children = routes.children || [];
-        newRoutes[routes.path] = Object.assign({}, routes, { parents: routes.parents || [], children: children.map(r => (Object.assign({}, r, { parents: void 0, children: void 0 }))) });
+        var children = routes.children || [];
+        newRoutes[routes.path] = tslib_1.__assign({}, routes, { parents: routes.parents || [], children: children.map(function (r) { return (tslib_1.__assign({}, r, { parents: void 0, children: void 0 })); }) });
         children
-            .map(r => (Object.assign({}, r, { path: join(routes.path, r.path), action: r.action, parents: (routes.parents || []).concat(Object.assign({}, routes, { parents: void 0, children: void 0 })), children: r.children })))
-            .forEach(r => rec(r, newRoutes));
+            .map(function (r) { return (tslib_1.__assign({}, r, { path: join(routes.path, r.path), action: r.action, parents: (routes.parents || []).concat(tslib_1.__assign({}, routes, { parents: void 0, children: void 0 })), children: r.children })); })
+            .forEach(function (r) { return rec(r, newRoutes); });
         return newRoutes;
     }
-    const meta = rec(routes, {});
-    let simpleRoutes = {};
-    for (const key in meta) {
-        const route = meta[key];
+    var meta = rec(routes, {});
+    var simpleRoutes = {};
+    for (var key in meta) {
+        var route = meta[key];
         if (route.action) {
             simpleRoutes[key] = route.action;
         }
     }
-    return { routes: simpleRoutes, meta };
+    return { routes: simpleRoutes, meta: meta };
 }
 //# sourceMappingURL=index.js.map

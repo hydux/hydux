@@ -1,15 +1,13 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-var tslib_1 = require("tslib");
-var cmd_1 = require("./../cmd");
-function withSSR(options) {
+import * as tslib_1 from "tslib";
+import Cmd from './../cmd';
+export default function withSSR(options) {
     var _this = this;
     return function (app) { return function (props) {
-        var initCmd = cmd_1.default.none;
+        var initCmd = Cmd.none;
         var ctx = app(tslib_1.__assign({}, props, { init: function () {
                 var result = props.init();
                 if (!(result instanceof Array)) {
-                    result = [result, cmd_1.default.none];
+                    result = [result, Cmd.none];
                 }
                 initCmd = result[1];
                 return [result[0], result[1]];
@@ -30,5 +28,4 @@ function withSSR(options) {
         return ctx;
     }; };
 }
-exports.default = withSSR;
 //# sourceMappingURL=ssr.js.map

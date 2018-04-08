@@ -8,15 +8,15 @@ export function ofFn(task, args, succeedAction, failedAction) {
         succeedAction = args;
         args = void 0;
     }
-    const fn = () => {
-        const result = task(args);
+    var fn = function () {
+        var result = task(args);
         if (succeedAction) {
             succeedAction(result);
         }
         return result;
     };
     return [
-            _ => {
+        function (_) {
             if (failedAction) {
                 try {
                     return fn();
@@ -42,31 +42,56 @@ export function ofPromise(task, args, succeedAction, failedAction) {
         args = void 0;
     }
     return [
-            _ => task(args)
-            .then(res => {
-            try {
-                succeedAction && succeedAction(res);
-            }
-            catch (error) {
-                console.error(error);
-            }
-        })
-            .catch(failedAction)
+        function (_) {
+            return task(args)
+                .then(function (res) {
+                try {
+                    succeedAction && succeedAction(res);
+                }
+                catch (error) {
+                    console.error(error);
+                }
+            })
+                .catch(failedAction);
+        }
     ];
 }
-export const ofSub = (sub) => [sub];
-const _concat = Array.prototype.concat;
-export const batch = (...cmds) => _concat.apply([], _concat.apply([], cmds));
-export const map = (map, cmd) => {
-    return cmd.map(sub => actions => sub(map(actions)));
+/**
+ * Create a command from a sub function, you can access all same level actions in a `sub`.
+ * @param sub
+ */
+export var ofSub = function (sub) { return [sub]; };
+var _concat = Array.prototype.concat;
+/**
+ * Batch multi commands to one command
+ * @param cmds
+ */
+export var batch = function () {
+    var cmds = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+        cmds[_i] = arguments[_i];
+    }
+    return _concat.apply([], _concat.apply([], cmds));
 };
-export const none = [];
-export default {
-    none,
-    ofFn,
-    ofPromise,
-    ofSub,
-    batch,
-    map,
+/**
+ * Map a command to a low level command
+ * @param map
+ * @param cmd
+ */
+export var map = function (map, cmd) {
+    return cmd.map(function (sub) { return function (actions) { return sub(map(actions)); }; });
 };
+/**
+ * Empty command
+ */
+export var none = [];
+export var Cmd = {
+    none: none,
+    ofFn: ofFn,
+    ofPromise: ofPromise,
+    ofSub: ofSub,
+    batch: batch,
+    map: map,
+};
+export default Cmd;
 //# sourceMappingURL=cmd.js.map

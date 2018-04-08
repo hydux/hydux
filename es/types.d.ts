@@ -12,3 +12,5 @@ export declare type UnknownArgsActionType<State, Actions> = (...args: any[]) => 
 export declare type ActionsType<State, Actions> = {
     [P in keyof Actions]: ActionType<any, State, Actions> | ActionsType<any, Actions[P]>;
 };
+export declare type AR<S, A> = ActionResult<S, A>;
+export declare type ACR<S, A> = ActionCmdResult<S, A>;

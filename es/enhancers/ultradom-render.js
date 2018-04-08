@@ -1,24 +1,31 @@
+import * as tslib_1 from "tslib";
 import { patch, createNode as _h } from 'ultradom';
-const React = { createElement: h };
+var React = { createElement: h };
 export { React };
-export function h(type, props, ...children) {
+export function h(type, props) {
+    var children = [];
+    for (var _i = 2; _i < arguments.length; _i++) {
+        children[_i - 2] = arguments[_i];
+    }
     if (props) {
-        for (const key in props) {
+        for (var key in props) {
             if (key.match(/^on[A-Z]\w+$/)) {
                 props[key.toLowerCase()] = props[key];
             }
         }
     }
-    return _h(type, props, ...children);
+    return _h.apply(void 0, [type, props].concat(children));
 }
-const __HYDUX_RENDER_NODE__ = '__HYDUX_RENDER_NODE__';
-export default function withUltradom(container = document.body, options = { raf: true }) {
-    let rafId;
-    return app => props => app(Object.assign({}, props, { onRender(view) {
+var __HYDUX_RENDER_NODE__ = '__HYDUX_RENDER_NODE__';
+export default function withUltradom(container, options) {
+    if (container === void 0) { container = document.body; }
+    if (options === void 0) { options = { raf: true }; }
+    var rafId;
+    return function (app) { return function (props) { return app(tslib_1.__assign({}, props, { onRender: function (view) {
             props.onRender && props.onRender(view);
             // fix duplicate node in hmr
-            const render = () => {
-                let rootEl = container[__HYDUX_RENDER_NODE__];
+            var render = function () {
+                var rootEl = container[__HYDUX_RENDER_NODE__];
                 if (!rootEl) {
                     rootEl = container[__HYDUX_RENDER_NODE__] = patch(view);
                     container.appendChild(rootEl);
@@ -34,6 +41,6 @@ export default function withUltradom(container = document.body, options = { raf:
                 window.cancelAnimationFrame(rafId);
             }
             rafId = window.requestAnimationFrame(render);
-        } }));
+        } })); }; };
 }
 //# sourceMappingURL=ultradom-render.js.map

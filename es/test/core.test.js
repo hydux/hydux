@@ -1,64 +1,68 @@
+var _this = this;
 import * as tslib_1 from "tslib";
 import { noop } from './../utils';
 import * as assert from 'assert';
 import app, { Cmd, withParents } from '../index';
 import logger from '../enhancers/logger';
 function sleep(ns) {
-    return new Promise(resolve => setTimeout(resolve, ns));
+    return new Promise(function (resolve) { return setTimeout(resolve, ns); });
 }
-const Counter = {
-    init: () => ({ count: 1 }),
+var Counter = {
+    init: function () { return ({ count: 1 }); },
     actions: {
-        up: () => state => ({ count: state.count + 1 }),
-        upN: (n) => (state, actions) => ({ count: state.count + n }),
-        down: () => state => ({ count: state.count - 1 }),
-        reset: () => ({ count: 1 }),
-        up12: () => (state, actions) => actions.upN(12),
-        upLaterByPromise: n => state => actions => new Promise(resolve => setTimeout(() => resolve(actions.upN(n)), 10)),
-        upLater: () => state => actions => [state, Cmd.ofPromise(() => new Promise(resolve => setTimeout(() => resolve(), 10)), void 0, actions.up)],
-        upLaterObj: () => state => actions => ({
-            state,
-            cmd: Cmd.ofPromise(() => new Promise(resolve => setTimeout(() => resolve(), 10)), void 0, actions.up)
-        }),
-        upLaterWithBatchedCmd: () => state => actions => [state, Cmd.batch([
-                Cmd.ofPromise(() => new Promise(resolve => setTimeout(() => resolve(), 10)), void 0, actions.up)
-            ])]
+        up: function () { return function (state) { return ({ count: state.count + 1 }); }; },
+        upN: function (n) { return function (state, actions) { return ({ count: state.count + n }); }; },
+        down: function () { return function (state) { return ({ count: state.count - 1 }); }; },
+        reset: function () { return ({ count: 1 }); },
+        up12: function () { return function (state, actions) { return actions.upN(12); }; },
+        upLaterByPromise: function (n) { return function (state) { return function (actions) { return new Promise(function (resolve) {
+            return setTimeout(function () { return resolve(actions.upN(n)); }, 10);
+        }); }; }; },
+        upLater: function () { return function (state) { return function (actions) { return [state, Cmd.ofPromise(function () { return new Promise(function (resolve) { return setTimeout(function () { return resolve(); }, 10); }); }, void 0, actions.up)]; }; }; },
+        upLaterObj: function () { return function (state) { return function (actions) { return ({
+            state: state,
+            cmd: Cmd.ofPromise(function () { return new Promise(function (resolve) { return setTimeout(function () { return resolve(); }, 10); }); }, void 0, actions.up)
+        }); }; }; },
+        upLaterWithBatchedCmd: function () { return function (state) { return function (actions) { return [state, Cmd.batch([
+                Cmd.ofPromise(function () { return new Promise(function (resolve) { return setTimeout(function () { return resolve(); }, 10); }); }, void 0, actions.up)
+            ])]; }; }; }
     }
 };
-let _dummyState = Counter.init();
-describe('core api', () => {
-    it('init', () => {
-        let ctx;
-        let state;
-        let renderResult;
+var _dummyState = Counter.init();
+describe('core api', function () {
+    it('init', function () {
+        var ctx;
+        var state;
+        var renderResult;
         ctx = app({
-            init: () => ({ count: 1 }),
+            init: function () { return ({ count: 1 }); },
             actions: {},
-            view: state => actions => state,
-            onRender: view => renderResult = view
+            view: function (state) { return function (actions) { return state; }; },
+            onRender: function (view) { return renderResult = view; }
         });
-        assert(ctx.getState().count === 1, 'simple state should work');
+        assert(ctx.state.count === 1, 'simple state should work');
         assert.equal(renderResult.count, 1, 'simple state in view should work');
         state = { aa: 1, bb: { cc: 'aa' } };
         ctx = logger()(app)({
-            init: () => state,
+            init: function () { return state; },
             actions: {},
-            view: (state, actions) => ({ type: 'view', state }),
-            onRender: view => renderResult = view
+            view: function (state, actions) { return ({ type: 'view', state: state }); },
+            onRender: function (view) { return renderResult = view; }
         });
-        assert.deepStrictEqual(ctx.getState(), state, 'nested state should work');
-        assert.deepStrictEqual(renderResult, { type: 'view', state }, 'nested state in view should work');
+        assert.deepStrictEqual(ctx.state, state, 'nested state should work');
+        assert.deepStrictEqual(renderResult, { type: 'view', state: state }, 'nested state in view should work');
     });
-    function testCounter(ctx, renderResult, path = []) {
+    function testCounter(ctx, renderResult, path) {
+        if (path === void 0) { path = []; }
         function getState() {
-            let state = ctx.getState();
-            for (const i in path) {
+            var state = ctx.state;
+            for (var i in path) {
                 state = state[path[i]];
             }
             return state;
         }
-        let actions = ctx.actions;
-        for (const i in path) {
+        var actions = ctx.actions;
+        for (var i in path) {
             actions = actions[path[i]];
         }
         assert(getState().count === 1, 'init should work');
@@ -73,111 +77,129 @@ describe('core api', () => {
         actions.reset();
         assert(getState().count === 1, 'reset should work');
     }
-    it('actions', () => {
-        let ctx;
-        let state;
-        let renderResult;
+    it('actions', function () {
+        var ctx;
+        var state;
+        var renderResult;
         ctx = app({
-            init: () => ({ count: 1 }),
+            init: function () { return ({ count: 1 }); },
             actions: {
-                up: _ => state => ({ count: state.count + 1 }),
-                down: _ => state => ({ count: state.count - 1 }),
-                reset: _ => ({ count: 1 }),
+                up: function (_) { return function (state) { return ({ count: state.count + 1 }); }; },
+                down: function (_) { return function (state) { return ({ count: state.count - 1 }); }; },
+                reset: function (_) { return ({ count: 1 }); },
             },
-            view: state => actions => actions,
-            onRender: view => renderResult = view
+            view: function (state) { return function (actions) { return actions; }; },
+            onRender: function (view) { return renderResult = view; }
         });
         testCounter(ctx, renderResult);
     });
-    it('complex actions', () => {
-        let state;
-        let renderResult;
-        class ClassActions {
-            constructor(inc) {
-                this.up = () => (state) => {
-                    console.log('up in class', state, this._inc);
-                    return ({ count: state.count + this._inc });
-                };
+    it('complex actions', function () {
+        var state;
+        var renderResult;
+        var ClassActions = /** @class */ (function () {
+            function ClassActions(inc) {
+                var _this = this;
+                this.up = function () { return function (state) {
+                    console.log('up in class', state, _this._inc);
+                    return ({ count: state.count + _this._inc });
+                }; };
                 this._inc = inc;
             }
-        }
-        let ctx = app({
-            init: () => ({ count: 1, classActions: { count: 1 } }),
+            return ClassActions;
+        }());
+        var ctx = app({
+            init: function () { return ({ count: 1, classActions: { count: 1 } }); },
             actions: {
                 classActions: new ClassActions(10),
                 xx: 'aaa',
                 _actions: new Date(),
-                up: _ => state => ({ count: state.count + 1 }),
-                down: _ => state => ({ count: state.count - 1 }),
-                reset: _ => ({ count: 1 }),
+                up: function (_) { return function (state) { return ({ count: state.count + 1 }); }; },
+                down: function (_) { return function (state) { return ({ count: state.count - 1 }); }; },
+                reset: function (_) { return ({ count: 1 }); },
             },
-            view: state => actions => actions,
-            onRender: view => renderResult = view
+            view: function (state) { return function (actions) { return actions; }; },
+            onRender: function (view) { return renderResult = view; }
         });
         testCounter(ctx, renderResult);
-        assert.deepEqual(ctx.getState().classActions.count, 1, 'classActions state work');
+        assert.deepEqual(ctx.state.classActions.count, 1, 'classActions state work');
         ctx.actions.classActions.up();
-        assert.deepEqual(ctx.getState().classActions.count, 11, 'classActions should work');
+        assert.deepEqual(ctx.state.classActions.count, 11, 'classActions should work');
     });
-    it('nested async actions', () => tslib_1.__awaiter(this, void 0, void 0, function* () {
-        let state;
-        let renderResult;
-        const _state = {
-            counter1: Counter.init(),
-            counter2: Counter.init(),
-        };
-        const actions = {
-            counter1: Counter.actions,
-            counter2: Counter.actions,
-        };
-        let ctx = app({
-            init: () => _state,
-            actions,
-            view: state => actions => actions,
-            onRender: view => renderResult = view
+    it('nested async actions', function () { return tslib_1.__awaiter(_this, void 0, void 0, function () {
+        var state, renderResult, _state, actions, ctx;
+        return tslib_1.__generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _state = {
+                        counter1: Counter.init(),
+                        counter2: Counter.init(),
+                    };
+                    actions = {
+                        counter1: Counter.actions,
+                        counter2: Counter.actions,
+                    };
+                    ctx = app({
+                        init: function () { return _state; },
+                        actions: actions,
+                        view: function (state) { return function (actions) { return actions; }; },
+                        onRender: function (view) { return renderResult = view; }
+                    });
+                    assert(ctx.state.counter1.count === 1, 'counter1 init should work');
+                    ctx.actions.counter1.upLater();
+                    assert(ctx.state.counter1.count === 1, 'counter1 should work 1');
+                    return [4 /*yield*/, sleep(10)];
+                case 1:
+                    _a.sent();
+                    assert.equal(ctx.state.counter1.count, 2, 'counter1 should work 2');
+                    ctx.actions.counter1.upLater();
+                    return [4 /*yield*/, sleep(10)];
+                case 2:
+                    _a.sent();
+                    assert(ctx.state.counter1.count === 3, 'counter1 should work 3');
+                    ctx.actions.counter1.upLaterByPromise(3);
+                    assert(ctx.state.counter1.count === 3, 'upLaterByPromise should work 3');
+                    return [4 /*yield*/, sleep(10)];
+                case 3:
+                    _a.sent();
+                    assert(ctx.state.counter1.count === 6, 'upLaterByPromise should work 6');
+                    ctx.actions.counter1.upLaterWithBatchedCmd();
+                    assert(ctx.state.counter1.count === 6, 'upLaterWithBatchedCmd should work 6');
+                    return [4 /*yield*/, sleep(10)];
+                case 4:
+                    _a.sent();
+                    assert(ctx.state.counter1.count === 7, 'upLaterWithBatchedCmd should work 7');
+                    ctx.actions.counter1.up12();
+                    assert(ctx.state.counter1.count === 19, 'up12 should work 19');
+                    return [2 /*return*/];
+            }
         });
-        assert(ctx.getState().counter1.count === 1, 'counter1 init should work');
-        ctx.actions.counter1.upLater();
-        assert(ctx.getState().counter1.count === 1, 'counter1 should work 1');
-        yield sleep(10);
-        assert.equal(ctx.getState().counter1.count, 2, 'counter1 should work 2');
-        ctx.actions.counter1.upLater();
-        yield sleep(10);
-        assert(ctx.getState().counter1.count === 3, 'counter1 should work 3');
-        ctx.actions.counter1.upLaterByPromise(3);
-        assert(ctx.getState().counter1.count === 3, 'upLaterByPromise should work 3');
-        yield sleep(10);
-        assert(ctx.getState().counter1.count === 6, 'upLaterByPromise should work 6');
-        ctx.actions.counter1.upLaterWithBatchedCmd();
-        assert(ctx.getState().counter1.count === 6, 'upLaterWithBatchedCmd should work 6');
-        yield sleep(10);
-        assert(ctx.getState().counter1.count === 7, 'upLaterWithBatchedCmd should work 7');
-        ctx.actions.counter1.up12();
-        assert(ctx.getState().counter1.count === 19, 'up12 should work 19');
-    }));
-    it('parent actions', () => {
-        const initState = {
+    }); });
+    it('parent actions', function () {
+        var initState = {
             counter1: Counter.init(),
             counter2: Counter.init(),
         };
-        const counter1Actions = Object.assign({}, Counter.actions, { upN: (n) => withParents(Counter.actions.upN, (action, parentState, parentActions, _, __) => {
-                const [state, cmd] = action(n + 1);
-                assert.equal(state.count, parentState.counter1.count + n + 1, 'call child action work');
-                return [state, Cmd.batch(cmd, Cmd.ofFn(() => parentActions.counter2.up()))];
-            }) });
-        const actions = {
+        // const counter1Actions: CounterActions =
+        var actions = {
             counter2: Counter.actions,
-            counter1: counter1Actions,
+            counter1: tslib_1.__assign({}, Counter.actions, { upN: function (n) { return withParents(Counter.actions.upN, function (action, parentState, parentActions, _, __) {
+                    var _a = action(n + 1), state = _a[0], cmd = _a[1];
+                    assert.equal(state.count, parentState.counter1.count + n + 1, 'call child action work');
+                    return [
+                        state,
+                        Cmd.batch(cmd, Cmd.ofFn(function () { return parentActions.counter2.up(); }))
+                    ];
+                }); } }),
         };
-        let ctx = app({
-            init: () => initState,
-            actions,
-            view: state => actions => actions,
+        var ctx = app({
+            init: function () { return initState; },
+            actions: actions,
+            view: function (state) { return function (actions) { return actions; }; },
             onRender: noop
         });
         ctx.actions.counter1.upN(1);
-        assert.equal(ctx.getState().counter1.count, 3, 'counter1 upN work');
-        assert.equal(ctx.getState().counter2.count, 2, 'counter2 upN work');
+        assert.equal(ctx.state.counter1.count, 3, 'counter1 upN work');
+        assert.equal(ctx.state.counter2.count, 2, 'counter2 upN work');
     });
 });
 //# sourceMappingURL=core.test.js.map
