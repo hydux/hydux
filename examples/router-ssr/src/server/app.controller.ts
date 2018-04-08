@@ -5,14 +5,16 @@ import * as Client from '../client/main'
 @Controller()
 export class AppController {
   @Get('/api/initcount')
-  initCount(@Req() req: Request, @Res() res: Response): string {
-    return '100'
+  initCount(@Req() req: Request, @Res() res: Response) {
+    res.send({
+      count: 100
+    })
   }
 
-  @Get()
+  @Get('*')
   async index(@Req() req: Request, @Res() res: Response) {
     let ctx = Client.main(req.path)
     let html = await ctx.render()
-    res.render('index', { html })
+    res.render('index', { html, state: ctx.state })
   }
 }

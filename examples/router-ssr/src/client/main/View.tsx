@@ -1,4 +1,4 @@
-import withPicodom, { React } from '../../../../../src/enhancers/picodom-render'
+import withReact, { React } from 'hydux-react'
 import withRouter, {
   mkLink,
   History,
@@ -8,7 +8,7 @@ import withRouter, {
   RouterState,
   Routes,
 } from '../../../../../src/enhancers/router'
-import Counter, { State as CounterState } from '../counter'
+import * as Counter from '../counter'
 import { State, Actions, history } from './State'
 
 const NoMatch = () => <div>404</div>

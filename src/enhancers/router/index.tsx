@@ -77,8 +77,19 @@ export type RouterState<State extends Object> = State & {
 
 export function mkLink(history: History, h) {
   const React = { createElement: h }
-  return function Link({ to, onClick, replace = false, ...props }: { to: string, onClick?: (e: MouseEvent) => void, replace?: boolean } , children) {
-    function handleClick(e: MouseEvent) {
+  return function Link({
+      to,
+      onClick,
+      replace = false,
+      ...props,
+    }: {
+      to: string,
+      onClick?: (e: any) => void,
+      replace?: boolean,
+    },
+    children
+  ) {
+    function handleClick(e: any) {
       if (replace) {
         history.replace(to)
       } else {
@@ -89,7 +100,14 @@ export function mkLink(history: History, h) {
       onClick && onClick(e)
     }
     const Comp: any = 'a'
-    return <Comp href={to} {...props} onclick={handleClick} onClick={handleClick}>{children}</Comp>
+    if ('children' in props) {
+      children = (props as any).children
+    }
+    return (
+      <a href={to} {...props} onClick={handleClick}>
+      {children}
+      </a>
+    )
   }
 }
 

@@ -1,11 +1,10 @@
-import _app from '../../../../../src/index'
-import withPicodom, { React } from '../../../../../src/enhancers/picodom-render'
+import _app, { Cmd, Init } from '../../../../../src/index'
 import { ActionsType } from '../../../../../src/types'
 import withRouter, {
   mkLink, History, HashHistory, BrowserHistory,
   RouterActions, RouterState, Routes, MemoryHistory
 } from '../../../../../src/enhancers/router'
-import Counter, { State as CounterState } from '../counter'
+import * as Counter from '../counter'
 // const history = new HashHistory()
 export const history =
   __is_browser
@@ -23,16 +22,24 @@ export type Page =
 | '404'
 
 export type State = {
-  counter: CounterState,
+  counter: Counter.State,
   page: Page
 }
 
-const initState: State = {
-  counter: Counter.init(),
+const initState: State = (global as any).__INIT_STATE__ || {
+  counter: Counter.initState(),
   page: 'Home',
 }
 
-export const init = () => initState
+export const init: Init<State, Actions> = () => [
+  initState,
+  // Since the init command is already executed on the server side, we can simply ignore it on the browser side.
+  __is_browser
+    ? Cmd.none
+    : Cmd.batch(
+        Cmd.map(_ => _.counter, Counter.initCmd())
+      )
+]
 
 export type Actions = typeof actions
 

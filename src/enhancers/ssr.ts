@@ -21,6 +21,10 @@ export default function withSSR<State, Actions>(
         initCmd = result[1]
         return [result[0], result[1]]
       },
+      onRender() {
+        // ignore
+        return
+      }
     })
     ctx.render = async (state?: State) => {
       await Promise.all(

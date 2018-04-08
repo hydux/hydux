@@ -5,8 +5,11 @@
   <title>Hydux Router-SSR example</title>
 </head>
 <body>
-  <div id="root"><%= html %></div>
-  <script src="/static/dist/vendor.dll.js" charset="utf-8"></script>
-  <script src="/static/dist/bundle.js" charset="utf-8"></script>
+  <div id="root"><%- html %></div>
+  <script>
+    var __INIT_STATE__ = <%- JSON.stringify(state) %>
+  </script>
+  <script src="<%= assets_url %>/static/dist/vendor.dll.js" charset="utf-8"></script>
+  <script src="<%= assets_url %>/static/dist/bundle.js" charset="utf-8"></script>
 </body>
 </html>

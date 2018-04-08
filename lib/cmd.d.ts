@@ -30,7 +30,7 @@ export declare const ofSub: <Actions>(sub: Sub<Actions>) => Sub<Actions>[];
  * Batch multi commands to one command
  * @param cmds
  */
-export declare const batch: <Actions>(...cmds: (Sub<any>[] | Sub<any>[][])[]) => Sub<Actions>[];
+export declare const batch: <Actions>(...cmds: (Sub<Actions>[] | Sub<Actions>[][])[]) => Sub<Actions>[];
 /**
  * Map a command to a low level command
  * @param map
@@ -52,7 +52,7 @@ export declare const Cmd: {
         <A, T, State, Actions>(task: () => Promise<T>, succeedAction?: ActionType<T, State, Actions> | undefined, failedAction?: ActionType<Error, State, Actions> | undefined): Sub<Actions>[];
     };
     ofSub: <Actions>(sub: Sub<Actions>) => Sub<Actions>[];
-    batch: <Actions>(...cmds: (Sub<any>[] | Sub<any>[][])[]) => Sub<Actions>[];
+    batch: <Actions>(...cmds: (Sub<Actions>[] | Sub<Actions>[][])[]) => Sub<Actions>[];
     map: <Actions, SubActions>(map: (action: Actions) => SubActions, cmd: Sub<SubActions>[]) => Sub<Actions>[];
 };
 export default Cmd;

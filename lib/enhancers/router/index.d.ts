@@ -29,7 +29,7 @@ export declare type RouterState<State extends Object> = State & {
 };
 export declare function mkLink(history: History, h: any): ({to, onClick, replace, ...props}: {
     to: string;
-    onClick?: ((e: MouseEvent) => void) | undefined;
+    onClick?: ((e: any) => void) | undefined;
     replace?: boolean | undefined;
 }, children: any) => JSX.Element;
 export declare type Routes<State, Actions> = {

@@ -242,7 +242,7 @@ export function app<State, Actions>(props: AppProps<State, Actions>): Context<St
             props.onUpdate({
               prevAppState: appState,
               nextAppState,
-              msgData,
+              msgData: subFrom.length ? msgData : [],
               action: path.concat(key).join('.'),
             })
           }

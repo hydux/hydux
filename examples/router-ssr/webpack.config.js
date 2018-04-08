@@ -62,7 +62,7 @@ module.exports = createConfig([
     }),
     devServer.proxy({
       '/api': {
-        target: 'http://localhost:3000',
+        target: 'http://localhost:3456',
         secure: false,
         changeOrigin: true,
       },

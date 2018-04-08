@@ -6,11 +6,10 @@ export abstract class BaseHistory {
   public location: Location<any, any>
   public lastLocation: Location<any, any>
   protected props: HistoryProps
-  protected _last: string[]
+  protected _last: string[] = []
   protected listeners: ((path: string) => void)[] = []
   constructor(props: Partial<HistoryProps> = {}) {
-    this.props = { basePath: '', ...props }
-    this._last = [this.current()]
+    this.props = props = { basePath: '', ...props }
     this.listeners.push(path => {
       this._last = [this._last[this._last.length - 1], path]
     })
@@ -51,6 +50,7 @@ export class HashHistory extends BaseHistory {
       hash: '#!',
       ...this.props,
     }
+    this._last = [this.current()]
     window.addEventListener('hashchange', e => {
       this.handleChange()
     })
@@ -72,6 +72,7 @@ export class HashHistory extends BaseHistory {
 export class BrowserHistory extends BaseHistory {
   constructor(props: Partial<HistoryProps> = {}) {
     super(props)
+    this._last = [this.current()]
     window.addEventListener('popstate', e => {
       this.handleChange()
     })

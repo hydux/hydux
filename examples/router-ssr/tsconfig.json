@@ -38,7 +38,7 @@
     // "rootDirs": ["./", "../test"],     /* List of root folders whose combined content represents the structure of the project at runtime. */
     // "typeRoots": [],                       /* List of folders to include type definitions from. */
     // "types": [],                           /* Type declaration files to be included in compilation. */
-    "allowSyntheticDefaultImports": true,  /* Allow default imports from modules with no default export. This does not affect code emit, just typechecking. */
+    "allowSyntheticDefaultImports": false,  /* Allow default imports from modules with no default export. This does not affect code emit, just typechecking. */
 
     /* Source Map Options */
     // "sourceRoot": "./",                    /* Specify the location where debugger should locate TypeScript files instead of source locations. */
@@ -51,12 +51,16 @@
     "emitDecoratorMetadata": true         /* Enables experimental support for emitting type metadata for decorators. */
   },
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "../../src"
   ],
   "exclude": [
     "./.history",
     "./static",
     "./node_modules",
-    "**/*.test.*"
-  ]
+    "**/*.test.*",
+    "./node_modules/ultradom",
+    "../../src/enhancers/picodom-render.ts",
+    "../../src/enhancers/ultradom-render.ts"
+  ],
 }

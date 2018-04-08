@@ -1,6 +1,6 @@
 {
-  "watch": ["src"],
-  "ext": "ts",
+  "watch": ["src/**.*", "../../src/**.*"],
+  "ext": "ts,tsx",
   "ignore": ["src/**/*.spec.ts"],
-  "exec": "ts-node -O '{\"module\": \"commonjs\"}'  ./src/server/main.ts"
+  "exec": "ts-node -O '{\"module\": \"commonjs\"}' ./src/server/main.ts"
 }

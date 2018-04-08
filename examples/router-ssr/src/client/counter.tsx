@@ -1,8 +1,18 @@
-import { h, React } from '../../../../src/enhancers/picodom-render'
+import { React } from 'hydux-react'
 import { Cmd, noop, ActionsType, ActionType } from '../../../../src/index'
-const initState = { count: 0 }
-const init = () => initState
-const actions = {
+import * as Utils from './utils'
+
+const initStateValue = { count: 0 }
+
+export const initState = () => initStateValue
+export const initCmd = () => Cmd.ofSub<Actions>(
+  _ =>
+    Utils.fetch(`/api/initcount`)
+    .then(res => res.json())
+    .then(data => _.setCount(data.count)),
+)
+export const actions = {
+  setCount: count => (state: State) => ({ count }),
   down: () => (state: State) => ({ count: state.count - 1 }),
   up: () => (state: State) => ({ count: state.count + 1 }),
   upN: n => (state: State) => ({ count: state.count + n }),
@@ -17,15 +27,14 @@ const actions = {
         actions.upN) ])
 }
 
-const view = (state: State, actions: Actions) => (
+export const view = (state: State, actions: Actions) => (
   <div>
     <h1>{state.count}</h1>
-    <button onclick={actions.down}>–</button>
-    <button onclick={actions.up}>+</button>
-    <button onclick={actions.upLater}>+ later</button>
+    <button onClick={actions.down}>–</button>
+    <button onClick={actions.up}>+</button>
+    <button onClick={actions.upLater}>+ later</button>
   </div>
 )
 
-export default { init, actions, view }
 export type Actions = typeof actions
-export type State = typeof initState
+export type State = typeof initStateValue

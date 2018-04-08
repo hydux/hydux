@@ -118,7 +118,7 @@ const _concat = Array.prototype.concat
  * @param cmds
  */
 export const batch = <Actions>(
-  ...cmds: (CmdType<any> | CmdType<any>[])[]
+  ...cmds: (CmdType<Actions> | CmdType<Actions>[])[]
 ): CmdType<Actions> =>
   _concat.apply([], _concat.apply([], cmds))
 /**
