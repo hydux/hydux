@@ -2,13 +2,13 @@
 
 ## How
 
-Server-Side Rendering is super simple in the Elm Architechture, because we already split init, update and view.
+Server-Side Rendering is super simple in the Elm Architechture, because we already split our code with init, update and view.
 
-Not like next.js, we don't need to add a conventional magic lifecycle method(`getInitProps`), because there already has a powerful `init` funciton, which contains initial model and initial command. What we need to do is just run initial command on the server side, and ignore it on the client side, and synchronize state on the client and server side by adding some conditional compilation. Then we get an **isomorphic app** for free!
+Not like next.js, we don't need to add a conventional magic lifecycle method(`getInitialProps`), because we already have a powerful `init` funciton, which contains initial model and initial command, what we need to do is just running initial command on the server side, and ignore it on the client side, then synchronize state between the client and server by adding some conditionals. Then we get an **isomorphic app** for free!
 
 ## Example App
 
-If you cann't wait, here is a [demo app](https://github.com/hydux/hydux/tree/master/examples/router-ssr) with built-in router in the examples folder.
+If you can't wait, here is a [demo app](https://github.com/hydux/hydux/tree/master/examples/router-ssr) with built-in router in the examples folder.
 
 ```sh
 cd ./examples/router-ssr
@@ -31,7 +31,7 @@ let withEnhancers = Hydux.compose(
       document.getElementById('root'),
       { hydrate: true },
     )
-    // Inject `renderToString` to Hydux on the server side, so we can call `ctx.render` to run all init commands.
+    // Inject `renderToString` to Hydux on the server side, so we can call `ctx.render` to run all init commands and render the vdom to html string.
     : withSSR<State.State, State.Actions>({
       renderToString(view) {
         return ReactDOM.renderToString(view)
@@ -98,4 +98,4 @@ export class AppController {
 
 ```
 
-That's it! All API and steps are simple, explicit and based on the power of the Elm Architechture (TEA), we don't need to read tons of docs and try hard to figure out lots of examples, tutorials and APIs. This is the charm of TEA.
+That's it! APIs are simple, explicit and powerful. Based on **The Elm Architechture (TEA)**, we don't need to read tons of docs, examples, tutorials, APIs and try hard to figure out them. That is why Elm is fascinating.
