@@ -10,7 +10,7 @@
   "sideEffects": false,
   "scripts": {
     "build": "del lib && tsc -d",
-    "build:es": "del lib && tsc -d -m es6 --outDir ./es",
+    "build:es": "del es && tsc -d -m es6 --outDir ./es",
     "build:dist": "webpack -p --progress --profile",
     "test": "mocha --require ts-node/register \"src/test/**/*.ts\"",
     "test:watch": "npm run test -- -w --watch-extensions ts,tsx",
