@@ -9,10 +9,10 @@
   "module": "./es/index.js",
   "sideEffects": false,
   "scripts": {
-    "build": "del lib && tsc -d -t es5",
-    "build:es": "del lib && tsc -d -m ESNext --outDir ./es",
+    "build": "del lib && tsc -d",
+    "build:es": "del lib && tsc -d -m es6 --outDir ./es",
     "build:dist": "webpack -p --progress --profile",
-    "test": "mocha --require espower-typescript/guess \"src/test/**/*.ts\"",
+    "test": "mocha --require ts-node/register \"src/test/**/*.ts\"",
     "test:watch": "npm run test -- -w --watch-extensions ts,tsx",
     "doc": "typedoc --theme minimal --exclude \"**/test/*.ts\"  --excludeNotExported --excludePrivate --out ./docs/api ./src && touch ./docs/.nojekyll",
     "preversion": "npm run test && npm run build && npm run build:dist && git add -A"
@@ -40,7 +40,7 @@
   "homepage": "https://github.com/hydux/hydux#readme",
   "devDependencies": {
     "@types/mocha": "^2.2.44",
-    "@types/node": "^8.0.56",
+    "@types/node": "^9.6.2",
     "awesome-typescript-loader": "^3.4.1",
     "clean-webpack-plugin": "^0.1.17",
     "cross-env": "^5.1.1",
@@ -52,6 +52,7 @@
     "pre-commit": "^1.2.2",
     "source-map-loader": "^0.2.3",
     "timekeeper": "^2.0.0",
+    "ts-node": "^5.0.1",
     "tslint": "^5.8.0",
     "tslint-config-standard": "^7.0.0",
     "typedoc": "^0.9.0",

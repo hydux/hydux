@@ -1,10 +1,17 @@
 import { ActionType, ActionsType } from './../../types'
-import { AppProps, App, Init, View, Subscribe, OnUpdate, runAction } from './../../index'
+import { AppProps, App, Init, View, Subscribe, OnUpdate, runAction, Context } from './../../index'
 import Cmd, { CmdType } from './../../cmd'
 import { get, isFn } from '../../utils'
-import { HistoryProps, BaseHistory, HashHistory, BrowserHistory } from './history'
+import {
+  HistoryProps, BaseHistory, HashHistory,
+  BrowserHistory, MemoryHistory, MemoryHistoryProps,
+} from './history'
 
-export { HistoryProps, BaseHistory, HashHistory, BrowserHistory }
+export {
+  HistoryProps, BaseHistory, HashHistory,
+  BrowserHistory, MemoryHistory, MemoryHistoryProps,
+  Context,
+}
 const CHANGE_LOCATION = '@@hydux-router/CHANGE_LOCATION'
 export interface Query { [key: string]: string | string[] }
 export interface Location<P, Q extends Query> {

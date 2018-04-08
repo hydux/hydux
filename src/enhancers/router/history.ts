@@ -97,7 +97,7 @@ export interface MemoryHistoryProps extends HistoryProps {
 }
 export class MemoryHistory extends BaseHistory {
   protected props: MemoryHistoryProps
-  private _stack: string[]
+  private _stack: string[] = []
   private _index: number = 0
   constructor(props: Partial<MemoryHistoryProps> = {}) {
     super(props)
@@ -105,7 +105,9 @@ export class MemoryHistory extends BaseHistory {
       initPath: '/',
       ...this.props,
     }
+    // override initialization in super class
     this._stack = [this.props.basePath + this.props.initPath]
+    this._last = [this.current()]
   }
   getRealPath(path: string) {
     return this.props.basePath + path

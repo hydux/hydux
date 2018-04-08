@@ -53,7 +53,7 @@ describe('core api', () => {
       view: state => actions => state,
       onRender: view => renderResult = view
     })
-    assert(ctx.getState().count === 1, 'simple state should work')
+    assert(ctx.state.count === 1, 'simple state should work')
     assert.equal(renderResult.count, 1, 'simple state in view should work')
 
     state = { aa: 1, bb: { cc : 'aa' } }
@@ -63,13 +63,14 @@ describe('core api', () => {
       view: (state, actions) => ({ type: 'view', state }),
       onRender: view => renderResult = view
     })
-    assert.deepStrictEqual(ctx.getState(), state, 'nested state should work')
+    assert.deepStrictEqual(ctx.state, state, 'nested state should work')
     assert.deepStrictEqual(renderResult, { type: 'view', state }, 'nested state in view should work')
   })
 
   function testCounter(ctx, renderResult, path: string[] = []) {
     function getState() {
-      let state = ctx.getState()
+      let state = ctx.state
+      console.log('getState', state)
       for (const i in path) {
         state = state[path[i]]
       }
@@ -136,9 +137,9 @@ describe('core api', () => {
       onRender: view => renderResult = view
     })
     testCounter(ctx, renderResult)
-    assert.deepEqual(ctx.getState().classActions.count, 1, 'classActions state work')
+    assert.deepEqual(ctx.state.classActions.count, 1, 'classActions state work')
     ctx.actions.classActions.up()
-    assert.deepEqual(ctx.getState().classActions.count, 11, 'classActions should work')
+    assert.deepEqual(ctx.state.classActions.count, 11, 'classActions should work')
   })
 
   it('nested async actions', async () => {
@@ -158,31 +159,31 @@ describe('core api', () => {
       view: state => actions => actions,
       onRender: view => renderResult = view
     })
-    assert(ctx.getState().counter1.count === 1, 'counter1 init should work')
+    assert(ctx.state.counter1.count === 1, 'counter1 init should work')
 
     ctx.actions.counter1.upLater()
 
-    assert(ctx.getState().counter1.count === 1, 'counter1 should work 1')
+    assert(ctx.state.counter1.count === 1, 'counter1 should work 1')
 
     await sleep(10)
-    assert.equal(ctx.getState().counter1.count, 2, 'counter1 should work 2')
+    assert.equal(ctx.state.counter1.count, 2, 'counter1 should work 2')
 
     ctx.actions.counter1.upLater()
 
     await sleep(10)
-    assert(ctx.getState().counter1.count === 3, 'counter1 should work 3')
+    assert(ctx.state.counter1.count === 3, 'counter1 should work 3')
 
     ctx.actions.counter1.upLaterByPromise(3)
-    assert(ctx.getState().counter1.count === 3, 'upLaterByPromise should work 3')
+    assert(ctx.state.counter1.count === 3, 'upLaterByPromise should work 3')
     await sleep(10)
-    assert(ctx.getState().counter1.count === 6, 'upLaterByPromise should work 6')
+    assert(ctx.state.counter1.count === 6, 'upLaterByPromise should work 6')
 
     ctx.actions.counter1.upLaterWithBatchedCmd()
-    assert(ctx.getState().counter1.count === 6, 'upLaterWithBatchedCmd should work 6')
+    assert(ctx.state.counter1.count === 6, 'upLaterWithBatchedCmd should work 6')
     await sleep(10)
-    assert(ctx.getState().counter1.count === 7, 'upLaterWithBatchedCmd should work 7')
+    assert(ctx.state.counter1.count === 7, 'upLaterWithBatchedCmd should work 7')
     ctx.actions.counter1.up12()
-    assert(ctx.getState().counter1.count === 19, 'up12 should work 19')
+    assert(ctx.state.counter1.count === 19, 'up12 should work 19')
   })
   it('parent actions', () => {
     const initState = {
@@ -226,7 +227,7 @@ describe('core api', () => {
     })
 
     ctx.actions.counter1.upN(1)
-    assert.equal(ctx.getState().counter1.count, 3, 'counter1 upN work')
-    assert.equal(ctx.getState().counter2.count, 2, 'counter2 upN work')
+    assert.equal(ctx.state.counter1.count, 3, 'counter1 upN work')
+    assert.equal(ctx.state.counter2.count, 2, 'counter2 upN work')
   })
 })
