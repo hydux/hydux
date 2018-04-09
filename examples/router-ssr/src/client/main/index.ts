@@ -28,7 +28,7 @@ export function main(path?: string) {
         document.getElementById('root'),
         { hydrate: true },
       )
-      // Inject `renderToString` to Hydux on the server side, so we can call `ctx.render` to run all init commands.
+      // Inject `renderToString` to Hydux on the server side, so we can call `ctx.render` to run all init commands and render the vdom to html string.
       : withSSR<State.State, State.Actions>({
         renderToString(view) {
           return ReactDOM.renderToString(view)

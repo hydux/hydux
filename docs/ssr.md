@@ -24,22 +24,30 @@ Add `withSSR` enhancer and add remove `withReact` enhancer when running on the s
 
 ```ts
 import * as Hydux from 'hydux'
-let withEnhancers = Hydux.compose(
-  //... other enhancers
-  __is_browser
-    ? withReact<State.State, State.Actions>(
-      document.getElementById('root'),
-      { hydrate: true },
-    )
-    // Inject `renderToString` to Hydux on the server side, so we can call `ctx.render` to run all init commands and render the vdom to html string.
-    : withSSR<State.State, State.Actions>({
-      renderToString(view) {
-        return ReactDOM.renderToString(view)
-      },
+export function main(path?: string) {
+  let withEnhancers = Hydux.compose(
+    withRouter<State.State, State.Actions>({
+      history:
+        __is_browser
+          ? State.history
+          // Since there are no history API on the server side, we should use MemoryHistory here. The initPath are from your server controller.
+          : new MemoryHistory({ initPath: path }) ,
+      routes: State.routes,
     }),
-)
-
-let app = withEnhancers(Hydux.app)
+    __is_browser
+      ? withReact<State.State, State.Actions>(
+        document.getElementById('root'),
+        { hydrate: true },
+      )
+      // Inject `renderToString` to Hydux on the server side, so we can call `ctx.render` to run all init commands and render the vdom to html string.
+      : withSSR<State.State, State.Actions>({
+        renderToString(view) {
+          return ReactDOM.renderToString(view)
+        },
+      }),
+  )
+  let app = withEnhancers(Hydux.app)
+  // ...
 ```
 
 > Note: `__is_browser` is a global variable to indicate the current environment is server side or browser side.
@@ -87,8 +95,8 @@ export class AppController {
 
   @Get('*')
   async index(@Req() req: Request, @Res() res: Response) {
-    // Get the app context from client, note here we passed the path to the client router.
-    let ctx = Client.main(req.path)
+    // Get the app context from client, note here we passed the path and query to the client router.
+    let ctx = Client.main(req.url)
     // Rendering it to html, this will also run all initial commands.
     let html = await ctx.render()
     // Render the html and state to client

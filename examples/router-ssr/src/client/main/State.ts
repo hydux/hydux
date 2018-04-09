@@ -6,10 +6,7 @@ import withRouter, {
 } from '../../../../../src/enhancers/router'
 import * as Counter from '../counter'
 // const history = new HashHistory()
-export const history =
-  __is_browser
-    ? new BrowserHistory()
-    : new MemoryHistory()
+export const history = new BrowserHistory()
 
 export const actions = {
   counter: Counter.actions,

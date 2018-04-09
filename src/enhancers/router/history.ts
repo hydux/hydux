@@ -2,6 +2,11 @@ import { Location, Query } from './index'
 
 export type HistoryProps = { basePath: string }
 
+const isBrowser =
+  typeof window !== 'undefined'
+  && typeof location !== 'undefined'
+  && typeof history !== 'undefined'
+
 export abstract class BaseHistory {
   public location: Location<any, any>
   public lastLocation: Location<any, any>
@@ -46,6 +51,9 @@ export class HashHistory extends BaseHistory {
   protected props: HashHistoryProps
   constructor(props: Partial<HashHistoryProps> = {}) {
     super(props)
+    if (!isBrowser) {
+      return new MemoryHistory() as any
+    }
     this.props = props = {
       hash: '#!',
       ...this.props,
@@ -72,6 +80,9 @@ export class HashHistory extends BaseHistory {
 export class BrowserHistory extends BaseHistory {
   constructor(props: Partial<HistoryProps> = {}) {
     super(props)
+    if (!isBrowser) {
+      return new MemoryHistory(props)
+    }
     this._last = [this.current()]
     window.addEventListener('popstate', e => {
       this.handleChange()

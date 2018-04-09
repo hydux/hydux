@@ -13,7 +13,7 @@ export class AppController {
 
   @Get('*')
   async index(@Req() req: Request, @Res() res: Response) {
-    let ctx = Client.main(req.path)
+    let ctx = Client.main(req.url)
     let html = await ctx.render()
     res.render('index', { html, state: ctx.state })
   }
