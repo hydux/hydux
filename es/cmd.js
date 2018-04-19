@@ -26,7 +26,7 @@ export function ofFn(task, args, succeedAction, failedAction) {
                     failedAction(e);
                 }
             }
-            else {
+            else { // don't wrap in try cache, get better DX in `Pause on exceptions`
                 return fn();
             }
         }

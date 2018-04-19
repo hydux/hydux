@@ -1,8 +1,8 @@
 import * as tslib_1 from "tslib";
 import { connectViaExtension, extractState } from 'remotedev';
 import Cmd from '../cmd';
-export default function withDevtools(options) {
-    options = tslib_1.__assign({ remote: false, hostname: 'remotedev.io', port: 443, secure: true, getActionType: function (f) { return f; }, debounce: 10, filter: function (_) { return true; }, jsonToState: function (f) { return f; }, stateToJson: function (f) { return f; } }, options);
+export default function withDevtools(_options) {
+    var options = tslib_1.__assign({ remote: false, hostname: 'remotedev.io', port: 443, secure: true, getActionType: function (f) { return f; }, debounce: 10, filter: function (_) { return true; }, jsonToState: function (f) { return f; }, stateToJson: function (f) { return f; } }, _options);
     var jsonToState = options.jsonToState, stateToJson = options.stateToJson;
     var connection = connectViaExtension(options);
     var timer;

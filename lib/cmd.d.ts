@@ -43,14 +43,8 @@ export declare const map: <Actions, SubActions>(map: (action: Actions) => SubAct
 export declare const none: Sub<any>[];
 export declare const Cmd: {
     none: Sub<any>[];
-    ofFn: {
-        <A, T, State, Actions>(task: (args: A) => T, args: A, succeedAction?: ActionType<T, State, Actions> | undefined, failedAction?: ActionType<Error, State, Actions> | undefined): Sub<Actions>[];
-        <A, T, State, Actions>(task?: (() => T) | undefined, succeedAction?: ActionType<T, State, Actions> | undefined, failedAction?: ActionType<Error, State, Actions> | undefined): Sub<Actions>[];
-    };
-    ofPromise: {
-        <A, T, State, Actions>(task: (arg: A) => Promise<T>, args: A, succeedAction?: ActionType<T, State, Actions> | undefined, failedAction?: ActionType<Error, State, Actions> | undefined): Sub<Actions>[];
-        <A, T, State, Actions>(task: () => Promise<T>, succeedAction?: ActionType<T, State, Actions> | undefined, failedAction?: ActionType<Error, State, Actions> | undefined): Sub<Actions>[];
-    };
+    ofFn: typeof ofFn;
+    ofPromise: typeof ofPromise;
     ofSub: <Actions>(sub: Sub<Actions>) => Sub<Actions>[];
     batch: <Actions>(...cmds: (Sub<Actions>[] | Sub<Actions>[][])[]) => Sub<Actions>[];
     map: <Actions, SubActions>(map: (action: Actions) => SubActions, cmd: Sub<SubActions>[]) => Sub<Actions>[];

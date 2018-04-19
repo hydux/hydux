@@ -1,6 +1,6 @@
 import * as tslib_1 from "tslib";
 var globalState;
-export default function withHmr(options) {
+export default function withHmr() {
     return function (app) { return function (props) { return app(tslib_1.__assign({}, props, { init: function () {
             var result = props.init();
             if (!(result instanceof Array)) {

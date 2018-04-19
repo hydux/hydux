@@ -5,7 +5,7 @@ export { HistoryProps, BaseHistory, HashHistory, BrowserHistory, MemoryHistory, 
 export interface Query {
     [key: string]: string | string[];
 }
-export interface Location<P, Q extends Query> {
+export interface Location<P, Q: Query> {
     template: string | null;
     pathname: string;
     params: P;
@@ -19,27 +19,27 @@ export interface History {
     back: () => void;
     forward: () => void;
 }
-export declare function parsePath<P, Q extends Query>(path: string): Location<P, Q>;
-export declare function matchPath(pathname: string, fmt: string): {}[];
-export declare type RouterActions<Actions extends Object> = Actions & {
+declare export function parsePath<P, Q: Query>(path: string): Location<P, Q>;
+declare export function matchPath(pathname: string, fmt: string): {}[];
+export type RouterActions<Actions: Object> = Actions & {
     history: History;
 };
-export declare type RouterState<State extends Object> = State & {
+export type RouterState<State: Object> = State & {
     location: Location<any, any>;
 };
-export declare function mkLink(history: History, h: any): ({ to, onClick, replace, ...props, }: {
+declare export function mkLink(history: History, h: any): (options: {
     to: string;
     onClick?: ((e: any) => void) | undefined;
     replace?: boolean | undefined;
 }, children: any) => JSX.Element;
-export declare type Routes<State, Actions> = {
+export type Routes<State, Actions> = {
     [key: string]: ActionType<Location<any, any>, State, Actions>;
 };
 export interface RouterAppProps<State, Actions> extends AppProps<State, Actions> {
     view: View<RouterState<State>, RouterActions<Actions>>;
     onUpdate?: OnUpdate<RouterState<State>, RouterActions<Actions>>;
 }
-export default function withRouter<State, Actions>(props?: {
+declare export default function withRouter<State, Actions>(props?: {
     history?: BaseHistory;
     routes?: Routes<State, Actions>;
 }): (app: App<State, Actions>) => (props: RouterAppProps<State, Actions>) => Context<State, Actions, any>;
@@ -64,11 +64,11 @@ export interface RouteMeta<State, Actions> {
 export interface RoutesMeta<State, Actions> {
     [key: string]: RouteMeta<State, Actions>;
 }
-export declare function join(...args: string[]): string;
+declare export function join(...args: string[]): string;
 /**
  * @param routes nested routes contains path, action, children, it would parse it to a `route` field (path:action map) for router enhancer, and a `meta` field which contains each route's parents.
  */
-export declare function parseNestedRoutes<State, Actions>(routes: NestedRoutes<State, Actions>): {
+declare export function parseNestedRoutes<State, Actions>(routes: NestedRoutes<State, Actions>): {
     routes: Routes<State, Actions>;
     meta: RoutesMeta<State, Actions>;
 };

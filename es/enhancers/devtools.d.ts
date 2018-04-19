@@ -1,5 +1,5 @@
 import { App } from './../index';
-export declare type Options = {
+export declare type Options<State> = {
     remote?: boolean;
     hostname?: string;
     port?: number;
@@ -7,7 +7,7 @@ export declare type Options = {
     getActionType?: (a: object) => any;
     debounce?: number;
     filter?: (action: string) => true;
-    jsonToState?: (j: object) => any;
-    stateToJson?: (s: object) => any;
+    jsonToState?: (j: object) => State;
+    stateToJson?: (s: State) => object;
 };
-export default function withDevtools<State, Actions>(options: any): (app: App<State, Actions>) => App<State, Actions>;
+export default function withDevtools<State, Actions>(_options: Options<State>): (app: App<State, Actions>) => App<State, Actions>;
