@@ -2,7 +2,7 @@ import { connectViaExtension, extractState } from 'remotedev'
 import Cmd from '../cmd'
 import { merge, setDeep } from '../utils'
 import { AppProps, App } from './../index'
-export type Options = {
+export type Options<State> = {
   remote?: boolean,
   hostname?: string,
   port?: number,
@@ -12,11 +12,12 @@ export type Options = {
   debounce?: number,
   /// filter action name
   filter?: (action: string) => true,
-  jsonToState?: (j: object) => any,
-  stateToJson?: (s: object) => any,
+  jsonToState?: (j: object) => State,
+  stateToJson?: (s: State) => object,
 }
-export default function withDevtools<State, Actions>(options): (app: App<State, Actions>) => App<State, Actions> {
-  options = {
+
+export default function withDevtools<State, Actions>(_options: Options<State>): (app: App<State, Actions>) => App<State, Actions> {
+  const options: Required<Options<State>> = {
     remote: false,
     hostname: 'remotedev.io',
     port: 443,
@@ -24,9 +25,9 @@ export default function withDevtools<State, Actions>(options): (app: App<State, 
     getActionType: f => f,
     debounce: 10,
     filter: _ => true,
-    jsonToState: f => f,
-    stateToJson: f => f,
-    ...options
+    jsonToState: f => f as any,
+    stateToJson: f => f as any,
+    ..._options
   }
   const { jsonToState, stateToJson } = options
   const connection = connectViaExtension(options)

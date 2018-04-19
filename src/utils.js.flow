@@ -1,0 +1,9 @@
+declare export var isPojo: (obj: any) => boolean;
+declare export function set(to: any, from: any): any;
+declare export function merge(to: any, from: any): any;
+declare export function clone(from: any): any;
+declare export function setDeep(path: string[], value: any, from: any): any;
+declare export function get(path: string[], from: any): any;
+declare export function isFn(data: Function): true;
+declare export function isFn(data: any): false;
+declare export var noop: (f: any) => any;

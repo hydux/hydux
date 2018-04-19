@@ -1,0 +1,10 @@
+import { Component, VNode } from 'ultradom';
+import { App } from '../index';
+declare var React: {
+    createElement: <Props>(type: string | Component<Props>, props?: Props | undefined, ...children: (string | number | VNode<{}> | null)[]) => VNode<Props>;
+};
+export { React };
+declare export function h<Props>(type: Component<Props> | string, props?: Props, ...children: Array<VNode<{}> | string | number | null>): VNode<Props>;
+declare export default function withUltradom<State, Actions>(container?: Element, options?: {
+    raf?: boolean;
+}): (app: App<State, Actions>) => App<State, Actions>;

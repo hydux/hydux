@@ -2,7 +2,7 @@
 import { AppProps, App } from './../index'
 
 let globalState
-export default function withHmr<State, Actions>(options): (app: App<State, Actions>) => App<State, Actions> {
+export default function withHmr<State, Actions>(): (app: App<State, Actions>) => App<State, Actions> {
   return (app: App<State, Actions>) => (props: AppProps<State, Actions>) => app({
     ...props,
     init() {
