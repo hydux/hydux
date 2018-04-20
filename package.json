@@ -9,7 +9,7 @@
   "module": "./es/index.js",
   "sideEffects": false,
   "scripts": {
-    "build": "del lib && tsc -d && cpy './src/**/*.js.flow' ./lib --parents",
+    "build": "del lib && tsc -d && cpy '**/*.js.flow' '../lib/' --cwd=src --parents",
     "build:es": "del es && tsc -d -m es6 --outDir ./es",
     "build:dist": "webpack -p --progress --profile",
     "test": "mocha --require ts-node/register \"src/test/**/*.ts\"",
