@@ -1,6 +1,7 @@
-import { CmdType } from './cmd'
+// @flow
+import { type CmdType } from './cmd'
 
-export type ActionState<State> = Partial<State> | null | void
+export type ActionState<State> = $Shape<State> | null | void
 
 export type ActionCmdResult<State, Actions> = [State, CmdType<Actions>]
 

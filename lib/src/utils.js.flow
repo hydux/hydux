@@ -1,3 +1,4 @@
+// @flow
 declare export var isPojo: (obj: any) => boolean;
 declare export function set(to: any, from: any): any;
 declare export function merge(to: any, from: any): any;

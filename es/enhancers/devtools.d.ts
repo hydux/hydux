@@ -10,4 +10,4 @@ export declare type Options<State> = {
     jsonToState?: (j: object) => State;
     stateToJson?: (s: State) => object;
 };
-export default function withDevtools<State, Actions>(_options: Options<State>): (app: App<State, Actions>) => App<State, Actions>;
+export default function withDevtools<State, Actions>(_options?: Options<State>): (app: App<State, Actions>) => App<State, Actions>;
