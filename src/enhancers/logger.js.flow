@@ -1,4 +1,5 @@
-import { App } from './../index';
+// @flow
+import { type App } from './../index';
 export type Options<State> = {
     logger?: (prevState: State, action: {
         name: string;

@@ -16,7 +16,7 @@ export type Options<State> = {
   stateToJson?: (s: State) => object,
 }
 
-export default function withDevtools<State, Actions>(_options: Options<State>): (app: App<State, Actions>) => App<State, Actions> {
+export default function withDevtools<State, Actions>(_options: Options<State> = {}): (app: App<State, Actions>) => App<State, Actions> {
   const options: Required<Options<State>> = {
     remote: false,
     hostname: 'remotedev.io',

@@ -1,9 +1,12 @@
-import { ActionType } from './../../types';
-import { AppProps, App, View, OnUpdate, Context } from './../../index';
-import { HistoryProps, BaseHistory, HashHistory, BrowserHistory, MemoryHistory, MemoryHistoryProps } from './history';
-export { HistoryProps, BaseHistory, HashHistory, BrowserHistory, MemoryHistory, MemoryHistoryProps, Context };
+// @flow
+
+import { type ActionType } from './../../types';
+import { type AppProps, type App, type View, type OnUpdate, type Context } from './../../index';
+import { type HistoryProps, BaseHistory, HashHistory, BrowserHistory, MemoryHistory, type MemoryHistoryProps } from './history';
+export type { HistoryProps, MemoryHistoryProps, Context };
+export { BaseHistory, HashHistory, BrowserHistory, MemoryHistory };
 export interface Query {
-    [key: string]: string | string[];
+    [string]: string | string[];
 }
 export interface Location<P, Q: Query> {
     template: string | null;
@@ -21,28 +24,30 @@ export interface History {
 }
 declare export function parsePath<P, Q: Query>(path: string): Location<P, Q>;
 declare export function matchPath(pathname: string, fmt: string): {}[];
-export type RouterActions<Actions: Object> = Actions & {
+export type RouterActions<Actions> = Actions & {
     history: History;
 };
-export type RouterState<State: Object> = State & {
+export type RouterState<State> = State & {
     location: Location<any, any>;
 };
 declare export function mkLink(history: History, h: any): (options: {
     to: string;
-    onClick?: ((e: any) => void) | undefined;
-    replace?: boolean | undefined;
-}, children: any) => JSX.Element;
+    onClick?: ((e: any) => void);
+    replace?: boolean;
+}, children: any) => any;
 export type Routes<State, Actions> = {
-    [key: string]: ActionType<Location<any, any>, State, Actions>;
+    [string]: ActionType<Location<any, any>, State, Actions>;
 };
-export interface RouterAppProps<State, Actions> extends AppProps<State, Actions> {
-    view: View<RouterState<State>, RouterActions<Actions>>;
-    onUpdate?: OnUpdate<RouterState<State>, RouterActions<Actions>>;
+export type RouterAppProps<State, Actions> = {
+    ...AppProps<State, Actions>,
+    view: View<RouterState<State>, RouterActions<Actions>>,
+    onUpdate?: OnUpdate<RouterState<State>, RouterActions<Actions>>,
 }
 declare export default function withRouter<State, Actions>(props?: {
     history?: BaseHistory;
     routes?: Routes<State, Actions>;
-}): (app: App<State, Actions>) => (props: RouterAppProps<State, Actions>) => Context<State, Actions, any>;
+}): (app: App<State, Actions>) => App<RouterState<State>, RouterActions<Actions>>;
+
 export interface NestedRoutes<State, Actions> {
     path: string;
     label?: string;

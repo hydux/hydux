@@ -1,3 +1,4 @@
+// @flow
 import { Location, Query } from './index';
 export type HistoryProps = {
     basePath: string;
@@ -5,7 +6,7 @@ export type HistoryProps = {
 declare export class BaseHistory {
     location: Location<any, any>;
     lastLocation: Location<any, any>;
-    constructor(props?: Partial<HistoryProps>): void;
+    constructor(props?: $Shape<HistoryProps>): void;
     last: () => string;
     getRealPath(path: string): string;
     current(): string;
@@ -20,14 +21,14 @@ export interface HashHistoryProps extends HistoryProps {
     hash: string;
 }
 declare export class HashHistory extends BaseHistory {
-    constructor(props?: Partial<HashHistoryProps>): void;
+    constructor(props?: $Shape<HashHistoryProps>): void;
     getRealPath(path: string): string;
     current(): string;
     push(path: any): void;
     replace(path: any): void;
 }
 declare export class BrowserHistory extends BaseHistory {
-    constructor(props?: Partial<HistoryProps>): void;
+    constructor(props?: $Shape<HistoryProps>): void;
     getRealPath(path: string): string;
     current(): string;
     push(path: any): void;
@@ -37,7 +38,7 @@ export interface MemoryHistoryProps extends HistoryProps {
     initPath: string;
 }
 declare export class MemoryHistory extends BaseHistory {
-    constructor(props?: Partial<MemoryHistoryProps>): void;
+    constructor(props?: $Shape<MemoryHistoryProps>): void;
     getRealPath(path: string): string;
     current(): string;
     push(path: any): void;
