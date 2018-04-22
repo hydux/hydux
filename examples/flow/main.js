@@ -4,7 +4,7 @@ import * as Hydux from '../../src/index'
 import withPersist from '../../src/enhancers/persist'
 import withUltradom, { h, React } from '../../src/enhancers/ultradom-render'
 import { type ActionsType } from '../../src/types'
-import Counter, { type State as CounterState, type Actions as CounterActions } from './counter'
+import * as Counter from './counter'
 
 // let app = withPersist<State, Actions>({
 //   key: 'time-game/v1'
@@ -21,8 +21,8 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 const actions = {
-  counter1: Counter.actions,
-  counter2: Counter.actions,
+  counter1: (Counter.actions: Counter.Actions),
+  counter2: (Counter.actions: Counter.Actions),
   change: (e: any) => (state: State) => ({ ...state, value: e.target.value })
 }
 

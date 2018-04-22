@@ -37,7 +37,7 @@ const routes: Routes<State, Actions> = {
 }
 
 let app = withRouter<State, Actions>({ history, routes })(_app)
-app = withPicodom()(app)
+app = withPicodom<State, Actions>()(app)
 
 if (process.env.NODE_ENV === 'development') {
   const devTools = require('hydux/lib/enhancers/devtools').default
