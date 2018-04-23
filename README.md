@@ -181,10 +181,17 @@ let ctx = app<State, Actions>({
 
 ## Ecosystem
 
+### Libraries
+
 * [hydux-react](https://github.com/hydux/hydux-react): Hydux's react integration
 * [hydux-react-router](https://github.com/hydux/hydux-react-router): Hydux's react-router integration
 * [hydux-mutator](https://github.com/hydux/hydux-mutator): A statically-typed immutable update help package, which also contains immutable collections.
 * [hydux-transitions](https://github.com/hydux/hydux-transitions): A css transition library inspired by [animajs](http://animejs.com/)'s timeline, follow **The Elm Architecture**.
+* [hydux-data](https://github.com/hydux/hydux-data): Statically-typed data-driven development for hydux, in the Elm way. Inspired by apollo-client.
+
+### Samples
+
+* [samples-antd](https://github.com/hydux/samples-antd): Admin sample in hydux.
 
 ## Counter App
 
