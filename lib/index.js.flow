@@ -48,6 +48,14 @@ declare export function withParents<S, A, PS, PA, A1, A2>(action: (a1: A1, a2: A
 declare export function withParents<S, A, PS, PA, A1, A2, A3>(action: (a1: A1, a2: A2, a3: A3) => (s: S, a: A) => any, wrapper?: (action: (a1: A1, a2: A2, a3: A3) => ActionCmdResult<S, A>, parentState: PS, parentActions: PA, state: S, actions: A) => ActionResult<S, A>, parentState?: PS, parentActions?: PA): any;
 declare export function withParents<S, A, PS, PA, A1, A2, A3, A4>(action: (a1: A1, a2: A2, a3: A3, a4: A4) => (s: S, a: A) => any, wrapper?: (action: (a1: A1, a2: A2, a3: A3, a4: A4) => ActionCmdResult<S, A>, parentState: PS, parentActions: PA, state: S, actions: A) => ActionResult<S, A>, parentState?: PS, parentActions?: PA): any;
 declare export function withParents<S, A, PS, PA, A1, A2, A3, A4, A5>(action: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5) => (s: S, a: A) => any, wrapper?: (action: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5) => ActionCmdResult<S, A>, parentState: PS, parentActions: PA, state: S, actions: A) => ActionResult<S, A>, parentState?: PS, parentActions?: PA): any;
+
+
+export interface Component<State, Actions> {
+  init: Init<State, Actions>;
+  view: View;
+  actions: Actions;
+}
+
 export interface Context<State, Actions, RenderReturn> {
     actions: Actions;
     state: State;
@@ -58,6 +66,8 @@ export interface Context<State, Actions, RenderReturn> {
     onUpdate?: OnUpdate<State, Actions>;
     onUpdateStart?: OnUpdateStart<State, Actions>;
     render(state?: State): RenderReturn;
+    /** Patch a component in runtime, used for code-splitting */
+    patch<S, A>(path: string | string[], component: Component<S, A>): RenderReturn;
 }
 export type App<State, Actions> = (props: AppProps<State, Actions>) => Context<State, Actions, any>;
 declare export function app<State, Actions>(props: AppProps<State, Actions>): Context<State, Actions, any>;
