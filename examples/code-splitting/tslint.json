@@ -1,0 +1,17 @@
+{
+    "defaultSeverity": "warning",
+    "extends": [
+        "tslint-config-standard",
+        "tslint-react"
+    ],
+    "jsRules": {},
+    "rules": {
+        "trailing-comma": true,
+        "space-before-function-paren": false,
+        "quotemark": [true, "single", "jsx-double"],
+        "jsx-boolean-value": false,
+        "jsx-no-lambda": false,
+        "jsx-no-multiline-js": false
+    },
+    "rulesDirectory": []
+}

@@ -9,7 +9,7 @@ A React-Compatible fork of [Hyperapp](https://github.com/hyperapp/hyperapp), ins
 * [hyperapp](https://github.com/hyperapp/hyperapp) compatible API
 * Support any vdom library, including react ([official support](https://github.com/hydux/hydux-react))
 * [Official support for react-router](https://github.com/hydux/hydux-react-router)
-* Hot reload (hmr), [router](https://github.com/hydux/hydux/tree/master/examples/router), logger, [SSR](https://github.com/hydux/hydux/tree/master/docs/ssr.md),  persist, [Redux Devtools with time traveling](https://github.com/zalmoxisus/redux-devtools-extension), [ultradom](https://github.com/jorgebucaran/ultradom)(1kb vdom), **\*\*All in One\*\***, easily setup all these fancy stuff without pain!
+* Hot reload (hmr), [router](https://github.com/hydux/hydux/tree/master/examples/router), logger, [SSR](https://github.com/hydux/hydux/tree/master/docs/ssr.md), [code splitting](https://github.com/hydux/hydux/tree/master/examples/code-splitting), persist, [Redux Devtools with time traveling](https://github.com/zalmoxisus/redux-devtools-extension), [ultradom](https://github.com/jorgebucaran/ultradom)(1kb vdom), **\*\*All in One\*\***, easily setup all these fancy stuff without pain!
 * Elm-like side effect manager and subscribe API
 
 ![](media/timetravel.gif)

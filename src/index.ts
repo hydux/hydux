@@ -155,6 +155,13 @@ export function withParents<S, A, PS, PA>(
  * @deprecated Deprecated for `withParents`
  */
 export const wrapActions = withParents
+
+export interface Component<State, Actions> {
+  init: Init<State, Actions>
+  view: View<State, Actions>
+  actions: ActionsType<State, Actions>
+}
+
 export interface Context<State, Actions, RenderReturn> {
   actions: Actions
   state: State
@@ -165,21 +172,31 @@ export interface Context<State, Actions, RenderReturn> {
   onUpdate?: OnUpdate<State, Actions>
   onUpdateStart?: OnUpdateStart<State, Actions>
   render(state?: State): RenderReturn
+  /** Patch a component in runtime, used for code-splitting */
+  patch<S, A>(path: string | string[], component: Component<S, A>)
 }
 export type App<State, Actions> = (props: AppProps<State, Actions>) => Context<State, Actions, any>
 
+function normalizeInit<S, A>(initResult: S | [S, CmdType<A>]): [S, CmdType<A>] {
+  if (initResult instanceof Array) {
+    return initResult
+  }
+  return [initResult, Cmd.none]
+}
+
+export function runCmd<A>(cmd: CmdType<A>, actions: A) {
+  return cmd.map(sub => sub(actions))
+}
+
 export function app<State, Actions>(props: AppProps<State, Actions>): Context<State, Actions, any> {
   // const appEvents = props.events || {}
-  const appActions = {} as Actions
+  let appActions = {} as Actions
   const appSubscribe = props.subscribe || (_ => Cmd.none)
   const render = props.onRender || noop
   // const appMiddlewares = props.middlewares || []
-  let [appState, cmd] = runAction(props.init(), (void 0 as any) as State, appActions) as [
-    State,
-    CmdType<Actions>
-  ]
+  let [appState, cmd] = normalizeInit(props.init())
   init(appState, appActions, props.actions, [])
-  cmd.forEach(sub => sub(appActions))
+  runCmd(cmd, appActions)
   appRender(appState)
   appSubscribe(appState).forEach(sub => sub(appActions))
 
@@ -192,6 +209,20 @@ export function app<State, Actions>(props: AppProps<State, Actions>): Context<St
     ...props,
     actions: appActions,
     render: appRender,
+    patch<S, A>(path: string | string[], comp: Component<S, A>) {
+      const paths = typeof path === 'string' ? [path] : path
+      const render = () => appRender(appState)
+      let actions = get(paths, appActions)
+      if (get(paths, appState) && actions) {
+        return render()
+      }
+      let [state, cmd] = normalizeInit(comp.init())
+      appActions = setDeep(paths, actions = {}, appActions)
+      appState = setDeep(paths, state, appState)
+      init(state, actions, comp.actions as any, paths)
+      runCmd(cmd, actions)
+      return render()
+    }
   }
 
   function appRender(state = appState) {
