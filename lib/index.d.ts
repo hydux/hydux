@@ -42,6 +42,11 @@ export declare function withParents<S, A, PS, PA, A1, A2, A3, A4, A5>(action: (a
  * @deprecated Deprecated for `withParents`
  */
 export declare const wrapActions: typeof withParents;
+export interface Component<State, Actions> {
+    init: Init<State, Actions>;
+    view: View<State, Actions>;
+    actions: ActionsType<State, Actions>;
+}
 export interface Context<State, Actions, RenderReturn> {
     actions: Actions;
     state: State;
@@ -52,7 +57,10 @@ export interface Context<State, Actions, RenderReturn> {
     onUpdate?: OnUpdate<State, Actions>;
     onUpdateStart?: OnUpdateStart<State, Actions>;
     render(state?: State): RenderReturn;
+    /** Patch a component in runtime, used for code-splitting */
+    patch<S, A>(path: string | string[], component: Component<S, A>): any;
 }
 export declare type App<State, Actions> = (props: AppProps<State, Actions>) => Context<State, Actions, any>;
+export declare function runCmd<A>(cmd: CmdType<A>, actions: A): any[];
 export declare function app<State, Actions>(props: AppProps<State, Actions>): Context<State, Actions, any>;
 export default app;

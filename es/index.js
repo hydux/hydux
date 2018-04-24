@@ -53,15 +53,24 @@ export function withParents(action, wrapper, parentState, parentActions) {
  * @deprecated Deprecated for `withParents`
  */
 export var wrapActions = withParents;
+function normalizeInit(initResult) {
+    if (initResult instanceof Array) {
+        return initResult;
+    }
+    return [initResult, Cmd.none];
+}
+export function runCmd(cmd, actions) {
+    return cmd.map(function (sub) { return sub(actions); });
+}
 export function app(props) {
     // const appEvents = props.events || {}
     var appActions = {};
     var appSubscribe = props.subscribe || (function (_) { return Cmd.none; });
     var render = props.onRender || noop;
     // const appMiddlewares = props.middlewares || []
-    var _a = runAction(props.init(), void 0, appActions), appState = _a[0], cmd = _a[1];
+    var _a = normalizeInit(props.init()), appState = _a[0], cmd = _a[1];
     init(appState, appActions, props.actions, []);
-    cmd.forEach(function (sub) { return sub(appActions); });
+    runCmd(cmd, appActions);
     appRender(appState);
     appSubscribe(appState).forEach(function (sub) { return sub(appActions); });
     return tslib_1.__assign({ 
@@ -69,7 +78,20 @@ export function app(props) {
         // otherwise it would be copied and becomes normal property
         get state() {
             return appState;
-        } }, props, { actions: appActions, render: appRender });
+        } }, props, { actions: appActions, render: appRender, patch: function (path, comp) {
+            var paths = typeof path === 'string' ? [path] : path;
+            var render = function () { return appRender(appState); };
+            var actions = get(paths, appActions);
+            if (get(paths, appState) && actions) {
+                return render();
+            }
+            var _a = normalizeInit(comp.init()), state = _a[0], cmd = _a[1];
+            appActions = setDeep(paths, actions = {}, appActions);
+            appState = setDeep(paths, state, appState);
+            init(state, actions, comp.actions, paths);
+            runCmd(cmd, actions);
+            return render();
+        } });
     function appRender(state) {
         if (state === void 0) { state = appState; }
         if (state !== appState) {
