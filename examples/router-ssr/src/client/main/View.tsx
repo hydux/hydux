@@ -1,4 +1,5 @@
 import withReact, { React } from 'hydux-react'
+import { Context } from '../../../../../src/index'
 import withRouter, {
   mkLink,
   History,
@@ -8,8 +9,8 @@ import withRouter, {
   RouterState,
   Routes,
 } from '../../../../../src/enhancers/router'
-import * as Counter from '../counter'
-import { State, Actions, history } from './State'
+import { State, Actions, history, Ctx } from './State'
+import * as Utils from '../utils'
 
 const NoMatch = () => <div>404</div>
 const Home = () => <div>Home</div>
@@ -17,12 +18,16 @@ const Users = () => <div>Users</div>
 
 let Link = mkLink(history, React.createElement)
 
-const renderRoutes = (state: State, actions: Actions) => {
+const renderRoutes = (state: State, actions: Actions, ctx: Ctx) => {
+  const Counter = ctx.lazyComps.counter
   switch (state.page) {
     case 'Home':
       return <div>Home</div>
     case 'Counter':
-      return Counter.view(state.counter, actions.counter)
+      if (Counter) {
+        return Counter.view(state.counter, actions.counter)
+      }
+      return <div>Loading...</div>
     case '404':
       return <NoMatch />
     default:
@@ -32,7 +37,7 @@ const renderRoutes = (state: State, actions: Actions) => {
       }
   }
 }
-export const root = (state: State, actions: RouterActions<Actions>) => (
+export const root = (state: State, actions: RouterActions<Actions>, ctx: Ctx) => (
   <main>
     <style>{`
         a {
@@ -45,6 +50,6 @@ export const root = (state: State, actions: RouterActions<Actions>) => (
     <Link to="/accounts">Accounts</Link>
     <Link to="/counter">Counter</Link>
     <Link to="/404">404</Link>
-    {renderRoutes(state, actions)}
+    {renderRoutes(state, actions, ctx)}
   </main>
 )

@@ -1,5 +1,5 @@
 import { React } from 'hydux-react'
-import { Cmd, noop, ActionsType, ActionType } from '../../../../src/index'
+import { Cmd, noop, ActionsType, ActionType, CmdType } from '../../../../src/index'
 import * as Utils from './utils'
 
 const initStateValue = { count: 0 }
@@ -11,6 +11,7 @@ export const initCmd = () => Cmd.ofSub<Actions>(
     .then(res => res.json())
     .then(data => _.setCount(data.count)),
 )
+export const init = () => [initState(), initCmd()] as [State, CmdType<Actions>]
 export const actions = {
   setCount: count => (state: State) => ({ count }),
   down: () => (state: State) => ({ count: state.count - 1 }),

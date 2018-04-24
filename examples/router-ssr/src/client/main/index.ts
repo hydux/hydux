@@ -11,18 +11,12 @@ import * as Counter from '../counter'
 import '../polyfill.ts'
 import * as State from './State'
 import * as View from './View'
+import * as Utils from '../utils'
 // const history = new HashHistory()
 
 export function main(path?: string) {
+  let ctx: any = null
   let withEnhancers = Hydux.compose(
-    withRouter<State.State, State.Actions>({
-      history:
-        __is_browser
-          ? State.history
-          // Since there are no history API on the server side, we should use MemoryHistory here.
-          : new MemoryHistory({ initPath: path }) ,
-      routes: State.routes,
-    }),
     __is_browser
       ? withReact<State.State, State.Actions>(
         document.getElementById('root'),
@@ -34,6 +28,14 @@ export function main(path?: string) {
           return ReactDOM.renderToString(view)
         },
       }),
+    withRouter<State.State, State.Actions>({
+      history:
+        __is_browser
+          ? State.history
+          // Since there are no history API on the server side, we should use MemoryHistory here.
+          : new MemoryHistory({ initPath: path }) ,
+      routes: State.routes(() => ctx),
+    }),
   )
   let app = withEnhancers(Hydux.app)
 
@@ -47,7 +49,7 @@ export function main(path?: string) {
   }
   // WithSSR would assume the app is running on the server side, so it won't render anything to the DOM, but will call renderToString when you call ctx.render()
 
-  const ctx = app({
+  ctx = app({
     init: State.init,
     actions: State.actions,
     view: View.root,

@@ -35,7 +35,7 @@ const routes: Routes<State, Actions> = {
   }), Cmd.ofSub(async _ => {
     if (!Counter) {
       Counter = await import('./counter')
-      ctx.patch('counter', Counter)
+      return ctx.patch('counter', Counter)
     }
   }) ],
   '*': loc => state => ({

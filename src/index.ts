@@ -14,7 +14,8 @@ export * from './types'
 export { Cmd, CmdType, Sub, ActionResult, noop, isFn, isPojo }
 
 export type Init<S, A> = () => S | [S, CmdType<A>]
-export type View<S, A> = (state: S, actions: A) => any
+// todo: Remove back compatible optional ctx
+export type View<S, A> = ((state: S, actions: A, ctx?: Context<S, A>) => any)
 export type Subscribe<S, A> = (state: S) => CmdType<A>
 export type OnUpdate<S, A> = <M>(
   data: { prevAppState: S; nextAppState: S; msgData: M; action: string },
@@ -44,6 +45,7 @@ export function runAction<S, A, PS, PA>(
   actions: A,
   parentState?: PS,
   parentActions?: PA,
+  appContext?: Context<any, any>
 ): ActionCmdResult<S, A> {
   let rst: any = result
   isFn(rst)
@@ -162,7 +164,7 @@ export interface Component<State, Actions> {
   actions: ActionsType<State, Actions>
 }
 
-export interface Context<State, Actions, RenderReturn> {
+export interface Context<State, Actions, RenderReturn = any, Comps = any> {
   actions: Actions
   state: State
   init: Init<State, Actions>
@@ -171,9 +173,10 @@ export interface Context<State, Actions, RenderReturn> {
   onRender?: ((view: any) => RenderReturn)
   onUpdate?: OnUpdate<State, Actions>
   onUpdateStart?: OnUpdateStart<State, Actions>
+  lazyComps: Comps
   render(state?: State): RenderReturn
   /** Patch a component in runtime, used for code-splitting */
-  patch<S, A>(path: string | string[], component: Component<S, A>)
+  patch<S, A>(path: string | string[], component: Component<S, A>): any
 }
 export type App<State, Actions> = (props: AppProps<State, Actions>) => Context<State, Actions, any>
 
@@ -200,7 +203,7 @@ export function app<State, Actions>(props: AppProps<State, Actions>): Context<St
   appRender(appState)
   appSubscribe(appState).forEach(sub => sub(appActions))
 
-  return {
+  const appContext = {
     // getter should before spread operator,
     // otherwise it would be copied and becomes normal property
     get state() {
@@ -209,8 +212,10 @@ export function app<State, Actions>(props: AppProps<State, Actions>): Context<St
     ...props,
     actions: appActions,
     render: appRender,
+    lazyComps: {},
     patch<S, A>(path: string | string[], comp: Component<S, A>) {
       const paths = typeof path === 'string' ? [path] : path
+      this.lazyComps[paths.join('.')] = comp
       const render = () => appRender(appState)
       let actions = get(paths, appActions)
       if (get(paths, appState) && actions) {
@@ -221,15 +226,18 @@ export function app<State, Actions>(props: AppProps<State, Actions>): Context<St
       appState = setDeep(paths, state, appState)
       init(state, actions, comp.actions as any, paths)
       render()
-      return runCmd(cmd, actions)
+      const cmdRes = runCmd(cmd, actions)
+      return Promise.all(cmdRes)
     }
   }
+
+  return appContext
 
   function appRender(state = appState) {
     if (state !== appState) {
       appState = state
     }
-    let view = props.view(appState, appActions)
+    let view = props.view(appState, appActions, appContext)
     if (isFn(view)) {
       view = view(appActions)
     }

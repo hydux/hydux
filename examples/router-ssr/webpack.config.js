@@ -23,7 +23,7 @@ module.exports = createConfig([
   setOutput({
     filename: '[name].js',
     path: DIST,
-    publicPath: '/static/dist',
+    publicPath: 'http://127.0.0.1:8080/static/dist/',
   }),
   css(),
   typescript(),
@@ -65,6 +65,9 @@ module.exports = createConfig([
         target: 'http://localhost:3456',
         secure: false,
         changeOrigin: true,
+        headers: {
+          'Access-Control-Allow-Origin': '*'
+        }
       },
     }),
     sourceMaps(),
