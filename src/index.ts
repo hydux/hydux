@@ -220,8 +220,8 @@ export function app<State, Actions>(props: AppProps<State, Actions>): Context<St
       appActions = setDeep(paths, actions = {}, appActions)
       appState = setDeep(paths, state, appState)
       init(state, actions, comp.actions as any, paths)
-      runCmd(cmd, actions)
-      return render()
+      render()
+      return runCmd(cmd, actions)
     }
   }
 
