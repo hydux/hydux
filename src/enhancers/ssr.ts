@@ -19,7 +19,7 @@ export default function withSSR<State, Actions>(
           result = [result, Cmd.none]
         }
         initCmd = result[1]
-        return [result[0], result[1]]
+        return [result[0], Cmd.none]
       },
       onRender() {
         // ignore

@@ -8,10 +8,3 @@ export function fetch(input: string, init?: RequestInit) {
 }
 
 // todo: Inject ctx in actions/views
-export const global = {
-  ctx: null as any as Hydux.Context<State.State, State.Actions, any, LazyComps>
-}
-
-export type LazyComps = {
-  counter: typeof _Counter | null
-}

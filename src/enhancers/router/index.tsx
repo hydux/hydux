@@ -1,5 +1,10 @@
-import { ActionType, ActionsType } from './../../types'
-import { AppProps, App, Init, View, Subscribe, OnUpdate, runAction, Context } from './../../index'
+import { ActionType, ActionsType, ActionType2 } from './../../types'
+import {
+  AppProps, App, Init, View, Subscribe,
+  OnUpdate, runAction, Context, Patch,
+  Component, normalizeInit
+} from './../../index'
+import { Dt, dt, never } from '../../helpers'
 import Cmd, { CmdType } from './../../cmd'
 import { get, isFn } from '../../utils'
 import {
@@ -14,12 +19,13 @@ export {
 }
 const CHANGE_LOCATION = '@@hydux-router/CHANGE_LOCATION'
 export interface Query { [key: string]: string | string[] }
-export interface Location<P, Q extends Query> {
+export interface Location<P = any, Q extends Query = any> {
   template: string | null
   pathname: string
   params: P
   query: Q
   search: string
+  fromInit: boolean
 }
 
 export interface History {
@@ -44,7 +50,7 @@ export function parsePath<P, Q extends Query>(path: string): Location<P, Q> {
       }
       return query
     }, {}) as Q
-  return { pathname, params: {} as P, query, search, template: null }
+  return { pathname, params: {} as P, query, search, template: null, fromInit: false }
 }
 
 const isNotEmpty = s => s !== ''
@@ -72,7 +78,8 @@ export type RouterActions<Actions extends Object> = Actions & {
 }
 
 export type RouterState<State extends Object> = State & {
-  location: Location<any, any>
+  location: Location
+  lazyComps: any
 }
 
 export function mkLink(history: History, h) {
@@ -112,7 +119,7 @@ export function mkLink(history: History, h) {
 }
 
 export type Routes<State, Actions> = {
-  [key: string]: ActionType<Location<any, any>, State, Actions>
+  [key: string]: ActionType2<Location<any, any>, Patch, State, Actions>
 }
 
 export interface RouterAppProps<State, Actions> extends AppProps<State, Actions> {
@@ -122,17 +129,24 @@ export interface RouterAppProps<State, Actions> extends AppProps<State, Actions>
 
 export default function withRouter<State, Actions>(props: {
   history?: BaseHistory,
-  routes?: Routes<State, Actions>,
-} = {}) {
+  routes: Routes<State, Actions> | NestedRoutes<State, Actions>,
+} = { routes: {} }) {
   const {
     history = new HashHistory(),
-    routes = {},
+    routes,
   } = props
   let timer
   return (app: App<State, Actions>) => (props: RouterAppProps<State, Actions>) => {
+    let routesMap: Routes<State, Actions> = null as any
+    let routesMeta = {} as any as RoutesMeta<State, Actions>
+    if (('path' in routes) && typeof (routes as any).path === 'string') {
+      const parsed = parseNestedRoutes<State, Actions>(routes as any)
+      routesMap = parsed.routes
+      routesMeta = parsed.meta
+    }
     function pathToLoc(path) {
       const loc = parsePath<any, any>(path)
-      for (const key in routes) {
+      for (const key in routesMap) {
         const [match, params] = matchPath(loc.pathname, key)
         if (match) {
           loc.params = params
@@ -142,58 +156,116 @@ export default function withRouter<State, Actions>(props: {
       }
       return loc
     }
-    return app({
+    const loc: Location<any, any> = pathToLoc(history.current())
+    loc.fromInit = true
+    const meta = routesMeta[loc.template!]
+    let initComp = dt('none') as RouteComp<State, Actions>
+    if (meta && meta.getComponent) {
+      let _comp
+      initComp = meta.getComponent(loc)
+    }
+
+    let actions = props.actions
+    if (initComp.tag === 'normal' || initComp.tag === 'ssr') {
+      actions = {
+        ...actions as any,
+        [initComp.data.key]: initComp.data.comp.actions,
+      }
+    }
+    function runRoute<S, A>(routeComp: RouteComp<S, A>, actions: A, loc: Location) {
+      const meta = routesMeta[loc.template!]
+      switch (routeComp.tag) {
+        case 'dynamic':
+          const key = routeComp.data.key
+          return routeComp.data.comp.then(
+            comp => ctx.patch(key, comp)
+          )
+        case 'normal':
+          return actions[CHANGE_LOCATION](loc)
+        case 'ssr': case 'none': return
+        default:
+          return never(routeComp)
+      }
+    }
+    const ctx = app({
       ...props,
       init: () => {
-        let result = props.init()
-        if (!(result instanceof Array)) {
-          result = [result, Cmd.none]
-        }
-        const loc: Location<any, any> = pathToLoc(history.current())
+        let result = normalizeInit(props.init())
         let cmd = Cmd.batch(
           result[1],
           Cmd.ofSub<RouterActions<Actions>>(
-            actions => actions[CHANGE_LOCATION](loc)
+            actions => runRoute(initComp, actions, loc)
           )
         )
-        return [{ ...result[0] as any, location: loc }, cmd]
+        let state = { ...result[0] as any, location: loc } as State
+        switch (initComp.tag) {
+          case 'normal':
+          case 'ssr':
+            const [s, c] = normalizeInit(initComp.data.comp.init())
+            state[initComp.data.key] = s
+            if (initComp.tag === 'normal') {
+              cmd = Cmd.batch(c, cmd)
+            }
+            break
+          default:
+            break
+        }
+        return [state, cmd]
       },
       subscribe: state => Cmd.batch(
         Cmd.ofSub<RouterActions<Actions>>(actions => {
           history.listen(path => {
-            actions[CHANGE_LOCATION](pathToLoc(path))
+            const loc = pathToLoc(path)
+            const meta = routesMeta[loc.template!]
+            if (meta && meta.getComponent) {
+              const res = meta.getComponent(loc)
+              runRoute(res, actions, loc)
+            } else {
+              actions[CHANGE_LOCATION](loc)
+            }
           })
         }),
         props.subscribe ? props.subscribe(state) : Cmd.none
       ),
       actions: {
-        ...(props.actions as any),
+        ...actions as any,
         history: ({
-          push: path => (history.push(path), void 0),
-          replace: path => (history.replace(path), void 0),
-          go: delta => (history.go(delta), void 0),
-          back: () => (history.back(), void 0),
-          forward: () => (history.forward(), void 0),
+          push: path => history.push(path),
+          replace: path => history.replace(path),
+          go: delta => history.go(delta),
+          back: () => history.back(),
+          forward: () => history.forward(),
         } as History),
-        [CHANGE_LOCATION]: (loc: Location<any, any>) => (state: State, actions: Actions) => {
+        [CHANGE_LOCATION]: (loc: Location<any, any>, resolve?: Function) => (state: State, actions: Actions) => {
           history._setLoc(loc)
           if (loc.template) {
-            let [nextState, cmd] = runAction(routes[loc.template](loc), state, actions)
+            const patch: Patch = (...args) => (ctx.patch as any)(...args)
+            let [nextState, cmd] = runAction(routesMap[loc.template](loc, patch), state, actions)
             return [{ ...(nextState as any as object), location: loc }, cmd]
           } else {
             return { ...(state as any), location: loc }
           }
         },
-      }
+      },
     })
+    return ctx
   }
 }
+
+export type RouteComp<S, A> =
+| Dt<'normal', {key: string, comp: Component<S, A>}>
+| Dt<'ssr', {key: string, comp: Component<S, A>}>
+| Dt<'dynamic', {key: string, comp: Promise<Component<S, A>>}>
+| Dt<'none'>
+
+export type GetComp<S, A> = (loc: Location<any, any>) => RouteComp<S, A>
 
 export interface NestedRoutes<State, Actions> {
   path: string,
   label?: string,
   action?: ActionType<Location<any, any>, State, Actions>,
-  children?: NestedRoutes<State, Actions>[],
+  children?: NestedRoutes<any, any>[],
+  getComponent?: GetComp<State, Actions>
 }
 export interface RouteInfo<State, Actions> {
   path: string,
@@ -204,6 +276,7 @@ export interface RouteMeta<State, Actions> {
   path: string,
   label?: string,
   action?: ActionType<Location<any, any>, State, Actions>,
+  getComponent?: GetComp<State, Actions>
   parents: RouteInfo<State, Actions>[],
   children: RouteInfo<State, Actions>[],
 }
@@ -242,7 +315,7 @@ export function parseNestedRoutes<State, Actions>(routes: NestedRoutes<State, Ac
         }),
         children: r.children,
       }))
-      .forEach(r => rec(r, newRoutes))
+      .forEach(r => rec(r as any, newRoutes))
     return newRoutes
   }
   const meta = rec(routes, {})

@@ -9,7 +9,7 @@ import withRouter, {
   RouterState,
   Routes,
 } from '../../../../../src/enhancers/router'
-import { State, Actions, history, Ctx } from './State'
+import { State, Actions, history } from './State'
 import * as Utils from '../utils'
 
 const NoMatch = () => <div>404</div>
@@ -18,8 +18,8 @@ const Users = () => <div>Users</div>
 
 let Link = mkLink(history, React.createElement)
 
-const renderRoutes = (state: State, actions: Actions, ctx: Ctx) => {
-  const Counter = ctx.lazyComps.counter
+const renderRoutes = (state: State, actions: Actions) => {
+  const Counter = state.lazyComps.Counter
   switch (state.page) {
     case 'Home':
       return <div>Home</div>
@@ -37,7 +37,7 @@ const renderRoutes = (state: State, actions: Actions, ctx: Ctx) => {
       }
   }
 }
-export const root = (state: State, actions: RouterActions<Actions>, ctx: Ctx) => (
+export const root = (state: State, actions: RouterActions<Actions>) => (
   <main>
     <style>{`
         a {
@@ -50,6 +50,6 @@ export const root = (state: State, actions: RouterActions<Actions>, ctx: Ctx) =>
     <Link to="/accounts">Accounts</Link>
     <Link to="/counter">Counter</Link>
     <Link to="/404">404</Link>
-    {renderRoutes(state, actions, ctx)}
+    {renderRoutes(state, actions)}
   </main>
 )

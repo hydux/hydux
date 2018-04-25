@@ -15,7 +15,6 @@ import * as Utils from '../utils'
 // const history = new HashHistory()
 
 export function main(path?: string) {
-  let ctx: any = null
   let withEnhancers = Hydux.compose(
     __is_browser
       ? withReact<State.State, State.Actions>(
@@ -34,7 +33,7 @@ export function main(path?: string) {
           ? State.history
           // Since there are no history API on the server side, we should use MemoryHistory here.
           : new MemoryHistory({ initPath: path }) ,
-      routes: State.routes(() => ctx),
+      routes: State.routes,
     }),
   )
   let app = withEnhancers(Hydux.app)
@@ -49,7 +48,7 @@ export function main(path?: string) {
   }
   // WithSSR would assume the app is running on the server side, so it won't render anything to the DOM, but will call renderToString when you call ctx.render()
 
-  ctx = app({
+  const ctx = app({
     init: State.init,
     actions: State.actions,
     view: View.root,

@@ -15,12 +15,13 @@ export { Cmd, CmdType, Sub, ActionResult, noop, isFn, isPojo }
 
 export type Init<S, A> = () => S | [S, CmdType<A>]
 // todo: Remove back compatible optional ctx
-export type View<S, A> = ((state: S, actions: A, ctx?: Context<S, A>) => any)
+export type View<S, A> = ((state: S, actions: A) => any)
 export type Subscribe<S, A> = (state: S) => CmdType<A>
 export type OnUpdate<S, A> = <M>(
   data: { prevAppState: S; nextAppState: S; msgData: M; action: string },
 ) => void
 export type OnUpdateStart<S, A> = <M>(data: { action: string }) => void
+export type Patch = <S, A>(path: string | string[], component: Component<S, A>, runInitCmd?: boolean) => Promise<any>
 
 export interface AppProps<State, Actions> {
   init: Init<State, Actions>
@@ -164,7 +165,7 @@ export interface Component<State, Actions> {
   actions: ActionsType<State, Actions>
 }
 
-export interface Context<State, Actions, RenderReturn = any, Comps = any> {
+export interface Context<State, Actions, RenderReturn = any> {
   actions: Actions
   state: State
   init: Init<State, Actions>
@@ -173,14 +174,13 @@ export interface Context<State, Actions, RenderReturn = any, Comps = any> {
   onRender?: ((view: any) => RenderReturn)
   onUpdate?: OnUpdate<State, Actions>
   onUpdateStart?: OnUpdateStart<State, Actions>
-  lazyComps: Comps
-  render(state?: State): RenderReturn
   /** Patch a component in runtime, used for code-splitting */
-  patch<S, A>(path: string | string[], component: Component<S, A>): any
+  patch: Patch
+  render(state?: State): RenderReturn
 }
 export type App<State, Actions> = (props: AppProps<State, Actions>) => Context<State, Actions, any>
 
-function normalizeInit<S, A>(initResult: S | [S, CmdType<A>]): [S, CmdType<A>] {
+export function normalizeInit<S, A>(initResult: S | [S, CmdType<A>]): [S, CmdType<A>] {
   if (initResult instanceof Array) {
     return initResult
   }
@@ -188,10 +188,10 @@ function normalizeInit<S, A>(initResult: S | [S, CmdType<A>]): [S, CmdType<A>] {
 }
 
 export function runCmd<A>(cmd: CmdType<A>, actions: A) {
-  return cmd.map(sub => sub(actions))
+  return Promise.all(cmd.map(sub => sub(actions)))
 }
 
-export function app<State, Actions>(props: AppProps<State, Actions>): Context<State, Actions, any> {
+export function app<State, Actions>(props: AppProps<State, Actions>): Context<State, Actions> {
   // const appEvents = props.events || {}
   let appActions = {} as Actions
   const appSubscribe = props.subscribe || (_ => Cmd.none)
@@ -212,22 +212,26 @@ export function app<State, Actions>(props: AppProps<State, Actions>): Context<St
     ...props,
     actions: appActions,
     render: appRender,
-    lazyComps: {},
-    patch<S, A>(path: string | string[], comp: Component<S, A>) {
+    patch<S, A>(path: string | string[], comp: Component<S, A>, reuseState = false): Promise<any> {
       const paths = typeof path === 'string' ? [path] : path
-      this.lazyComps[paths.join('.')] = comp
       const render = () => appRender(appState)
       let actions = get(paths, appActions)
-      if (get(paths, appState) && actions) {
-        return render()
+      const oldState = get(paths, appState)
+      if (oldState && actions) {
+        return Promise.resolve(render())
       }
+      reuseState = reuseState && oldState
       let [state, cmd] = normalizeInit(comp.init())
-      appActions = setDeep(paths, actions = {}, appActions)
-      appState = setDeep(paths, state, appState)
+      actions = appActions
+      for (const path of paths) {
+        actions = appActions[path] || (appActions[path] = {})
+      }
       init(state, actions, comp.actions as any, paths)
+      if (!reuseState) {
+        appState = setDeep(paths, state, appState)
+      }
       render()
-      const cmdRes = runCmd(cmd, actions)
-      return Promise.all(cmdRes)
+      return !reuseState ? runCmd(cmd, actions) : Promise.resolve()
     }
   }
 
@@ -237,7 +241,7 @@ export function app<State, Actions>(props: AppProps<State, Actions>): Context<St
     if (state !== appState) {
       appState = state
     }
-    let view = props.view(appState, appActions, appContext)
+    let view = props.view(appState, appActions)
     if (isFn(view)) {
       view = view(appActions)
     }
@@ -246,7 +250,7 @@ export function app<State, Actions>(props: AppProps<State, Actions>): Context<St
 
   function init(
     state,
-    actions,
+    actions: any,
     from: ActionsType<State, Actions> | ActionType<any, State, Actions>,
     path: string[],
   ) {
@@ -293,7 +297,7 @@ export function app<State, Actions>(props: AppProps<State, Actions>): Context<St
                 : setDeep(path, merge(state, nextState), appState)
             appRender(appState)
           }
-          cmd.forEach(sub => sub(actions))
+          return runCmd(cmd, actions)
         }
       } else if (typeof subFrom === 'object' && subFrom) {
         init(

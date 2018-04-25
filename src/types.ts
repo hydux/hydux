@@ -13,6 +13,11 @@ export type ActionType<Data, State, Actions> =
   | ActionResult<State, Actions>
   | ((state: State, actions: Actions) => ActionResult<State, Actions>)
 
+export type ActionType2<D1, D2, State, Actions> =
+  (data1: D1, data2: D2, ...args: any[]) =>
+  | ActionResult<State, Actions>
+  | ((state: State, actions: Actions) => ActionResult<State, Actions>)
+
 export type UnknownArgsActionType<State, Actions> =
   (...args: any[]) =>
   | ActionResult<State, Actions>
