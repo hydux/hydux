@@ -19,7 +19,7 @@ const Users = () => <div>Users</div>
 let Link = mkLink(history, React.createElement)
 
 const renderRoutes = (state: State, actions: Actions) => {
-  const Counter = state.lazyComps.Counter
+  const Counter = state.lazyComps.counter
   switch (state.page) {
     case 'Home':
       return <div>Home</div>

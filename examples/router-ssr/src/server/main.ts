@@ -10,7 +10,7 @@ import ejs from 'ejs'
 async function bootstrap() {
   const app = await NestFactory.create(ApplicationModule)
   app.use(((req, res, next) => {
-    res.locals.assets_url = 'http://127.0.0.1:8080'
+    res.locals.assets_url = 'http://127.0.0.1:8081'
     if (req.path.startsWith('static')) {
       express.static(path.join(__dirname, '../../static'))(req, res, next)
     } else {

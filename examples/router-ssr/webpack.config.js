@@ -23,7 +23,7 @@ module.exports = createConfig([
   setOutput({
     filename: '[name].js',
     path: DIST,
-    publicPath: 'http://127.0.0.1:8080/static/dist/',
+    publicPath: 'http://127.0.0.1:8081/static/dist/',
   }),
   css(),
   typescript(),
@@ -59,6 +59,7 @@ module.exports = createConfig([
         chunks: false,
         children: false,
       },
+      port: 8081,
     }),
     devServer.proxy({
       '/api': {

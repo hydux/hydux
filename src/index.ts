@@ -21,7 +21,7 @@ export type OnUpdate<S, A> = <M>(
   data: { prevAppState: S; nextAppState: S; msgData: M; action: string },
 ) => void
 export type OnUpdateStart<S, A> = <M>(data: { action: string }) => void
-export type Patch = <S, A>(path: string | string[], component: Component<S, A>, runInitCmd?: boolean) => Promise<any>
+export type Patch = <S, A>(path: string | string[], component: Component<S, A>, reuseState?: boolean) => Promise<any>
 
 export interface AppProps<State, Actions> {
   init: Init<State, Actions>
@@ -212,26 +212,23 @@ export function app<State, Actions>(props: AppProps<State, Actions>): Context<St
     ...props,
     actions: appActions,
     render: appRender,
-    patch<S, A>(path: string | string[], comp: Component<S, A>, reuseState = false): Promise<any> {
-      const paths = typeof path === 'string' ? [path] : path
+    patch<S, A>(path: string, comp: Component<S, A>, reuseState = false): Promise<any> {
       const render = () => appRender(appState)
-      let actions = get(paths, appActions)
-      const oldState = get(paths, appState)
+      let actions = appActions[path]
+      const oldState = appState[path]
       if (oldState && actions) {
         return Promise.resolve(render())
       }
       reuseState = reuseState && oldState
       let [state, cmd] = normalizeInit(comp.init())
-      actions = appActions
-      for (const path of paths) {
-        actions = appActions[path] || (appActions[path] = {})
-      }
-      init(state, actions, comp.actions as any, paths)
+      actions = appActions[path] || (appActions[path] = {})
+      init(state, actions, comp.actions as any, [path])
       if (!reuseState) {
-        appState = setDeep(paths, state, appState)
+        appState = setDeep([path], state, appState)
       }
+      appState = setDeep(['lazyComps', path], comp, appState)
       render()
-      return !reuseState ? runCmd(cmd, actions) : Promise.resolve()
+      return reuseState ? Promise.resolve() : runCmd(cmd, actions)
     }
   }
 

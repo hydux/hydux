@@ -24,7 +24,7 @@ let initState = {
   counter: null as any as _Counter.State,
   page: 'Home' as Page,
   lazyComps: {
-    Counter: undefined as typeof _Counter | void,
+    counter: undefined as typeof _Counter | void,
   }
 }
 
@@ -60,14 +60,14 @@ export const routes: NestedRoutes<State, Actions> = {
     path: '/counter',
     getComponent: (loc): RouteComp<any, any> => {
       if (loc.fromInit && __is_browser) {
-        return dt('ssr', {
+        return dt('clientSSR', {
           key: 'counter',
-          comp: require('../counter'),
+          comp: import('../counter'),
         })
       } else if (!__is_browser) {
         return dt('normal', {
           key: 'counter',
-          comp: require('../counter'),
+          comp: import('../counter'),
         })
       } else {
         return dt('dynamic', {
@@ -76,19 +76,10 @@ export const routes: NestedRoutes<State, Actions> = {
         })
       }
     },
-    action: (loc, patch) => state => [({
+    action: (loc, patch) => state => ({
       ...state,
       page: 'Counter'
-    }), Cmd.ofSub(async _ => {
-      // if (!state.lazyComps.Counter) {
-      //   console.log('runInitCmd', loc.fromInit && __is_browser)
-      //   return patch(
-      //     'counter',
-      //     state.lazyComps.Counter = await import('../counter'),
-      //     (loc.fromInit && __is_browser),
-      //   )
-      // }
-    })],
+    }),
   }, {
     path: '*',
     action: loc => state => ({

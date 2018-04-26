@@ -36,6 +36,18 @@ export default function withSSR<State, Actions>(
       const view = ctx.view(state, ctx.actions)
       return options.renderToString(view)
     }
-    return ctx
+    let newCtx = new Proxy(ctx, {
+      get(t, p, r) {
+        if (p === 'state') {
+          const s = t.state
+          if ('lazyComps' in s) {
+            (s as any).lazyComps = {}
+          }
+          return s
+        }
+        return t[p]
+      }
+    })
+    return newCtx
   }
 }

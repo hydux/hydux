@@ -77,9 +77,9 @@ export type RouterActions<Actions extends Object> = Actions & {
   history: History
 }
 
-export type RouterState<State extends Object> = State & {
+export type RouterState<State extends Object, LazyComps = any> = State & {
   location: Location
-  lazyComps: any
+  lazyComps: LazyComps
 }
 
 export function mkLink(history: History, h) {
@@ -165,24 +165,30 @@ export default function withRouter<State, Actions>(props: {
       initComp = meta.getComponent(loc)
     }
 
-    let actions = props.actions
-    if (initComp.tag === 'normal' || initComp.tag === 'ssr') {
-      actions = {
-        ...actions as any,
-        [initComp.data.key]: initComp.data.comp.actions,
-      }
+    let isRenderable = true
+    console.log('isRenderable', isRenderable)
+
+    if (initComp.tag !== 'clientSSR') {
+      isRenderable = false
+      console.log('isRenderable', isRenderable)
     }
     function runRoute<S, A>(routeComp: RouteComp<S, A>, actions: A, loc: Location) {
       const meta = routesMeta[loc.template!]
       switch (routeComp.tag) {
+        case 'normal':
         case 'dynamic':
+        case 'clientSSR':
           const key = routeComp.data.key
           return routeComp.data.comp.then(
-            comp => ctx.patch(key, comp)
+            comp => {
+              isRenderable = true
+              console.log('isRenderable', isRenderable)
+              return ctx.patch(key, comp, routeComp.tag === 'clientSSR')
+            }
+          ).then(
+            () => actions[CHANGE_LOCATION](loc)
           )
-        case 'normal':
-          return actions[CHANGE_LOCATION](loc)
-        case 'ssr': case 'none': return
+        case 'none': return
         default:
           return never(routeComp)
       }
@@ -197,19 +203,7 @@ export default function withRouter<State, Actions>(props: {
             actions => runRoute(initComp, actions, loc)
           )
         )
-        let state = { ...result[0] as any, location: loc } as State
-        switch (initComp.tag) {
-          case 'normal':
-          case 'ssr':
-            const [s, c] = normalizeInit(initComp.data.comp.init())
-            state[initComp.data.key] = s
-            if (initComp.tag === 'normal') {
-              cmd = Cmd.batch(c, cmd)
-            }
-            break
-          default:
-            break
-        }
+        let state = { ...result[0] as any, location: loc, lazyComps: {} } as RouterState<State>
         return [state, cmd]
       },
       subscribe: state => Cmd.batch(
@@ -228,7 +222,7 @@ export default function withRouter<State, Actions>(props: {
         props.subscribe ? props.subscribe(state) : Cmd.none
       ),
       actions: {
-        ...actions as any,
+        ...props.actions as any,
         history: ({
           push: path => history.push(path),
           replace: path => history.replace(path),
@@ -247,14 +241,19 @@ export default function withRouter<State, Actions>(props: {
           }
         },
       },
+      onRender(view) {
+        if (isRenderable) {
+          props.onRender && props.onRender(view)
+        }
+      }
     })
     return ctx
   }
 }
 
 export type RouteComp<S, A> =
-| Dt<'normal', {key: string, comp: Component<S, A>}>
-| Dt<'ssr', {key: string, comp: Component<S, A>}>
+| Dt<'normal', {key: string, comp: Promise<Component<S, A>>}>
+| Dt<'clientSSR', {key: string, comp: Promise<Component<S, A>>}>
 | Dt<'dynamic', {key: string, comp: Promise<Component<S, A>>}>
 | Dt<'none'>
 
