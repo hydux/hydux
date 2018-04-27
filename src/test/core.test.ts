@@ -118,7 +118,6 @@ describe('core api', () => {
         this._inc = inc
       }
       up = () => (state) => {
-        console.log('up in class', state, this._inc)
         return ({ count: state.count + this._inc })
       }
     }

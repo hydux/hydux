@@ -13,9 +13,18 @@ import * as State from './State'
 import * as View from './View'
 import * as Utils from '../utils'
 // const history = new HashHistory()
-
 export function main(path?: string) {
+  const noop = <T>(f: T) => f
+  // NOTE: The order matters !!! If you are trying to integrate code splitting & SSR, you should ensure the enhancers order as ?withSSR -> withRouter -> ?withReact.
   let withEnhancers = Hydux.compose(
+    __is_browser
+      ? noop
+      // Inject `renderToString` to Hydux on the server side, so we can call `ctx.render` to run all init commands and render the vdom to html string.
+      : withSSR<State.State, State.Actions>({
+        renderToString(view) {
+          return ReactDOM.renderToString(view)
+        },
+      }),
     withRouter<State.State, State.Actions>({
       history:
         __is_browser
@@ -23,18 +32,15 @@ export function main(path?: string) {
           // Since there are no history API on the server side, we should use MemoryHistory here.
           : new MemoryHistory({ initPath: path }) ,
       routes: State.routes,
+      ssr: true,
+      isServer: !__is_browser,
     }),
     __is_browser
       ? withReact<State.State, State.Actions>(
         document.getElementById('root'),
         { hydrate: true },
       )
-      // Inject `renderToString` to Hydux on the server side, so we can call `ctx.render` to run all init commands and render the vdom to html string.
-      : withSSR<State.State, State.Actions>({
-        renderToString(view) {
-          return ReactDOM.renderToString(view)
-        },
-      }),
+      : noop
   )
   let app = withEnhancers(Hydux.app)
 

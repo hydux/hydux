@@ -24,6 +24,7 @@ const renderRoutes = (state: State, actions: Actions) => {
     case 'Home':
       return <div>Home</div>
     case 'Counter':
+      console.log('client state', state)
       if (Counter) {
         return Counter.view(state.counter, actions.counter)
       }

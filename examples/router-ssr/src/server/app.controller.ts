@@ -16,7 +16,7 @@ export class AppController {
     let ctx = Client.main(req.url)
     console.log('before render')
     let html = await ctx.render()
-    console.log('rendered')
+    console.log('rendered', ctx.state)
     res.render('index', { html, state: ctx.state })
   }
 }

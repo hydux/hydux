@@ -25,7 +25,6 @@ export interface Location<P = any, Q extends Query = any> {
   params: P
   query: Q
   search: string
-  fromInit: boolean
 }
 
 export interface History {
@@ -50,7 +49,7 @@ export function parsePath<P, Q extends Query>(path: string): Location<P, Q> {
       }
       return query
     }, {}) as Q
-  return { pathname, params: {} as P, query, search, template: null, fromInit: false }
+  return { pathname, params: {} as P, query, search, template: null }
 }
 
 const isNotEmpty = s => s !== ''
@@ -127,13 +126,21 @@ export interface RouterAppProps<State, Actions> extends AppProps<State, Actions>
   onUpdate?: OnUpdate<RouterState<State>, RouterActions<Actions>>,
 }
 
-export default function withRouter<State, Actions>(props: {
+export type Options<S, A> = {
   history?: BaseHistory,
-  routes: Routes<State, Actions> | NestedRoutes<State, Actions>,
-} = { routes: {} }) {
+  /** Whether is running in SSR mode, used for code-splitting */
+  ssr?: boolean,
+  /** Whether is running in the server side, if `ssr` is true, used for code-splitting */
+  isServer?: boolean,
+  routes: Routes<S, A> | NestedRoutes<S, A>,
+}
+
+export default function withRouter<State, Actions>(props: Options<State, Actions> = { routes: {} }) {
   const {
     history = new HashHistory(),
     routes,
+    ssr = false,
+    isServer = false,
   } = props
   let timer
   return (app: App<State, Actions>) => (props: RouterAppProps<State, Actions>) => {
@@ -157,40 +164,49 @@ export default function withRouter<State, Actions>(props: {
       return loc
     }
     const loc: Location<any, any> = pathToLoc(history.current())
-    loc.fromInit = true
     const meta = routesMeta[loc.template!]
-    let initComp = dt('none') as RouteComp<State, Actions>
-    if (meta && meta.getComponent) {
-      let _comp
-      initComp = meta.getComponent(loc)
+    const getRouteComp = (meta?: RouteMeta<State, Actions>, fromInit = false): RouteComp<State, Actions> => {
+      if (!meta || !meta.getComponent) {
+        return dt('none', null)
+      }
+      const [key, comp] = meta.getComponent()
+      if (ssr && fromInit && !isServer) {
+        return dt('clientSSR', { key, comp })
+      } else if (ssr && isServer) {
+        return dt('server', { key, comp })
+      } else {
+        return dt('client', { key, comp })
+      }
     }
+    let initComp = getRouteComp(meta, true)
 
-    let isRenderable = true
-    console.log('isRenderable', isRenderable)
-
-    if (initComp.tag !== 'clientSSR') {
-      isRenderable = false
-      console.log('isRenderable', isRenderable)
-    }
-    function runRoute<S, A>(routeComp: RouteComp<S, A>, actions: A, loc: Location) {
+    let isRenderable = false
+    function runRoute<S, A>(routeComp: RouteComp<S, A>, actions: A, loc: Location, fromInit = false) {
       const meta = routesMeta[loc.template!]
       switch (routeComp.tag) {
-        case 'normal':
-        case 'dynamic':
+        case 'client':
+        case 'server':
         case 'clientSSR':
           const key = routeComp.data.key
+          const isClientSSRInit = routeComp.tag === 'clientSSR' && fromInit
           return routeComp.data.comp.then(
-            comp => {
-              isRenderable = true
-              console.log('isRenderable', isRenderable)
-              return ctx.patch(key, comp, routeComp.tag === 'clientSSR')
-            }
+            comp => ctx.patch(key, comp, isClientSSRInit)
           ).then(
-            () => actions[CHANGE_LOCATION](loc)
+            () => {
+              if (isClientSSRInit) { // trigger client ssr render
+                isRenderable = true
+                return ctx.render()
+              }
+
+              isRenderable = true
+              const res = actions[CHANGE_LOCATION](loc)
+              return res
+            }
           )
-        case 'none': return
-        default:
-          return never(routeComp)
+        case 'none':
+          isRenderable = true
+          return actions[CHANGE_LOCATION](loc)
+        default: return never(routeComp)
       }
     }
     const ctx = app({
@@ -200,7 +216,7 @@ export default function withRouter<State, Actions>(props: {
         let cmd = Cmd.batch(
           result[1],
           Cmd.ofSub<RouterActions<Actions>>(
-            actions => runRoute(initComp, actions, loc)
+            actions => runRoute(initComp, actions, loc, true)
           )
         )
         let state = { ...result[0] as any, location: loc, lazyComps: {} } as RouterState<State>
@@ -211,12 +227,8 @@ export default function withRouter<State, Actions>(props: {
           history.listen(path => {
             const loc = pathToLoc(path)
             const meta = routesMeta[loc.template!]
-            if (meta && meta.getComponent) {
-              const res = meta.getComponent(loc)
-              runRoute(res, actions, loc)
-            } else {
-              actions[CHANGE_LOCATION](loc)
-            }
+            let comp = getRouteComp(meta, false)
+            runRoute(comp, actions, loc)
           })
         }),
         props.subscribe ? props.subscribe(state) : Cmd.none
@@ -252,12 +264,12 @@ export default function withRouter<State, Actions>(props: {
 }
 
 export type RouteComp<S, A> =
-| Dt<'normal', {key: string, comp: Promise<Component<S, A>>}>
+| Dt<'client', {key: string, comp: Promise<Component<S, A>>}>
 | Dt<'clientSSR', {key: string, comp: Promise<Component<S, A>>}>
-| Dt<'dynamic', {key: string, comp: Promise<Component<S, A>>}>
-| Dt<'none'>
+| Dt<'server', {key: string, comp: Promise<Component<S, A>>}>
+| Dt<'none', null>
 
-export type GetComp<S, A> = (loc: Location<any, any>) => RouteComp<S, A>
+export type GetComp<S, A> = () => [string, Promise<Component<S, A>>]
 
 export interface NestedRoutes<State, Actions> {
   path: string,

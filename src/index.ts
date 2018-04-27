@@ -213,21 +213,18 @@ export function app<State, Actions>(props: AppProps<State, Actions>): Context<St
     actions: appActions,
     render: appRender,
     patch<S, A>(path: string, comp: Component<S, A>, reuseState = false): Promise<any> {
-      const render = () => appRender(appState)
-      let actions = appActions[path]
-      const oldState = appState[path]
-      if (oldState && actions) {
-        return Promise.resolve(render())
-      }
-      reuseState = reuseState && oldState
+      reuseState = reuseState && appState[path]
       let [state, cmd] = normalizeInit(comp.init())
-      actions = appActions[path] || (appActions[path] = {})
-      init(state, actions, comp.actions as any, [path])
+      let actions = appActions[path]
+      if (!actions) {
+        actions = appActions[path] = {}
+        init(state, actions, comp.actions as any, [path])
+      }
       if (!reuseState) {
         appState = setDeep([path], state, appState)
       }
       appState = setDeep(['lazyComps', path], comp, appState)
-      render()
+      appRender(appState)
       return reuseState ? Promise.resolve() : runCmd(cmd, actions)
     }
   }

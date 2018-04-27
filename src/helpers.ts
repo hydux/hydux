@@ -1,7 +1,7 @@
 import * as Cmd from './cmd'
 import { ActionCmdResult } from './index'
 
-export type Dt<T extends string, D = undefined> = {
+export type Dt<T extends string, D = null> = {
   tag: T,
   data: D
 } & { __tsTag: 'DateType' }
@@ -28,7 +28,7 @@ export type Dt<T extends string, D = undefined> = {
  * }
  * ```
  */
-export function dt<T extends string, D = undefined>(tag: T, data?: D) {
+export function dt<T extends string, D>(tag: T, data: D) {
   return { tag, data } as Dt<T, D>
 }
 

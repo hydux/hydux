@@ -41,7 +41,7 @@ export default function withSSR<State, Actions>(
         if (p === 'state') {
           const s = t.state
           if ('lazyComps' in s) {
-            (s as any).lazyComps = {}
+            return { ...s as any, lazyComps: {} }
           }
           return s
         }

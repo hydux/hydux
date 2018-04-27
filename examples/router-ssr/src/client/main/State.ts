@@ -58,24 +58,7 @@ export const routes: NestedRoutes<State, Actions> = {
     })
   }, {
     path: '/counter',
-    getComponent: (loc): RouteComp<any, any> => {
-      if (loc.fromInit && __is_browser) {
-        return dt('clientSSR', {
-          key: 'counter',
-          comp: import('../counter'),
-        })
-      } else if (!__is_browser) {
-        return dt('normal', {
-          key: 'counter',
-          comp: import('../counter'),
-        })
-      } else {
-        return dt('dynamic', {
-          key: 'counter',
-          comp: import('../counter'),
-        })
-      }
-    },
+    getComponent: () => ['counter', import('../counter')],
     action: (loc, patch) => state => ({
       ...state,
       page: 'Counter'
