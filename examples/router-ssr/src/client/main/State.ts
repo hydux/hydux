@@ -23,6 +23,7 @@ export type Page =
 let initState = {
   counter: null as any as _Counter.State,
   page: 'Home' as Page,
+  // NOTE: `lazyComps` is a auto injected field contains all code-splitting components, you can define the type definitions to used in `view` function.
   lazyComps: {
     counter: undefined as typeof _Counter | void,
   }
@@ -35,7 +36,6 @@ export type State = typeof initState
 export const init: Init<State, Actions> = () => {
   return {
     ...initState,
-    lazyComps: {} as any
   }
 }
 
