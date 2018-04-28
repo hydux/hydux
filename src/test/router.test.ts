@@ -5,7 +5,7 @@ import { parsePath, matchPath, parseNestedRoutes, NestedRoutes } from '../enhanc
 
 describe('router', () => {
   it('parsePath simple', () => {
-    let loc = parsePath('/aa/bb?aa=bb&aa=cc&cc=dd')
+    let loc = parsePath('/aa/bb?aa=bb&aa=cc&cc=dd', [])
     assert.deepEqual(loc.params, {}, 'params should be empty obj')
     assert.deepEqual(loc.pathname, '/aa/bb')
     assert.deepEqual(loc.search, '?aa=bb&aa=cc&cc=dd')
@@ -15,7 +15,7 @@ describe('router', () => {
   })
 
   it('parsePath encode', () => {
-    let loc = parsePath('/user/%E5%B0%8F%E6%98%8E?aa=vv&aa=%E5%B0%8F%E6%98%8E&aa=badas')
+    let loc = parsePath('/user/%E5%B0%8F%E6%98%8E?aa=vv&aa=%E5%B0%8F%E6%98%8E&aa=badas', [])
     assert.deepEqual(loc.params, {}, 'params should be empty obj')
     assert.deepEqual(loc.pathname, '/user/小明', 'pathname')
     assert.deepEqual(loc.search, '?aa=vv&aa=%E5%B0%8F%E6%98%8E&aa=badas')
@@ -24,31 +24,29 @@ describe('router', () => {
   })
 
   it('matchPath simple', () => {
-    let [match, params] = matchPath('/aa/bb/cc', '/aa/bb/cc')
-    assert.deepEqual(match, true, 'match')
+    let params = matchPath('/aa/bb/cc', '/aa/bb/cc')
     assert.deepEqual(params, {}, 'params')
 
-      ;[match, params] = matchPath('/aa/bb/cc', '/aa/bb/cc/')
-    assert.deepEqual(match, true, 'match')
+    params = matchPath('/aa/bb/cc', '/aa/bb/cc/')
+    assert.deepEqual(params, {}, 'match')
 
-      ;[match, params] = matchPath('/aa/bb/cc/', '/aa/bb/cc')
-    assert.deepEqual(match, true, 'match')
+    params = matchPath('/aa/bb/cc/', '/aa/bb/cc')
+    assert.deepEqual(params, {}, 'match')
 
-      ;[match, params] = matchPath('/aa/bb/cc/', '/aa/bb/cc/')
-    assert.deepEqual(match, true, 'match')
+    params = matchPath('/aa/bb/cc/', '/aa/bb/cc/')
+    assert.deepEqual(params, {}, 'match')
 
-      ;[match, params] = matchPath('/aa/bb/cc', '/aa/bb/cd')
-    assert.deepEqual(match, false, 'match')
-    assert.deepEqual(params, {}, 'params')
+    params = matchPath('/aa/bb/cc', '/aa/bb/cd')
+    assert.deepEqual(params, null, 'match')
 
-      ;[match, params] = matchPath('/aa/bb/cc', '/aa/ba/cc')
-    assert.deepEqual(match, false, 'match')
+    params = matchPath('/aa/bb/cc', '/aa/ba/cc')
+    assert.deepEqual(params, null, 'match')
 
-      ;[match, params] = matchPath('/aa/bb/cc', '/aa/bb')
-    assert.deepEqual(match, false, 'match')
+    params = matchPath('/aa/bb/cc', '/aa/bb')
+    assert.deepEqual(params, null, 'match')
 
-      ;[match, params] = matchPath('/aa/bb/', '/aa/bb/cc/')
-    assert.deepEqual(match, false, 'match')
+    params = matchPath('/aa/bb/', '/aa/bb/cc/')
+    assert.deepEqual(params, null, 'match')
   })
 
   it('nestedRoutes', () => {

@@ -6,6 +6,7 @@
   "main": "index.js",
   "scripts": {
     "build": "cross-env NODE_ENV=production webpack --config webpack.config.js",
+    "build:dev": "cross-env NODE_ENV=development webpack --config webpack.config.js",
     "start": "cross-env NODE_ENV=development webpack-dev-server --progress --config webpack.config.js",
     "build:dll:dev": "cross-env NODE_ENV=development webpack --config ./webpack.config.dll.js --progress --colors",
     "build:dll": "cross-env NODE_ENV=production webpack --config ./webpack.config.dll.js --progress --profile --colors",

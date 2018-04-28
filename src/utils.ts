@@ -2,6 +2,12 @@
 const isSet = val => typeof val !== 'undefined' && val !== null
 export const isPojo = obj => !isSet(obj.constructor) || obj.constructor === Object
 
+export const isDev = typeof process !== 'undefined' && process.env.NODE_ENV === 'development'
+
+export const debug = (key: string, ...args: any[]) => {
+  isDev && console.log(`[hydux-${key}]`, ...args)
+}
+
 export function set(to, from) {
   const keys = Object.keys(from)
   let i = keys.length

@@ -8,8 +8,8 @@ import withRouter, {
 } from '../../../src/enhancers/router'
 import Counter, { State as CounterState } from './counter'
 import './polyfill.js'
-// const history = new HashHistory()
-const history = new BrowserHistory()
+const history = new HashHistory()
+// const history = new BrowserHistory()
 // let app = withPersist<State, Actions>({
 //   key: 'time-game/v1'
 // })(_app)
@@ -71,9 +71,7 @@ const state: State = {
 }
 
 type Actions = typeof actions
-const NoMatch = () => <div>404</div>
-const Home = () => <div>Home</div>
-const Users = () => <div>Users</div>
+const NoMatch = () => <div class="main">404</div>
 
 const renderRoutes = (state: State, actions: Actions) => {
   switch (state.page) {
@@ -98,12 +96,14 @@ const view = (state: State, actions: RouterActions<Actions>) => (
         }
     `}</style>
     <h1>Router example</h1>
-    <Link to="/">Home</Link>
-    <Link to="/user/1">Users</Link>
-    <Link to="/accounts">Accounts</Link>
-    <Link to="/counter">Counter</Link>
-    <Link to="/404">404</Link>
-    {renderRoutes(state, actions)}
+    <Link className="home" to="/">Home</Link>
+    <Link className="users" to="/user/1">Users</Link>
+    <Link className="accounts" to="/accounts">Accounts</Link>
+    <Link className="counter" to="/counter">Counter</Link>
+    <Link className="e404" to="/404">404</Link>
+    <div className="main">
+      {renderRoutes(state, actions)}
+    </div>
   </main>
 )
 

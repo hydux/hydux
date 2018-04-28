@@ -28,7 +28,7 @@ let initState = {
     counter: undefined as typeof _Counter | void,
   }
 }
-
+export const isSSR = !!(global as any).__INIT_STATE__
 initState = (global as any).__INIT_STATE__ || initState
 
 export type State = typeof initState

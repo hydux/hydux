@@ -6,11 +6,14 @@ import {
 } from './../../index'
 import { Dt, dt, never } from '../../helpers'
 import Cmd, { CmdType } from './../../cmd'
-import { get, isFn } from '../../utils'
+import { get, isFn, debug } from '../../utils'
 import {
   HistoryProps, BaseHistory, HashHistory,
   BrowserHistory, MemoryHistory, MemoryHistoryProps,
+  parsePath, matchPath
 } from './history'
+
+export { parsePath, matchPath }
 
 export {
   HistoryProps, BaseHistory, HashHistory,
@@ -35,43 +38,6 @@ export interface History {
   forward: () => void,
 }
 
-export function parsePath<P, Q extends Query>(path: string): Location<P, Q> {
-  const splits = path.split('?')
-  const pathname = decodeURI(splits[0])
-  const search = splits[1] ? '?' + splits[1] : ''
-  const query = search.slice(1).split('&').filter(Boolean)
-    .reduce((query, kv) => {
-      const [key, value] = kv.split('=').map(decodeURIComponent)
-      if (query[key]) {
-        query[key] = Array.prototype.concat.call([], query[key], value)
-      } else {
-        query[key] = value || ''
-      }
-      return query
-    }, {}) as Q
-  return { pathname, params: {} as P, query, search, template: null }
-}
-
-const isNotEmpty = s => s !== ''
-
-export function matchPath(pathname: string, fmt: string) {
-  let paramKeys: string[] = []
-  let re = '^' + fmt.replace(/\/$/, '').replace(/([.%|(){}\[\]])/g, '\\$1').replace('*', '.*').replace(/\/\:([\w]+)/g, (m, name) => {
-    paramKeys.push(name)
-    return '/([^/]+)'
-  }) + '\/?$'
-  let match = pathname.match(new RegExp(re))
-  if (match) {
-    const params = paramKeys.reduce(
-      (params, key, i) =>
-        ({ ...params, [key]: match && match[i + 1] }),
-      {})
-    return [true, params]
-  } else {
-    return [false, {}]
-  }
-}
-
 export type RouterActions<Actions extends Object> = Actions & {
   history: History
 }
@@ -81,18 +47,29 @@ export type RouterState<State extends Object, LazyComps = any> = State & {
   lazyComps: LazyComps
 }
 
+export interface LinkProps {
+  to: string,
+  onClick?: (e: any) => void,
+  replace?: boolean,
+  /** Prefetch splitted components, this will work only if you add code splitting first. */
+  prefetch?: boolean,
+  onMouseOver?: (e: any) => void
+  onMouseOut?: (e: any) => void
+  onTouchStart?: (e: any) => void
+  className?: string
+  onTouchEnd?: (e: any) => void
+  onTouchMove?: (e: any) => void
+}
+
 export function mkLink(history: History, h) {
   const React = { createElement: h }
   return function Link({
       to,
       onClick,
       replace = false,
+      prefetch = false,
       ...props,
-    }: {
-      to: string,
-      onClick?: (e: any) => void,
-      replace?: boolean,
-    },
+    }: LinkProps,
     children
   ) {
     function handleClick(e: any) {
@@ -109,9 +86,41 @@ export function mkLink(history: History, h) {
     if ('children' in props) {
       children = (props as any).children
     }
+    function handlePrefetch(e: any) {
+      if (!prefetch) {
+        return
+      }
+      const h = history as BaseHistory
+      if (!h._routesMeta) {
+        return console.error(`[hydux-router] Prefetch link requires passing nested routes to withRouter!`)
+      }
+      const loc = h.parsePath(to)
+      if (loc.template) {
+        const meta = h._routesMeta[loc.template]
+        if (!meta || !meta.getComponent) {
+          return console.error(`[hydux-router] Prefetch link requires code-splitting components as router component!`)
+        }
+        const [key, comp] = meta.getComponent()
+        comp.then(() => {
+          debug('router-link', `Component ${key} prefetched!`)
+        })
+      }
+    }
     return (
-      <a href={to} {...props} onClick={handleClick}>
-      {children}
+      <a
+        href={to}
+        {...props}
+        onMouseOver={e => {
+          handlePrefetch(e)
+          props.onMouseOver && props.onMouseOver(e)
+        }}
+        onTouchStart={e => {
+          handlePrefetch(e)
+          props.onTouchStart && props.onTouchStart(e)
+        }}
+        onClick={handleClick}
+      >
+        {children}
       </a>
     )
   }
@@ -144,38 +153,30 @@ export default function withRouter<State, Actions>(props: Options<State, Actions
   } = props
   let timer
   return (app: App<State, Actions>) => (props: RouterAppProps<State, Actions>) => {
-    let routesMap: Routes<State, Actions> = null as any
+    let routesMap: Routes<State, Actions> = routes as any
     let routesMeta = {} as any as RoutesMeta<State, Actions>
     if (('path' in routes) && typeof (routes as any).path === 'string') {
       const parsed = parseNestedRoutes<State, Actions>(routes as any)
       routesMap = parsed.routes
       routesMeta = parsed.meta
     }
-    function pathToLoc(path) {
-      const loc = parsePath<any, any>(path)
-      for (const key in routesMap) {
-        const [match, params] = matchPath(loc.pathname, key)
-        if (match) {
-          loc.params = params
-          loc.template = key
-          break
-        }
-      }
-      return loc
-    }
-    const loc: Location<any, any> = pathToLoc(history.current())
+    history._setRoutes(routesMap, routesMeta)
+    const loc: Location<any, any> = history.location
     const meta = routesMeta[loc.template!]
     const getRouteComp = (meta?: RouteMeta<State, Actions>, fromInit = false): RouteComp<State, Actions> => {
       if (!meta || !meta.getComponent) {
-        return dt('none', null)
+        return dt('normal', null)
       }
-      const [key, comp] = meta.getComponent()
-      if (ssr && fromInit && !isServer) {
+      const ret = meta.getComponent()
+      const [key, comp] = ret
+      let renderOnServer = true
+      if (ret.length >= 3) {
+        renderOnServer = ret[2] as boolean
+      }
+      if (ssr && fromInit && !isServer && renderOnServer) {
         return dt('clientSSR', { key, comp })
-      } else if (ssr && isServer) {
-        return dt('server', { key, comp })
       } else {
-        return dt('client', { key, comp })
+        return dt('dynamic', { key, comp })
       }
     }
     let initComp = getRouteComp(meta, true)
@@ -184,8 +185,7 @@ export default function withRouter<State, Actions>(props: Options<State, Actions
     function runRoute<S, A>(routeComp: RouteComp<S, A>, actions: A, loc: Location, fromInit = false) {
       const meta = routesMeta[loc.template!]
       switch (routeComp.tag) {
-        case 'client':
-        case 'server':
+        case 'dynamic':
         case 'clientSSR':
           const key = routeComp.data.key
           const isClientSSRInit = routeComp.tag === 'clientSSR' && fromInit
@@ -203,7 +203,7 @@ export default function withRouter<State, Actions>(props: Options<State, Actions
               return res
             }
           )
-        case 'none':
+        case 'normal':
           isRenderable = true
           return actions[CHANGE_LOCATION](loc)
         default: return never(routeComp)
@@ -225,7 +225,7 @@ export default function withRouter<State, Actions>(props: Options<State, Actions
       subscribe: state => Cmd.batch(
         Cmd.ofSub<RouterActions<Actions>>(actions => {
           history.listen(path => {
-            const loc = pathToLoc(path)
+            const loc = history.location
             const meta = routesMeta[loc.template!]
             let comp = getRouteComp(meta, false)
             runRoute(comp, actions, loc)
@@ -243,7 +243,6 @@ export default function withRouter<State, Actions>(props: Options<State, Actions
           forward: () => history.forward(),
         } as History),
         [CHANGE_LOCATION]: (loc: Location<any, any>, resolve?: Function) => (state: State, actions: Actions) => {
-          history._setLoc(loc)
           if (loc.template) {
             const patch: Patch = (...args) => (ctx.patch as any)(...args)
             let [nextState, cmd] = runAction(routesMap[loc.template](loc, patch), state, actions)
@@ -264,18 +263,26 @@ export default function withRouter<State, Actions>(props: Options<State, Actions
 }
 
 export type RouteComp<S, A> =
-| Dt<'client', {key: string, comp: Promise<Component<S, A>>}>
+| Dt<'dynamic', {key: string, comp: Promise<Component<S, A>>}>
 | Dt<'clientSSR', {key: string, comp: Promise<Component<S, A>>}>
-| Dt<'server', {key: string, comp: Promise<Component<S, A>>}>
-| Dt<'none', null>
+| Dt<'normal', null>
 
-export type GetComp<S, A> = () => [string, Promise<Component<S, A>>]
+export type GetComp<S, A> = () =>
+  | [string /** key */, Promise<Component<S, A>>]
+  | [string /** key */, Promise<Component<S, A>>, boolean /** whether rendering on the server side, default is true */]
 
 export interface NestedRoutes<State, Actions> {
   path: string,
   label?: string,
   action?: ActionType<Location<any, any>, State, Actions>,
   children?: NestedRoutes<any, any>[],
+  /**
+   * Get a dynamic component, you need to return the key and the promise of the component, if you setup SSR, it would automatically rendered in the server side, but you can return a third boolean value to indicate whether rendering on the server side.
+   * e.g.
+   *  () =>
+   *   | [string /** key *\/, Promise<Component<S, A>>]
+   *   | [string /** key *\/, Promise<Component<S, A>>, boolean /** false to disable rendering on the server side *\/]
+   */
   getComponent?: GetComp<State, Actions>
 }
 export interface RouteInfo<State, Actions> {

@@ -21,10 +21,10 @@ const actions = {
 
 const view = (state: State, actions: Actions) =>
   <div>
-    <h1>{state.count}</h1>
-    <button onclick={actions.down}>–</button>
-    <button onclick={actions.up}>+</button>
-    <button onclick={actions.upLater}>+ later</button>
+    <h1 class="count">{state.count}</h1>
+    <button class="up" onclick={actions.up}>+</button>
+    <button class="down" onclick={actions.down}>–</button>
+    <button class="upLater" onclick={actions.upLater}>+ later</button>
   </div>
 
 export default {

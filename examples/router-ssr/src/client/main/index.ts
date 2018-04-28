@@ -32,7 +32,7 @@ export function main(path?: string) {
           // Since there are no history API on the server side, we should use MemoryHistory here.
           : new MemoryHistory({ initPath: path }) ,
       routes: State.routes,
-      ssr: true,
+      ssr: State.isSSR,
       isServer: !__is_browser,
     }),
     __is_browser

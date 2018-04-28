@@ -4,12 +4,10 @@ import withPicodom, { React } from '../../../src/enhancers/picodom-render'
 import { ActionsType } from '../../../src/types'
 import withRouter, {
   mkLink, History, HashHistory, BrowserHistory,
-  RouterActions, RouterState, Routes
+  RouterActions, RouterState, Routes, NestedRoutes
 } from '../../../src/enhancers/router'
 import * as _Counter from './counter'
 import './polyfill.js'
-
-let Counter = null as typeof _Counter | null
 
 // const history = new HashHistory()
 const history = new BrowserHistory()
@@ -17,31 +15,35 @@ const history = new BrowserHistory()
 //   key: 'time-game/v1'
 // })(_app)
 
-const routes: Routes<State, Actions> = {
-  '/': loc => state => ({
+const routes: NestedRoutes<State, Actions> = {
+  path: '/',
+  action: loc => state => ({
     ...state,
     page: 'Home'
   }),
-  '/user/:id': loc => state => ({
-    ...state,
-    page: {
-      page: 'User',
-      id: loc.params.id,
-    }
-  }),
-  '/counter': loc => state => [({
-    ...state,
-    page: 'Counter'
-  }), Cmd.ofSub(async _ => {
-    if (!Counter) {
-      Counter = await import('./counter')
-      return ctx.patch('counter', Counter)
-    }
-  }) ],
-  '*': loc => state => ({
-    ...state,
-    page: '404'
-  })
+  children: [{
+    path: '/user/:id',
+    action: loc => state => ({
+      ...state,
+      page: {
+        page: 'User',
+        id: loc.params.id,
+      }
+    }),
+  }, {
+    path: '/counter',
+    getComponent: () => ['counter', import('./counter')],
+    action: loc => state => ({
+      ...state,
+      page: 'Counter'
+    }),
+  }, {
+    path: '*',
+    action: loc => state => ({
+      ...state,
+      page: '404'
+    })
+  }]
 }
 
 let app = withRouter<State, Actions>({ history, routes })(_app)
@@ -68,15 +70,16 @@ type Page =
 | { page: 'User', id: number }
 | '404'
 
-type State = {
-  counter: _Counter.State,
-  page: Page
+const state = {
+  counter: null as any as _Counter.State,
+  page: 'Home' as Page,
+  // Auto injected field from router enhancer, for code-splitting components.
+  lazyComps: {
+    counter: null as typeof _Counter | null,
+  }
 }
 
-const state: State = {
-  counter: null as any,
-  page: 'Home',
-}
+type State = typeof state
 
 type Actions = typeof actions
 const NoMatch = () => <div>404</div>
@@ -84,6 +87,7 @@ const Home = () => <div>Home</div>
 const Users = () => <div>Users</div>
 
 const renderRoutes = (state: State, actions: Actions) => {
+  const Counter = state.lazyComps.counter
   switch (state.page) {
     case 'Home':
       return <div>Home</div>
@@ -109,12 +113,14 @@ const view = (state: State, actions: RouterActions<Actions>) => (
         }
     `}</style>
     <h1>Router example</h1>
-    <Link to="/">Home</Link>
-    <Link to="/user/1">Users</Link>
-    <Link to="/accounts">Accounts</Link>
-    <Link to="/counter">Counter</Link>
-    <Link to="/404">404</Link>
-    {renderRoutes(state, actions)}
+    <Link className="home" to="/">Home</Link>
+    <Link className="users" to="/user/1">Users</Link>
+    <Link className="accounts" to="/accounts">Accounts</Link>
+    <Link className="counter" to="/counter">Counter</Link>
+    <Link className="e404" to="/404">404</Link>
+    <div className="main">
+      {renderRoutes(state, actions)}
+    </div>
   </main>
 )
 

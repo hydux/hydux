@@ -46,11 +46,13 @@ export const root = (state: State, actions: RouterActions<Actions>) => (
         }
     `}</style>
     <h1>Router example</h1>
-    <Link to="/">Home</Link>
-    <Link to="/user/1">Users</Link>
-    <Link to="/accounts">Accounts</Link>
-    <Link to="/counter">Counter</Link>
-    <Link to="/404">404</Link>
-    {renderRoutes(state, actions)}
+    <Link className="home" to="/">Home</Link>
+    <Link className="users" to="/user/1">Users</Link>
+    <Link className="accounts" to="/accounts">Accounts</Link>
+    <Link className="counter" to="/counter" prefetch>Counter</Link>
+    <Link className="e404" to="/404">404</Link>
+    <div className="main">
+      {renderRoutes(state, actions)}
+    </div>
   </main>
 )
