@@ -2,8 +2,8 @@
 
 import { type ActionType } from './../../types';
 import { type AppProps, type App, type View, type OnUpdate, type Context, type Component } from './../../index';
-import { type HistoryProps, BaseHistory, HashHistory, BrowserHistory, MemoryHistory, type MemoryHistoryProps } from './history';
-export type { HistoryProps, MemoryHistoryProps, Context };
+import { type HistoryProps, BaseHistory, HashHistory, BrowserHistory, MemoryHistory } from './history';
+export type { HistoryProps, Context };
 export { BaseHistory, HashHistory, BrowserHistory, MemoryHistory };
 export interface Query {
     [string]: string | string[];

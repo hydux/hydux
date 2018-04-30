@@ -12,11 +12,11 @@ A React-Compatible fork of [Hyperapp](https://github.com/hyperapp/hyperapp), ins
 * [Official support for react-router](https://github.com/hydux/hydux-react-router)
 * Hot reload (hmr)
 * [router](https://github.com/hydux/hydux/tree/master/examples/router)
-* [SSR](https://github.com/hydux/hydux/tree/master/docs/ssr.md)
+* [Server-Side Rendering(SSR)](https://github.com/hydux/hydux/tree/master/docs/ssr.md)
 * [code splitting](https://github.com/hydux/hydux/tree/master/examples/code-splitting), seamlessly integrated with SSR.
 * logger, persist, [Redux Devtools with time traveling](https://github.com/zalmoxisus/redux-devtools-extension), [ultradom](https://github.com/jorgebucaran/ultradom)(1kb vdom), **\*\*All in One\*\***, easily setup all these fancy stuff without pain!
 
-![](media/timetravel.gif)
+![timetravel](media/timetravel.gif)
 
 ## [Try it online!](https://codepen.io/zaaack/pen/zPgodL)
 
