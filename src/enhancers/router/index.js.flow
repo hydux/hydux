@@ -66,12 +66,19 @@ routes: Routes<S, A> | NestedRoutes<S, A>,
 
 declare export default function withRouter<State, Actions>(props?: Options<State, Actions>): (app: App<State, Actions>) => App<RouterState<State>, RouterActions<Actions>>;
 
-export type GetComp<S, A> = () => [string, Promise<Component<S, A>>]
+export type GetComp<S, A> = () => [string, Promise<Component<S, A>>] | [string, Promise<Component<S, A>>, boolean]
 export interface NestedRoutes<State, Actions> {
     path: string;
     label?: string;
     action?: ActionType<Location<any, any>, State, Actions>;
     children?: NestedRoutes<State, Actions>[];
+    /**
+     * Get a dynamic component, you need to return the key and the promise of the component, if you setup SSR, it would automatically rendered in the server side, but you can return a third boolean value to indicate whether rendering on the server side.
+     * e.g.
+     *  () =>
+     *   | [string /** key *\/, Promise<Component<S, A>>]
+     *   | [string /** key *\/, Promise<Component<S, A>>, boolean /** false to disable rendering on the server side *\/]
+     */
     getComponent?: GetComp<State, Actions>
 }
 export interface RouteInfo<State, Actions> {

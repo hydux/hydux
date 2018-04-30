@@ -76,7 +76,7 @@ export abstract class BaseHistory {
     this.handleChange(this.props.initPath)
   }
   abstract realPath(path: string): string
-  abstract get current(): string
+  abstract current(): string
   abstract push(path: string): void
   abstract replace(path: string): void
   get last() {
@@ -101,10 +101,10 @@ export abstract class BaseHistory {
     this._routesTpls = Object.keys(routes || {})
     this._updateLocation()
   }
-  protected handleChange(path = this.current) {
+  protected handleChange(path = this.current()) {
     this.listeners.forEach(f => f(path))
   }
-  private _updateLocation(path: string = this.current) {
+  private _updateLocation(path: string = this.current()) {
     const loc = this.parsePath(path)
     this.lastLocation = this.location || loc
     this.location = loc
@@ -126,7 +126,7 @@ export class HashHistory extends BaseHistory {
       hash: '#!',
       ...this.props,
     }
-    this._last = [this.current]
+    this._last = [this.current()]
     window.addEventListener('hashchange', e => {
       this.handleChange()
     })
@@ -134,7 +134,7 @@ export class HashHistory extends BaseHistory {
   realPath(path: string) {
     return this.props.hash + this.props.basePath + path
   }
-  get current() {
+  current() {
     return location.hash.slice(this.props.hash.length + this.props.basePath.length) || '/'
   }
   push(path) {
@@ -151,7 +151,7 @@ export class BrowserHistory extends BaseHistory {
       return new MemoryHistory(props)
     }
     super(props)
-    this._last = [this.current]
+    this._last = [this.current()]
     window.addEventListener('popstate', e => {
       this.handleChange()
     })
@@ -159,7 +159,7 @@ export class BrowserHistory extends BaseHistory {
   realPath(path: string) {
     return this.props.basePath + path
   }
-  get current() {
+  current() {
     return location.pathname.slice(this.props.basePath.length)
     + location.search
   }
@@ -186,12 +186,12 @@ export class MemoryHistory extends BaseHistory {
     }
     // Override initialization in super class
     this._stack = [this.props.basePath + this.props.initPath]
-    this._last = [this.current]
+    this._last = [this.current()]
   }
   realPath(path: string) {
     return this.props.basePath + path
   }
-  get current() {
+  current() {
     return this._stack[this._index].slice(this.props.basePath.length)
   }
   push(path) {

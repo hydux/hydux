@@ -59,6 +59,7 @@ export interface LinkProps {
   className?: string
   onTouchEnd?: (e: any) => void
   onTouchMove?: (e: any) => void
+  // Feel free to add more...
 }
 
 export function mkLink(history: History, h) {
