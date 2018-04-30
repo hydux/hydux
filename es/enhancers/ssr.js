@@ -10,7 +10,7 @@ export default function withSSR(options) {
                     result = [result, Cmd.none];
                 }
                 initCmd = result[1];
-                return [result[0], result[1]];
+                return [result[0], Cmd.none];
             },
             onRender: function () {
                 // ignore
@@ -29,7 +29,19 @@ export default function withSSR(options) {
                 }
             });
         }); };
-        return ctx;
+        var newCtx = new Proxy(ctx, {
+            get: function (t, p, r) {
+                if (p === 'state') {
+                    var s = t.state;
+                    if ('lazyComps' in s) {
+                        return tslib_1.__assign({}, s, { lazyComps: {} });
+                    }
+                    return s;
+                }
+                return t[p];
+            }
+        });
+        return newCtx;
     }; };
 }
 //# sourceMappingURL=ssr.js.map

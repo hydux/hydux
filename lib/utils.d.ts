@@ -1,4 +1,6 @@
 export declare const isPojo: (obj: any) => boolean;
+export declare const isDev: boolean;
+export declare const debug: (key: string, ...args: any[]) => void;
 export declare function set(to: any, from: any): any;
 export declare function merge(to: any, from: any): any;
 export declare function clone(from: any): any;

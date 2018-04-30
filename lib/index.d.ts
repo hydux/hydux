@@ -5,7 +5,7 @@ export * from './helpers';
 export * from './types';
 export { Cmd, CmdType, Sub, ActionResult, noop, isFn, isPojo };
 export declare type Init<S, A> = () => S | [S, CmdType<A>];
-export declare type View<S, A> = (state: S, actions: A) => any;
+export declare type View<S, A> = ((state: S, actions: A) => any);
 export declare type Subscribe<S, A> = (state: S) => CmdType<A>;
 export declare type OnUpdate<S, A> = <M>(data: {
     prevAppState: S;
@@ -16,6 +16,7 @@ export declare type OnUpdate<S, A> = <M>(data: {
 export declare type OnUpdateStart<S, A> = <M>(data: {
     action: string;
 }) => void;
+export declare type Patch = <S, A>(path: string | string[], component: Component<S, A>, reuseState?: boolean) => Promise<any>;
 export interface AppProps<State, Actions> {
     init: Init<State, Actions>;
     view: View<State, Actions>;
@@ -32,7 +33,7 @@ export interface AppProps<State, Actions> {
  * @param state
  * @param actions
  */
-export declare function runAction<S, A, PS, PA>(result: ActionResult<S, A> | ((state: S, actions: A) => ActionResult<S, A>), state: S, actions: A, parentState?: PS, parentActions?: PA): ActionCmdResult<S, A>;
+export declare function runAction<S, A, PS, PA>(result: ActionResult<S, A> | ((state: S, actions: A) => ActionResult<S, A>), state: S, actions: A, parentState?: PS, parentActions?: PA, appContext?: Context<any, any>): ActionCmdResult<S, A>;
 export declare function withParents<S, A, PS, PA, A1>(action: (a1: A1) => (s: S, a: A) => any, wrapper?: (action: (a1: A1) => ActionCmdResult<S, A>, parentState: PS, parentActions: PA, state: S, actions: A) => ActionResult<S, A>, parentState?: PS, parentActions?: PA): any;
 export declare function withParents<S, A, PS, PA, A1, A2>(action: (a1: A1, a2: A2) => (s: S, a: A) => any, wrapper?: (action: (a1: A1, a2: A2) => ActionCmdResult<S, A>, parentState: PS, parentActions: PA, state: S, actions: A) => ActionResult<S, A>, parentState?: PS, parentActions?: PA): any;
 export declare function withParents<S, A, PS, PA, A1, A2, A3>(action: (a1: A1, a2: A2, a3: A3) => (s: S, a: A) => any, wrapper?: (action: (a1: A1, a2: A2, a3: A3) => ActionCmdResult<S, A>, parentState: PS, parentActions: PA, state: S, actions: A) => ActionResult<S, A>, parentState?: PS, parentActions?: PA): any;
@@ -47,7 +48,7 @@ export interface Component<State, Actions> {
     view: View<State, Actions>;
     actions: ActionsType<State, Actions>;
 }
-export interface Context<State, Actions, RenderReturn> {
+export interface Context<State, Actions, RenderReturn = any> {
     actions: Actions;
     state: State;
     init: Init<State, Actions>;
@@ -56,11 +57,12 @@ export interface Context<State, Actions, RenderReturn> {
     onRender?: ((view: any) => RenderReturn);
     onUpdate?: OnUpdate<State, Actions>;
     onUpdateStart?: OnUpdateStart<State, Actions>;
-    render(state?: State): RenderReturn;
     /** Patch a component in runtime, used for code-splitting */
-    patch<S, A>(path: string | string[], component: Component<S, A>): any;
+    patch: Patch;
+    render(state?: State): RenderReturn;
 }
 export declare type App<State, Actions> = (props: AppProps<State, Actions>) => Context<State, Actions, any>;
-export declare function runCmd<A>(cmd: CmdType<A>, actions: A): any[];
-export declare function app<State, Actions>(props: AppProps<State, Actions>): Context<State, Actions, any>;
+export declare function normalizeInit<S, A>(initResult: S | [S, CmdType<A>]): [S, CmdType<A>];
+export declare function runCmd<A>(cmd: CmdType<A>, actions: A): Promise<any[]>;
+export declare function app<State, Actions>(props: AppProps<State, Actions>): Context<State, Actions>;
 export default app;

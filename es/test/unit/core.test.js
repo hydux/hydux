@@ -1,9 +1,9 @@
 var _this = this;
 import * as tslib_1 from "tslib";
-import { noop } from './../utils';
+import { noop } from './../../utils';
 import * as assert from 'assert';
-import app, { Cmd, withParents } from '../index';
-import logger from '../enhancers/logger';
+import app, { Cmd, withParents } from '../../index';
+import logger from '../../enhancers/logger';
 function sleep(ns) {
     return new Promise(function (resolve) { return setTimeout(resolve, ns); });
 }
@@ -100,7 +100,6 @@ describe('core api', function () {
             function ClassActions(inc) {
                 var _this = this;
                 this.up = function () { return function (state) {
-                    console.log('up in class', state, _this._inc);
                     return ({ count: state.count + _this._inc });
                 }; };
                 this._inc = inc;

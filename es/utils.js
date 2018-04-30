@@ -1,5 +1,13 @@
 var isSet = function (val) { return typeof val !== 'undefined' && val !== null; };
 export var isPojo = function (obj) { return !isSet(obj.constructor) || obj.constructor === Object; };
+export var isDev = typeof process !== 'undefined' && process.env.NODE_ENV === 'development';
+export var debug = function (key) {
+    var args = [];
+    for (var _i = 1; _i < arguments.length; _i++) {
+        args[_i - 1] = arguments[_i];
+    }
+    isDev && console.log.apply(console, ["[hydux-" + key + "]"].concat(args));
+};
 export function set(to, from) {
     var keys = Object.keys(from);
     var i = keys.length;

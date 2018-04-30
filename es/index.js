@@ -10,7 +10,7 @@ export { Cmd, noop, isFn, isPojo };
  * @param state
  * @param actions
  */
-export function runAction(result, state, actions, parentState, parentActions) {
+export function runAction(result, state, actions, parentState, parentActions, appContext) {
     var rst = result;
     isFn(rst)
         && (rst = rst(state, actions, parentState, parentActions))
@@ -53,14 +53,14 @@ export function withParents(action, wrapper, parentState, parentActions) {
  * @deprecated Deprecated for `withParents`
  */
 export var wrapActions = withParents;
-function normalizeInit(initResult) {
+export function normalizeInit(initResult) {
     if (initResult instanceof Array) {
         return initResult;
     }
     return [initResult, Cmd.none];
 }
 export function runCmd(cmd, actions) {
-    return cmd.map(function (sub) { return sub(actions); });
+    return Promise.all(cmd.map(function (sub) { return sub(actions); }));
 }
 export function app(props) {
     // const appEvents = props.events || {}
@@ -73,25 +73,28 @@ export function app(props) {
     runCmd(cmd, appActions);
     appRender(appState);
     appSubscribe(appState).forEach(function (sub) { return sub(appActions); });
-    return tslib_1.__assign({ 
+    var appContext = tslib_1.__assign({ 
         // getter should before spread operator,
         // otherwise it would be copied and becomes normal property
         get state() {
             return appState;
-        } }, props, { actions: appActions, render: appRender, patch: function (path, comp) {
-            var paths = typeof path === 'string' ? [path] : path;
-            var render = function () { return appRender(appState); };
-            var actions = get(paths, appActions);
-            if (get(paths, appState) && actions) {
-                return render();
-            }
+        } }, props, { actions: appActions, render: appRender, patch: function (path, comp, reuseState) {
+            if (reuseState === void 0) { reuseState = false; }
+            reuseState = reuseState && appState[path];
             var _a = normalizeInit(comp.init()), state = _a[0], cmd = _a[1];
-            appActions = setDeep(paths, actions = {}, appActions);
-            appState = setDeep(paths, state, appState);
-            init(state, actions, comp.actions, paths);
-            runCmd(cmd, actions);
-            return render();
+            var actions = appActions[path];
+            if (!actions) {
+                actions = appActions[path] = {};
+                init(state, actions, comp.actions, [path]);
+            }
+            if (!reuseState) {
+                appState = setDeep([path], state, appState);
+            }
+            appState = setDeep(['lazyComps', path], comp, appState);
+            appRender(appState);
+            return reuseState ? Promise.resolve() : runCmd(cmd, actions);
         } });
+    return appContext;
     function appRender(state) {
         if (state === void 0) { state = appState; }
         if (state !== appState) {
@@ -143,7 +146,7 @@ export function app(props) {
                                 : setDeep(path, merge(state, nextState), appState);
                         appRender(appState);
                     }
-                    cmd.forEach(function (sub) { return sub(actions); });
+                    return runCmd(cmd, actions);
                     var _c;
                 };
             }
