@@ -30,11 +30,22 @@ export type RouterActions<Actions> = Actions & {
 export type RouterState<State> = State & {
     location: Location<any, any>;
 };
-declare export function mkLink(history: History, h: any): (options: {
-    to: string;
-    onClick?: ((e: any) => void);
-    replace?: boolean;
-}, children: any) => any;
+
+
+export type LinkProps = {
+  to: string,
+  onClick?: (e: any) => void,
+  replace?: boolean,
+  /** Prefetch splitted components, this will work only if you add code splitting first. */
+  prefetch?: boolean,
+  onMouseOver?: (e: any) => void,
+  onMouseOut?: (e: any) => void,
+  onTouchStart?: (e: any) => void,
+  className?: string,
+  onTouchEnd?: (e: any) => void,
+  onTouchMove?: (e: any) => void,
+}
+declare export function mkLink(history: History, h: any): (options: LinkProps, children?: any) => any;
 export type Routes<State, Actions> = {
     [string]: ActionType<Location<any, any>, State, Actions>;
 };

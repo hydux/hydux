@@ -16,12 +16,18 @@ describe('counter test', function () {
     hs = await Utils.runServer('counter', port)
   })
   after(async () => {
+    console.log('start close browser')
     await browser.close()
     await hs.kill()
+    console.log('end close browser')
   })
   beforeEach(async () => {
     page = await browser.newPage()
     await page.goto(`http://127.0.0.1:${port}`)
+  })
+  afterEach(async () => {
+    await page.close()
+    console.log('page closed')
   })
   it('simple', async () => {
     await page.waitFor('.count')

@@ -85,7 +85,7 @@
 /******/ 	
 /******/ 	
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "45f84b95e926b10c9daa"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "caa6f80f7e8db7493fdb"; // eslint-disable-line no-unused-vars
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule; // eslint-disable-line no-unused-vars
@@ -1059,10 +1059,11 @@ var HashHistory = /** @class */ (function (_super) {
     __extends(HashHistory, _super);
     function HashHistory(props) {
         if (props === void 0) { props = {}; }
-        var _this = _super.call(this, props) || this;
+        var _this = this;
         if (!isBrowser) {
             return new MemoryHistory();
         }
+        _this = _super.call(this, props) || this;
         _this.props = props = __assign({ hash: '#!' }, _this.props);
         _this._last = [_this.current];
         window.addEventListener('hashchange', function (e) {
@@ -1093,10 +1094,11 @@ var BrowserHistory = /** @class */ (function (_super) {
     __extends(BrowserHistory, _super);
     function BrowserHistory(props) {
         if (props === void 0) { props = {}; }
-        var _this = _super.call(this, props) || this;
+        var _this = this;
         if (!isBrowser) {
             return new MemoryHistory(props);
         }
+        _this = _super.call(this, props) || this;
         _this._last = [_this.current];
         window.addEventListener('popstate', function (e) {
             _this.handleChange();
@@ -1133,7 +1135,7 @@ var MemoryHistory = /** @class */ (function (_super) {
         _this._stack = [];
         _this._index = 0;
         _this.props = props = __assign({}, _this.props);
-        // override initialization in super class
+        // Override initialization in super class
         _this._stack = [_this.props.basePath + _this.props.initPath];
         _this._last = [_this.current];
         return _this;
@@ -29755,7 +29757,7 @@ var actions = {
 var initState = {
     counter: null,
     page: 'Home',
-    // NOTE: `lazyComps` is a auto injected field contains all code-splitting components, you can define the type definitions to used in `view` function.
+    // NOTE: `lazyComps` is an auto injected field contains all code-splitting components, you can define the type definitions to used in `view` function.
     lazyComps: {
         counter: undefined,
     }

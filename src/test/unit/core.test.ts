@@ -1,7 +1,7 @@
-import { noop } from './../utils'
+import { noop } from './../../utils'
 import * as assert from 'assert'
-import app, { Cmd, withParents } from '../index'
-import logger from '../enhancers/logger'
+import app, { Cmd, withParents } from '../../index'
+import logger from '../../enhancers/logger'
 function sleep(ns) {
   return new Promise(resolve => setTimeout(resolve, ns))
 }

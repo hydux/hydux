@@ -85,7 +85,7 @@
 /******/ 	
 /******/ 	
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "e91a662636de6b633e93"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "eadaf665f937fead4f20"; // eslint-disable-line no-unused-vars
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule; // eslint-disable-line no-unused-vars
@@ -1395,10 +1395,11 @@ var HashHistory = /** @class */ (function (_super) {
     __extends(HashHistory, _super);
     function HashHistory(props) {
         if (props === void 0) { props = {}; }
-        var _this = _super.call(this, props) || this;
+        var _this = this;
         if (!isBrowser) {
             return new MemoryHistory();
         }
+        _this = _super.call(this, props) || this;
         _this.props = props = __assign({ hash: '#!' }, _this.props);
         _this._last = [_this.current];
         window.addEventListener('hashchange', function (e) {
@@ -1429,10 +1430,11 @@ var BrowserHistory = /** @class */ (function (_super) {
     __extends(BrowserHistory, _super);
     function BrowserHistory(props) {
         if (props === void 0) { props = {}; }
-        var _this = _super.call(this, props) || this;
+        var _this = this;
         if (!isBrowser) {
             return new MemoryHistory(props);
         }
+        _this = _super.call(this, props) || this;
         _this._last = [_this.current];
         window.addEventListener('popstate', function (e) {
             _this.handleChange();
@@ -1469,7 +1471,7 @@ var MemoryHistory = /** @class */ (function (_super) {
         _this._stack = [];
         _this._index = 0;
         _this.props = props = __assign({}, _this.props);
-        // override initialization in super class
+        // Override initialization in super class
         _this._stack = [_this.props.basePath + _this.props.initPath];
         _this._last = [_this.current];
         return _this;

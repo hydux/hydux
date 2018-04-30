@@ -7,10 +7,17 @@ const pExec = util.promisify(child.exec)
 async function main() {
   Promise.all(
     ['counter', 'router', 'code-splitting', 'router-ssr'].map(async app => {
+      const execOpts: child.ExecOptions = {
+        cwd: `${process.cwd()}/examples/${app}`,
+      }
       console.log('Start building...: ', app)
-      await pExec('npm run build:dev', {
-        cwd: `${process.cwd()}/examples/${app}`
-      })
+      // Fix concurrent issue for node-sass
+      let p = await pExec('yarn --mutex=network', execOpts)
+      console.log(p.stdout)
+      console.error(p.stderr)
+      p = await pExec('yarn build:dev', execOpts)
+      console.log(p.stdout)
+      console.error(p.stderr)
     })
   )
 }

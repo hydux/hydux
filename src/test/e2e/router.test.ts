@@ -16,12 +16,17 @@ describe('router test', function () {
     hs = await Utils.runServer('router', port)
   })
   after(async () => {
+    console.log('ssr start close browser')
     await browser.close()
     await hs.kill()
+    console.log('ssr end close browser')
   })
   beforeEach(async () => {
     page = await browser.newPage()
     await page.goto(`http://127.0.0.1:${port}`)
+  })
+  afterEach(async () => {
+    await page.close()
   })
   it('simple', async () => {
     await page.waitFor('.main')

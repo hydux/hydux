@@ -2,6 +2,7 @@
 import { Location, Query } from './index';
 export type HistoryProps = {
     basePath: string;
+    initPath: string;
 };
 declare export class BaseHistory {
     location: Location<any, any>;

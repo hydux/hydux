@@ -9,16 +9,12 @@ export const runServer = async (app: string, port: number) => {
     cwd: `${Examples}/${app}`,
   })
   p.on('error', console.error)
-  await sleep(800)
+  await sleep(1000)
   return p
 }
 
 export async function downloadChrome() {
-  if (puppeteer.executablePath) {
-    console.log('Chrome already downloaded')
-    return
-  }
-  if (require('get-chrome')()) {
+  if (!IsCI && require('get-chrome')()) {
     console.log('Chrome is installed')
     return
   }
@@ -35,15 +31,17 @@ export async function downloadChrome() {
 export const sleep = (ms: number) =>
   new Promise(res => setTimeout(res, ms))
 
-export const launchBrowser = async () =>
-  puppeteer.launch({
+export const launchBrowser = async () => {
+  return puppeteer.launch({
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
     executablePath: IsCI
       ? puppeteer.executablePath()
       : require('get-chrome')()
   })
+}
 
 export const text = async (e: puppeteer.ElementHandle, trim = true) => {
-  await sleep(10)
+  await sleep(20)
   return e.getProperty('innerText')
     .then(e => e.jsonValue())
     .then(e => trim ? e.trim() : e)

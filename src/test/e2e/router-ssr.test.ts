@@ -34,13 +34,18 @@ describe('ssr + code-splitting test', function () {
     await Utils.sleep(1000)
   })
   after(async () => {
+    console.log('start close browser')
     await browser.close()
-    hs && hs.kill()
+    await hs.kill()
     server && server.kill()
+    console.log('end close browser')
   })
   beforeEach(async () => {
     page = await browser.newPage()
     await page.goto(`http://127.0.0.1:${port}`)
+  })
+  afterEach(async () => {
+    await page.close()
   })
   it('simple', async () => {
     await page.waitFor('.main')

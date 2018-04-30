@@ -1,7 +1,7 @@
-import { noop } from './../utils'
+import { noop } from './../../utils'
 import * as assert from 'assert'
-import app, { Cmd } from '../index'
-import { parsePath, matchPath, parseNestedRoutes, NestedRoutes } from '../enhancers/router'
+import app, { Cmd } from '../../index'
+import { parsePath, matchPath, parseNestedRoutes, NestedRoutes } from '../../enhancers/router'
 
 describe('router', () => {
   it('parsePath simple', () => {

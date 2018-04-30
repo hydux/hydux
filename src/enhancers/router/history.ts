@@ -118,10 +118,10 @@ export interface HashHistoryProps extends HistoryProps {
 export class HashHistory extends BaseHistory {
   protected props: HashHistoryProps
   constructor(props: Partial<HashHistoryProps> = {}) {
-    super(props)
     if (!isBrowser) {
       return new MemoryHistory() as any
     }
+    super(props)
     this.props = props = {
       hash: '#!',
       ...this.props,
@@ -147,10 +147,10 @@ export class HashHistory extends BaseHistory {
 
 export class BrowserHistory extends BaseHistory {
   constructor(props: Partial<HistoryProps> = {}) {
-    super(props)
     if (!isBrowser) {
       return new MemoryHistory(props)
     }
+    super(props)
     this._last = [this.current]
     window.addEventListener('popstate', e => {
       this.handleChange()
@@ -184,7 +184,7 @@ export class MemoryHistory extends BaseHistory {
     this.props = props = {
       ...this.props,
     }
-    // override initialization in super class
+    // Override initialization in super class
     this._stack = [this.props.basePath + this.props.initPath]
     this._last = [this.current]
   }

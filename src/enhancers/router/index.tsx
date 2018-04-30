@@ -70,7 +70,7 @@ export function mkLink(history: History, h) {
       prefetch = false,
       ...props,
     }: LinkProps,
-    children
+    children?: any
   ) {
     function handleClick(e: any) {
       if (replace) {
