@@ -28,7 +28,7 @@ export type Dt<T extends string, D = null> = {
  * }
  * ```
  */
-export function dt<T extends string, D>(tag: T, data: D) {
+export function dt<T extends string, D = null>(tag: T, data: D = null as any) {
   return { tag, data } as Dt<T, D>
 }
 

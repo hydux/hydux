@@ -61,6 +61,7 @@ export function matchPath<P>(pathname: string, fmt: string): P | null {
 export abstract class BaseHistory {
   public location: Location<any, any>
   public lastLocation: Location<any, any>
+  /* @internal */
   public _routesMeta: RoutesMeta<any, any>
   protected props: HistoryProps
   protected _last: string[] = []
@@ -95,6 +96,7 @@ export abstract class BaseHistory {
   parsePath(path: string): Location<any, any> {
     return parsePath(path, this._routesTpls)
   }
+  /* @internal */
   public _setRoutes(routes: Routes<any, any>, routesMeta: RoutesMeta<any, any>) {
     this._routesMeta = routesMeta
     this._routes = routes

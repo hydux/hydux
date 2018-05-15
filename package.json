@@ -79,6 +79,7 @@
     "ultradom": "2.0.0"
   },
   "optionalDependencies": {
+    "preact": "^8.2.9",
     "remotedev": "^0.2.7"
   }
 }
