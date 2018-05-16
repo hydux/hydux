@@ -61,7 +61,7 @@
 /******/ 	
 /******/ 	
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "f3bf8dbe49547ff1682a"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "ef70b8e1237a3af5001f"; // eslint-disable-line no-unused-vars
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule; // eslint-disable-line no-unused-vars
@@ -5404,6 +5404,7 @@ function withUltradom(container, options) {
  * ```
  */
 function dt(tag, data) {
+    if (data === void 0) { data = null; }
     return { tag: tag, data: data };
 }
 var never = function (f) { return f; };

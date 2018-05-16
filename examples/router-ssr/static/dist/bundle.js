@@ -85,7 +85,7 @@
 /******/ 	
 /******/ 	
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "caa6f80f7e8db7493fdb"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "b7bb31c8a5f9975d5632"; // eslint-disable-line no-unused-vars
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule; // eslint-disable-line no-unused-vars
@@ -1036,6 +1036,7 @@ var BaseHistory = /** @class */ (function () {
     BaseHistory.prototype.parsePath = function (path) {
         return parsePath(path, this._routesTpls);
     };
+    /* @internal */
     BaseHistory.prototype._setRoutes = function (routes, routesMeta) {
         this._routesMeta = routesMeta;
         this._routes = routes;
@@ -1043,11 +1044,11 @@ var BaseHistory = /** @class */ (function () {
         this._updateLocation();
     };
     BaseHistory.prototype.handleChange = function (path) {
-        if (path === void 0) { path = this.current; }
+        if (path === void 0) { path = this.current(); }
         this.listeners.forEach(function (f) { return f(path); });
     };
     BaseHistory.prototype._updateLocation = function (path) {
-        if (path === void 0) { path = this.current; }
+        if (path === void 0) { path = this.current(); }
         var loc = this.parsePath(path);
         this.lastLocation = this.location || loc;
         this.location = loc;
@@ -1065,7 +1066,7 @@ var HashHistory = /** @class */ (function (_super) {
         }
         _this = _super.call(this, props) || this;
         _this.props = props = __assign({ hash: '#!' }, _this.props);
-        _this._last = [_this.current];
+        _this._last = [_this.current()];
         window.addEventListener('hashchange', function (e) {
             _this.handleChange();
         });
@@ -1074,13 +1075,9 @@ var HashHistory = /** @class */ (function (_super) {
     HashHistory.prototype.realPath = function (path) {
         return this.props.hash + this.props.basePath + path;
     };
-    Object.defineProperty(HashHistory.prototype, "current", {
-        get: function () {
-            return location.hash.slice(this.props.hash.length + this.props.basePath.length) || '/';
-        },
-        enumerable: true,
-        configurable: true
-    });
+    HashHistory.prototype.current = function () {
+        return location.hash.slice(this.props.hash.length + this.props.basePath.length) || '/';
+    };
     HashHistory.prototype.push = function (path) {
         location.assign(this.realPath(path));
     };
@@ -1099,7 +1096,7 @@ var BrowserHistory = /** @class */ (function (_super) {
             return new MemoryHistory(props);
         }
         _this = _super.call(this, props) || this;
-        _this._last = [_this.current];
+        _this._last = [_this.current()];
         window.addEventListener('popstate', function (e) {
             _this.handleChange();
         });
@@ -1108,14 +1105,10 @@ var BrowserHistory = /** @class */ (function (_super) {
     BrowserHistory.prototype.realPath = function (path) {
         return this.props.basePath + path;
     };
-    Object.defineProperty(BrowserHistory.prototype, "current", {
-        get: function () {
-            return location.pathname.slice(this.props.basePath.length)
-                + location.search;
-        },
-        enumerable: true,
-        configurable: true
-    });
+    BrowserHistory.prototype.current = function () {
+        return location.pathname.slice(this.props.basePath.length)
+            + location.search;
+    };
     BrowserHistory.prototype.push = function (path) {
         history.pushState(null, '', this.realPath(path));
         this.handleChange(path);
@@ -1137,19 +1130,15 @@ var MemoryHistory = /** @class */ (function (_super) {
         _this.props = props = __assign({}, _this.props);
         // Override initialization in super class
         _this._stack = [_this.props.basePath + _this.props.initPath];
-        _this._last = [_this.current];
+        _this._last = [_this.current()];
         return _this;
     }
     MemoryHistory.prototype.realPath = function (path) {
         return this.props.basePath + path;
     };
-    Object.defineProperty(MemoryHistory.prototype, "current", {
-        get: function () {
-            return this._stack[this._index].slice(this.props.basePath.length);
-        },
-        enumerable: true,
-        configurable: true
-    });
+    MemoryHistory.prototype.current = function () {
+        return this._stack[this._index].slice(this.props.basePath.length);
+    };
     MemoryHistory.prototype.push = function (path) {
         this._reset();
         this._stack.push(this.props.basePath + path);
@@ -1538,6 +1527,7 @@ function withSSR(options) {
  * ```
  */
 function dt(tag, data) {
+    if (data === void 0) { data = null; }
     return { tag: tag, data: data };
 }
 var never = function (f) { return f; };
