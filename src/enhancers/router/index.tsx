@@ -237,11 +237,11 @@ export default function withRouter<State, Actions>(props: Options<State, Actions
       actions: {
         ...props.actions as any,
         history: ({
-          push: path => history.push(path),
-          replace: path => history.replace(path),
-          go: delta => history.go(delta),
-          back: () => history.back(),
-          forward: () => history.forward(),
+          push: path => setTimeout(() => history.push(path)),
+          replace: path => setTimeout(() => history.replace(path)),
+          go: delta => setTimeout(() => history.go(delta)),
+          back: () => setTimeout(() => history.back()),
+          forward: () => setTimeout(() => history.forward()),
         } as History),
         [CHANGE_LOCATION]: (loc: Location<any, any>, resolve?: Function) => (state: State, actions: Actions) => {
           if (loc.template) {
