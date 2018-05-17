@@ -61,7 +61,7 @@
 /******/ 	
 /******/ 	
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "d1c154f6a31bb6050281"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "31bf95144dff8eab4460"; // eslint-disable-line no-unused-vars
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule; // eslint-disable-line no-unused-vars
@@ -1589,11 +1589,11 @@ function withRouter(props) {
                     runRoute(comp, actions, loc);
                 });
             }), props.subscribe ? props.subscribe(state) : __WEBPACK_IMPORTED_MODULE_2__cmd__["a" /* default */].none); }, actions: __assign({}, props.actions, (_a = { history: {
-                        push: function (path) { return history.push(path); },
-                        replace: function (path) { return history.replace(path); },
-                        go: function (delta) { return history.go(delta); },
-                        back: function () { return history.back(); },
-                        forward: function () { return history.forward(); },
+                        push: function (path) { return setTimeout(function () { return history.push(path); }); },
+                        replace: function (path) { return setTimeout(function () { return history.replace(path); }); },
+                        go: function (delta) { return setTimeout(function () { return history.go(delta); }); },
+                        back: function () { return setTimeout(function () { return history.back(); }); },
+                        forward: function () { return setTimeout(function () { return history.forward(); }); },
                     } }, _a[CHANGE_LOCATION] = function (loc, resolve) { return function (state, actions) {
                 if (loc.template) {
                     var patch = function () {

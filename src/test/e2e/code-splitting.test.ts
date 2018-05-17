@@ -5,7 +5,7 @@ import * as child from 'child_process'
 import * as Utils from './utils'
 
 describe('code-splitting test', function () {
-  this.timeout(10_000)
+  this.timeout(Utils.timeout)
   let browser: puppeteer.Browser = null!
   let page: puppeteer.Page = null!
   let port = 0
