@@ -1,4 +1,4 @@
-import { Location, Query, RoutesMeta, Routes } from './index'
+import { Location, Query, Param, RoutesMeta, Routes } from './index'
 import { debug } from '../../utils'
 
 export type HistoryProps = { basePath: string, initPath: string }
@@ -8,7 +8,7 @@ const isBrowser =
   && typeof location !== 'undefined'
   && typeof history !== 'undefined'
 
-export function parsePath<P, Q extends Query>(path: string, tpls: string[]): Location<P, Q> {
+export function parsePath<P extends Param, Q extends Query>(path: string, tpls: string[]): Location<P, Q> {
   const splits = path.split('?')
   const pathname = decodeURI(splits[0])
   const search = splits[1] ? '?' + splits[1] : ''
@@ -63,28 +63,34 @@ export abstract class BaseHistory {
   public lastLocation: Location<any, any>
   /* @internal */
   public _routesMeta: RoutesMeta<any, any>
-  protected props: HistoryProps
+  protected _props: HistoryProps
   protected _last: string[] = []
-  protected listeners: ((path: string) => void)[] = []
+  protected _listeners: ((path: string) => void)[] = []
+  protected _fireInitPath = true
   private _routes: Routes<any, any> = {}
   private _routesTpls: string[] = []
   constructor(props: Partial<HistoryProps> = {}) {
-    this.props = props = { basePath: '', initPath: '/', ...props }
-    this.listeners.push(path => {
+    this._props = props = { basePath: '', initPath: '/', ...props }
+    this._listeners.push(path => {
       this._last = this._last.concat(path).slice(-2)
       this._updateLocation(path)
     })
-    this.handleChange(this.props.initPath)
+    if (this._fireInitPath) {
+      this._fireChange(this._props.initPath)
+    }
   }
   abstract realPath(path: string): string
-  abstract current(): string
+  abstract get current(): string
+  abstract get length(): number
   abstract push(path: string): void
   abstract replace(path: string): void
   get last() {
-    return this._last[0] || this.props.initPath
+    return this._last[0] || this._props.initPath
   }
-  listen = listener => this.listeners.push(listener)
-  go(delta) {
+  listen(listener: ((path: string) => void)) {
+    this._listeners.push(listener)
+  }
+  go(delta: number) {
     history.go(delta)
   }
   back() {
@@ -103,10 +109,10 @@ export abstract class BaseHistory {
     this._routesTpls = Object.keys(routes || {})
     this._updateLocation()
   }
-  protected handleChange(path = this.current()) {
-    this.listeners.forEach(f => f(path))
+  protected _fireChange(path = this.current) {
+    this._listeners.forEach(f => f(path))
   }
-  private _updateLocation(path: string = this.current()) {
+  protected _updateLocation(path: string = this.current) {
     const loc = this.parsePath(path)
     this.lastLocation = this.location || loc
     this.location = loc
@@ -118,31 +124,34 @@ export interface HashHistoryProps extends HistoryProps {
 }
 
 export class HashHistory extends BaseHistory {
-  protected props: HashHistoryProps
+  protected _props: HashHistoryProps
   constructor(props: Partial<HashHistoryProps> = {}) {
     if (!isBrowser) {
       return new MemoryHistory() as any
     }
     super(props)
-    this.props = props = {
+    this._props = props = {
       hash: '#!',
-      ...this.props,
+      ...this._props,
     }
-    this._last = [this.current()]
+    this._last = [this.current]
     window.addEventListener('hashchange', e => {
-      this.handleChange()
+      this._fireChange()
     })
   }
   realPath(path: string) {
-    return this.props.hash + this.props.basePath + path
+    return this._props.hash + this._props.basePath + path
   }
-  current() {
-    return location.hash.slice(this.props.hash.length + this.props.basePath.length) || '/'
+  get length() {
+    return history.length
   }
-  push(path) {
+  get current() {
+    return location.hash.slice(this._props.hash.length + this._props.basePath.length) || '/'
+  }
+  push(path: string) {
     location.assign(this.realPath(path))
   }
-  replace(path) {
+  replace(path: string) {
     location.replace(this.realPath(path))
   }
 }
@@ -153,64 +162,87 @@ export class BrowserHistory extends BaseHistory {
       return new MemoryHistory(props)
     }
     super(props)
-    this._last = [this.current()]
+    this._last = [this.current]
     window.addEventListener('popstate', e => {
-      this.handleChange()
+      this._fireChange()
     })
   }
   realPath(path: string) {
-    return this.props.basePath + path
+    return this._props.basePath + path
   }
-  current() {
-    return location.pathname.slice(this.props.basePath.length)
+  get length() {
+    return history.length
+  }
+  get current() {
+    return location.pathname.slice(this._props.basePath.length)
     + location.search
   }
-  push(path) {
+  push(path: string) {
     history.pushState(null, '', this.realPath(path))
-    this.handleChange(path)
+    this._fireChange(path)
   }
-  replace(path) {
+  replace(path: string) {
     history.replaceState(null, '', this.realPath(path))
-    this.handleChange(path)
+    this._fireChange(path)
   }
 }
 export interface MemoryHistoryProps extends HistoryProps {
   initPath: string
+  store?: boolean | Storage
 }
 export class MemoryHistory extends BaseHistory {
-  protected props: MemoryHistoryProps
+  protected _props: MemoryHistoryProps
+  protected _fireInitPath: false
   private _stack: string[] = []
+  private _storeKey: string = '@hydux-router/memoryhistory'
   private _index: number = 0
   constructor(props: Partial<MemoryHistoryProps> = {}) {
     super(props)
-    this.props = props = {
-      ...this.props,
+    this._props = props = {
+      ...this._props,
     }
     // Override initialization in super class
-    this._stack = [this.props.basePath + this.props.initPath]
-    this._last = [this.current()]
+    this._stack = [this._props.basePath + this._props.initPath]
+    const storage = this._getStorage()
+    if (storage) {
+      this.listen(path => {
+        storage!.setItem(this._storeKey, JSON.stringify(this._stack))
+      })
+      const stack = storage.getItem(this._storeKey)
+      if (stack) {
+        this._stack = JSON.parse(stack)
+        return
+      }
+    }
+    this._fireChange(this._props.initPath)
   }
   realPath(path: string) {
-    return this.props.basePath + path
+    return this._props.basePath + path
   }
-  current() {
-    return this._stack[this._index].slice(this.props.basePath.length)
+  get length() {
+    return this._stack.length
   }
-  push(path) {
+  get current() {
+    return this._stack[this._index].slice(this._props.basePath.length)
+  }
+  push(path: string) {
     this._reset()
-    this._stack.push(this.props.basePath + path)
-    this.handleChange(path)
+    this._stack.push(this._props.basePath + path)
+    this._index++
+    this._fireChange(path)
   }
-  replace(path) {
+  replace(path: string) {
     this._reset()
-    this._stack[this._index] = this.props.basePath + path
-    this.handleChange(path)
+    this._stack[this._index] = this._props.basePath + path
+    this._fireChange(path)
   }
-  go(delta) {
+  go(delta: number) {
     let next = this._index + delta
     next = Math.min(next, this._stack.length - 1)
     next = Math.max(next, 0)
     this._index = next
+    this._updateLocation()
+    this._fireChange()
   }
   back() {
     this.go(-1)
@@ -218,8 +250,13 @@ export class MemoryHistory extends BaseHistory {
   forward() {
     this.go(1)
   }
-
   private _reset() {
     this._stack = this._stack.slice(0, this._index + 1)
+  }
+
+  private _getStorage() {
+    return (this._props.store && typeof this._props.store === 'boolean')
+    ? localStorage
+    : this._props.store || null
   }
 }

@@ -1,7 +1,7 @@
 import { noop } from './../../utils'
 import * as assert from 'assert'
 import app, { Cmd } from '../../index'
-import { parsePath, matchPath, parseNestedRoutes, NestedRoutes } from '../../enhancers/router'
+import { parsePath, matchPath, parseNestedRoutes, NestedRoutes, MemoryHistory } from '../../enhancers/router'
 
 describe('router', () => {
   it('parsePath simple', () => {
@@ -87,5 +87,24 @@ describe('router', () => {
     assert.deepEqual(parsedRoutes.meta['/general'].children[0].path, '/users')
     assert.deepEqual(parsedRoutes.meta['/general/users'].parents.length, 2)
     assert.deepEqual(parsedRoutes.meta['/general/users'].parents[1].path, '/general')
+  })
+
+  it('MemoryHistory', () => {
+    const history = new MemoryHistory({ initPath: '/test' })
+    assert.equal(history.current, '/test')
+    assert.equal(history.location.pathname, '/test')
+    assert.equal(history.location.template, null)
+    history.push('/test2')
+    assert.equal(history.current, '/test2')
+    assert.equal(history.last, '/test')
+    history.replace('/test3')
+    assert.equal(history.current, '/test3')
+    assert.equal(history.last, '/test2')
+    history.go(-1)
+    assert.equal(history.current, '/test')
+    assert.equal(history.last, '/test3')
+    history.go(1)
+    assert.equal(history.current, '/test3')
+    assert.equal(history.last, '/test')
   })
 })

@@ -85,7 +85,7 @@
 /******/ 	
 /******/ 	
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "9134099de8b7c0d4fa6f"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "57cdc2d70f4e73dcac20"; // eslint-disable-line no-unused-vars
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule; // eslint-disable-line no-unused-vars
@@ -1490,6 +1490,8 @@ var MemoryHistory = /** @class */ (function (_super) {
         next = Math.min(next, this._stack.length - 1);
         next = Math.max(next, 0);
         this._index = next;
+        this._updateLocation();
+        this.handleChange();
     };
     MemoryHistory.prototype.back = function () {
         this.go(-1);
@@ -1601,7 +1603,7 @@ function mkLink(history, h) {
 }
 function withRouter(props) {
     if (props === void 0) { props = { routes: {} }; }
-    var _a = props.history, history = _a === void 0 ? new __WEBPACK_IMPORTED_MODULE_4__history__["b" /* HashHistory */]() : _a, routes = props.routes, _b = props.ssr, ssr = _b === void 0 ? false : _b, _c = props.isServer, isServer = _c === void 0 ? false : _c;
+    var _a = props.history, history = _a === void 0 ? new __WEBPACK_IMPORTED_MODULE_4__history__["b" /* HashHistory */]() : _a, routes = props.routes, _b = props.ssr, ssr = _b === void 0 ? false : _b, _c = props.isServer, isServer = _c === void 0 ? typeof window === 'undefined' || (typeof self !== undefined && window !== self) : _c;
     var timer;
     return function (app) { return function (props) {
         var routesMap = routes;
@@ -1625,12 +1627,15 @@ function withRouter(props) {
             if (ret.length >= 3) {
                 renderOnServer = ret[2];
             }
-            if (ssr && fromInit && !isServer && renderOnServer) {
-                return Object(__WEBPACK_IMPORTED_MODULE_1__helpers__["a" /* dt */])('clientSSR', { key: key, comp: comp });
+            if (ssr) {
+                if (isServer && !renderOnServer) {
+                    return Object(__WEBPACK_IMPORTED_MODULE_1__helpers__["a" /* dt */])('normal', null);
+                }
+                if (fromInit && !isServer && renderOnServer) {
+                    return Object(__WEBPACK_IMPORTED_MODULE_1__helpers__["a" /* dt */])('clientSSR', { key: key, comp: comp });
+                }
             }
-            else {
-                return Object(__WEBPACK_IMPORTED_MODULE_1__helpers__["a" /* dt */])('dynamic', { key: key, comp: comp });
-            }
+            return Object(__WEBPACK_IMPORTED_MODULE_1__helpers__["a" /* dt */])('dynamic', { key: key, comp: comp });
         };
         var initComp = getRouteComp(meta, true);
         var isRenderable = false;

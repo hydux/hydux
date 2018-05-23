@@ -21,8 +21,9 @@ export {
   Context,
 }
 const CHANGE_LOCATION = '@@hydux-router/CHANGE_LOCATION'
+export interface Param { [key: string]: string }
 export interface Query { [key: string]: string | string[] }
-export interface Location<P = any, Q extends Query = any> {
+export interface Location<P extends Param = Param, Q extends Query = Query> {
   template: string | null
   pathname: string
   params: P
@@ -150,7 +151,7 @@ export default function withRouter<State, Actions>(props: Options<State, Actions
     history = new HashHistory(),
     routes,
     ssr = false,
-    isServer = false,
+    isServer = typeof window === 'undefined' || (typeof self !== undefined && window !== self),
   } = props
   let timer
   return (app: App<State, Actions>) => (props: RouterAppProps<State, Actions>) => {
@@ -174,11 +175,15 @@ export default function withRouter<State, Actions>(props: Options<State, Actions
       if (ret.length >= 3) {
         renderOnServer = ret[2] as boolean
       }
-      if (ssr && fromInit && !isServer && renderOnServer) {
-        return dt('clientSSR', { key, comp })
-      } else {
-        return dt('dynamic', { key, comp })
+      if (ssr) {
+        if (isServer && !renderOnServer) {
+          return dt('normal', null)
+        }
+        if (fromInit && !isServer && renderOnServer) {
+          return dt('clientSSR', { key, comp })
+        }
       }
+      return dt('dynamic', { key, comp })
     }
     let initComp = getRouteComp(meta, true)
 

@@ -27,7 +27,7 @@ export declare type Dt<T extends string, D = null> = {
  * }
  * ```
  */
-export declare function dt<T extends string, D>(tag: T, data: D): Dt<T, D>;
+export declare function dt<T extends string, D = null>(tag: T, data?: D): Dt<T, D>;
 export declare const never: (f: never) => never;
 export declare const mkInit: <S, A>(state: S, cmd?: Cmd.Sub<A>[]) => () => [S, Cmd.Sub<A>[]];
 export declare type Fn1<T1, R> = (a1: T1) => R;
