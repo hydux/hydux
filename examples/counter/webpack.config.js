@@ -23,7 +23,7 @@ module.exports = createConfig([
   setOutput({
     filename: '[name].js',
     path: DIST,
-    publicPath: '/static/dist',
+    publicPath: '/static/dist/',
   }),
   css(),
   typescript(),

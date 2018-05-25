@@ -23,7 +23,7 @@ module.exports = createConfig([
   setOutput({
     filename: '[name].js',
     path: DIST,
-    publicPath: '/static/dist',
+    publicPath: '/static/dist/',
   }),
   css(),
   typescript(),
@@ -68,9 +68,9 @@ module.exports = createConfig([
     sourceMaps(),
   ]),
   env('production', [
+    uglify(),
     addPlugins([
       new Clean(['dist'], {exclude: ['vendor.dll.js', 'vendor-manifest.json']}),
-      uglify(),
     ]),
     sourceMaps(),
   ]),

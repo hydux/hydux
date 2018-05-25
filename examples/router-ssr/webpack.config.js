@@ -74,9 +74,9 @@ module.exports = createConfig([
     sourceMaps(),
   ]),
   env('production', [
+    uglify(),
     addPlugins([
       new Clean(['dist'], {exclude: ['vendor.dll.js', 'vendor-manifest.json']}),
-      uglify(),
     ]),
     sourceMaps(),
   ]),

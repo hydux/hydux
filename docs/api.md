@@ -27,10 +27,10 @@ app({
     // (msg: Msg) => (state: State) => (state: State)
     // update the state by msg and current state
     add: n => state => ({ count: state.count + n }),
-    // (msg: Msg) => (state: State) => (actions: Actions) => void
+    // (msg: Msg) => (state: State, actions: Actions) => void
     // update the state by state and other same level actions
     add12: () => (state, actions) => actions.add(12),
-    // (msg: Msg) => (state: State) => (actions: Actions) => [state, CmdType<State, Actions>]
+    // (msg: Msg) => (state: State, actions: Actions) => [state, CmdType<State, Actions>]
     // update the state by side effects
     remoteAdd: () => (state, actions) =>
       [ state,

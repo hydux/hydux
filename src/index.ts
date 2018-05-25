@@ -179,6 +179,7 @@ export interface Context<State, Actions, RenderReturn = any> {
   render(state?: State): RenderReturn
 }
 export type App<State, Actions> = (props: AppProps<State, Actions>) => Context<State, Actions, any>
+export type Enhancer<S, A> = (app: App<S, A>) => App<S, A>
 
 export function normalizeInit<S, A>(initResult: S | [S, CmdType<A>]): [S, CmdType<A>] {
   if (initResult instanceof Array) {
