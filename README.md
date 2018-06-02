@@ -188,10 +188,12 @@ let ctx = app<State, Actions>({
 ### Libraries
 
 * [hydux-react](https://github.com/hydux/hydux-react): Hydux's react integration
+* [hydux-preact](https://github.com/hydux/hydux-preact): Hydux's [preact](https://github.com/developit/preact) integration
 * [hydux-react-router](https://github.com/hydux/hydux-react-router): Hydux's react-router integration
 * [hydux-mutator](https://github.com/hydux/hydux-mutator): A statically-typed immutable update help package, which also contains immutable collections.
 * [hydux-transitions](https://github.com/hydux/hydux-transitions): A css transition library inspired by [animajs](http://animejs.com/)'s timeline, follow **The Elm Architecture**.
 * [hydux-data](https://github.com/hydux/hydux-data): Statically-typed data-driven development for hydux, in the Elm way. Inspired by apollo-client.
+* [hydux-pixi](https://github.com/hydux/hydux-pixi): High performance [pixi.js](https://github.com/pixijs/pixi.js) renderer for Hydux.
 
 ### Samples
 
