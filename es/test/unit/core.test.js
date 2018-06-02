@@ -70,6 +70,7 @@ describe('core api', function () {
         actions.up();
         actions.up();
         actions.up();
+        console.log('getState().count', getState().count);
         assert.equal(getState().count, 4, 'up should work');
         actions.down();
         actions.down();

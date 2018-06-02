@@ -1,5 +1,5 @@
-import * as Cmd from './cmd'
-import { ActionCmdResult } from './index'
+import * as Cmd from '../cmd'
+import { ActionCmdResult } from '../index'
 
 export type Dt<T extends string, D = null> = {
   tag: T,

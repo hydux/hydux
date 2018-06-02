@@ -1,6 +1,6 @@
 import * as tslib_1 from "tslib";
 import Cmd from './cmd';
-import { merge, setDeep, get, isFn, noop, isPojo, clone } from './utils';
+import { set, merge, setDeep, setDeepMutable, get, isFn, noop, isPojo, clone } from './utils';
 export * from './helpers';
 export { Cmd, noop, isFn, isPojo };
 /**
@@ -60,7 +60,7 @@ export function normalizeInit(initResult) {
     return [initResult, Cmd.none];
 }
 export function runCmd(cmd, actions) {
-    return Promise.all(cmd.map(function (sub) { return sub(actions); }));
+    return cmd.map(function (sub) { return sub(actions); });
 }
 export function app(props) {
     // const appEvents = props.events || {}
@@ -92,7 +92,9 @@ export function app(props) {
             }
             appState = setDeep(['lazyComps', path], comp, appState);
             appRender(appState);
-            return reuseState ? Promise.resolve() : runCmd(cmd, actions);
+            return reuseState
+                ? Promise.resolve()
+                : Promise.all(runCmd(cmd, actions));
         } });
     return appContext;
     function appRender(state) {
@@ -120,34 +122,54 @@ export function app(props) {
                     }
                     state = get(path, appState);
                     // action = appMiddlewares.reduce((action, fn) => fn(action, key, path), action)
-                    var _a = [state, appState], nextState = _a[0], nextAppState = _a[1];
+                    var nextState = state;
+                    var nextAppState = appState;
                     var cmd = Cmd.none;
-                    var _b = [undefined, undefined], parentState = _b[0], parentActions = _b[1];
+                    var parentState;
+                    var parentActions;
                     var actionResult = subFrom.apply(void 0, msgData);
                     if (isFn(actionResult) && actionResult.length > 2) {
-                        var pPath = path.slice(0, -1);
-                        parentActions = get(pPath, appActions);
-                        parentState = get(pPath, appState);
+                        var pLen = path.length - 1;
+                        parentActions = get(path, appActions, pLen);
+                        parentState = get(path, appState, pLen);
                     }
-                    _c = runAction(actionResult, state, actions, parentState, parentActions), nextState = _c[0], cmd = _c[1];
+                    _a = runAction(actionResult, state, actions, parentState, parentActions), nextState = _a[0], cmd = _a[1];
                     if (props.onUpdate) {
-                        nextAppState = setDeep(path, merge(state, nextState), appState);
+                        if (props.mutable) {
+                            if (state !== nextState) {
+                                set(state, nextState);
+                            }
+                            nextAppState = setDeepMutable(path, state !== nextState
+                                ? set(state, nextState)
+                                : state, appState);
+                        }
+                        else {
+                            nextAppState = setDeep(path, merge(state, nextState), appState);
+                        }
                         props.onUpdate({
                             prevAppState: appState,
                             nextAppState: nextAppState,
                             msgData: subFrom.length ? msgData : [],
-                            action: path.concat(key).join('.'),
+                            action: path.join('.') + '.' + key,
                         });
                     }
-                    if (nextState !== state) {
-                        appState =
-                            nextAppState !== appState
-                                ? nextAppState
-                                : setDeep(path, merge(state, nextState), appState);
+                    if (props.mutable) {
+                        appState = setDeepMutable(path, state !== nextState
+                            ? set(state, nextState)
+                            : state, appState);
+                        appRender(appState);
+                    }
+                    else if (nextState !== state) {
+                        if (props.onUpdate) {
+                            appState = nextAppState;
+                        }
+                        else {
+                            appState = setDeep(path, merge(state, nextState), appState);
+                        }
                         appRender(appState);
                     }
                     return runCmd(cmd, actions);
-                    var _c;
+                    var _a;
                 };
             }
             else if (typeof subFrom === 'object' && subFrom) {

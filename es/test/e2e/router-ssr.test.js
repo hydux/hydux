@@ -4,7 +4,7 @@ import * as child from 'child_process';
 import * as Utils from './utils';
 describe('ssr + code-splitting test', function () {
     var _this = this;
-    this.timeout(20000);
+    this.timeout(Utils.timeout);
     var browser = null;
     var page = null;
     var port = 3456;

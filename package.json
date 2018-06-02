@@ -75,10 +75,12 @@
     "webpack": "^3.10.0"
   },
   "dependencies": {
+    "lru-cache": "^4.1.3",
     "tslib": "^1.8.1",
     "ultradom": "2.0.0"
   },
   "optionalDependencies": {
     "remotedev": "^0.2.7"
-  }
+  },
+  "peerDependencies": {}
 }

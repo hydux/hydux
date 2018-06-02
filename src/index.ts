@@ -8,7 +8,7 @@ import {
   NormalAction,
 } from './types'
 import Cmd, { CmdType, Sub } from './cmd'
-import { set, merge, setDeep, get, isFn, noop, isPojo, clone } from './utils'
+import { set, merge, setDeep, setDeepMutable, get, isFn, noop, isPojo, clone } from './utils'
 export * from './helpers'
 export * from './types'
 export { Cmd, CmdType, Sub, ActionResult, noop, isFn, isPojo }
@@ -32,6 +32,10 @@ export interface AppProps<State, Actions> {
   onRender?: (view: any) => void
   onUpdate?: OnUpdate<State, Actions>
   onUpdateStart?: OnUpdateStart<State, Actions>
+  /**
+   * Use mutable state, useful for high performance scenarios like graphics rendering, e.g. hydux-pixi
+   */
+  mutable?: boolean
 }
 /**
  * run action and return a normalized result ([State, CmdType<>]),
@@ -189,7 +193,7 @@ export function normalizeInit<S, A>(initResult: S | [S, CmdType<A>]): [S, CmdTyp
 }
 
 export function runCmd<A>(cmd: CmdType<A>, actions: A) {
-  return Promise.all(cmd.map(sub => sub(actions)))
+  return cmd.map(sub => sub(actions))
 }
 
 export function app<State, Actions>(props: AppProps<State, Actions>): Context<State, Actions> {
@@ -226,7 +230,9 @@ export function app<State, Actions>(props: AppProps<State, Actions>): Context<St
       }
       appState = setDeep(['lazyComps', path], comp, appState)
       appRender(appState)
-      return reuseState ? Promise.resolve() : runCmd(cmd, actions)
+      return reuseState
+        ? Promise.resolve()
+        : Promise.all(runCmd(cmd, actions))
     }
   }
 
@@ -258,14 +264,16 @@ export function app<State, Actions>(props: AppProps<State, Actions>): Context<St
         actions[key] = function(...msgData) {
           state = get(path, appState)
           // action = appMiddlewares.reduce((action, fn) => fn(action, key, path), action)
-          let [nextState, nextAppState] = [state, appState]
+          let nextState = state
+          let nextAppState = appState
           let cmd = Cmd.none
-          let [parentState, parentActions] = [undefined, undefined]
+          let parentState
+          let parentActions
           const actionResult = subFrom(...msgData)
           if (isFn(actionResult) && actionResult.length > 2) {
-            const pPath = path.slice(0, -1)
-            parentActions = get(pPath, appActions)
-            parentState = get(pPath, appState)
+            let pLen = path.length - 1
+            parentActions = get(path, appActions, pLen)
+            parentState = get(path, appState, pLen)
           }
           [nextState, cmd] = runAction(
             actionResult,
@@ -276,20 +284,42 @@ export function app<State, Actions>(props: AppProps<State, Actions>): Context<St
           )
 
           if (props.onUpdate) {
-            nextAppState = setDeep(path, merge(state, nextState), appState)
+            if (props.mutable) {
+              if (state !== nextState) {
+                set(state, nextState)
+              }
+              nextAppState = setDeepMutable(
+                path,
+                state !== nextState
+                  ? set(state, nextState)
+                  : state,
+                appState,
+              )
+            } else {
+              nextAppState = setDeep(path, merge(state, nextState), appState)
+            }
             props.onUpdate({
               prevAppState: appState,
               nextAppState,
               msgData: subFrom.length ? msgData : [],
-              action: path.concat(key).join('.'),
+              action: path.join('.') + '.' + key,
             })
           }
-
-          if (nextState !== state) {
-            appState =
-              nextAppState !== appState
-                ? nextAppState
-                : setDeep(path, merge(state, nextState), appState)
+          if (props.mutable) {
+            appState = setDeepMutable(
+              path,
+              state !== nextState
+                ? set(state, nextState)
+                : state,
+              appState,
+            )
+            appRender(appState)
+          } else if (nextState !== state) {
+            if (props.onUpdate) {
+              appState = nextAppState
+            } else {
+              appState = setDeep(path, merge(state, nextState), appState)
+            }
             appRender(appState)
           }
           return runCmd(cmd, actions)

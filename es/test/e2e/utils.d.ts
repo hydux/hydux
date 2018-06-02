@@ -3,6 +3,7 @@ import * as puppeteer from 'puppeteer';
 import * as child from 'child_process';
 export declare const IsCI: boolean;
 export declare const Examples: string;
+export declare const timeout = 60000;
 export declare const runServer: (app: string, port: number) => Promise<child.ChildProcess>;
 export declare function downloadChrome(): Promise<void>;
 export declare const sleep: (ms: number) => Promise<{}>;

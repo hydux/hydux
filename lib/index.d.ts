@@ -25,6 +25,10 @@ export interface AppProps<State, Actions> {
     onRender?: (view: any) => void;
     onUpdate?: OnUpdate<State, Actions>;
     onUpdateStart?: OnUpdateStart<State, Actions>;
+    /**
+     * Use mutable state, useful for high performance scenarios like graphics rendering, e.g. hydux-pixi
+     */
+    mutable?: boolean;
 }
 /**
  * run action and return a normalized result ([State, CmdType<>]),
@@ -62,7 +66,8 @@ export interface Context<State, Actions, RenderReturn = any> {
     render(state?: State): RenderReturn;
 }
 export declare type App<State, Actions> = (props: AppProps<State, Actions>) => Context<State, Actions, any>;
+export declare type Enhancer<S, A> = (app: App<S, A>) => App<S, A>;
 export declare function normalizeInit<S, A>(initResult: S | [S, CmdType<A>]): [S, CmdType<A>];
-export declare function runCmd<A>(cmd: CmdType<A>, actions: A): Promise<any[]>;
+export declare function runCmd<A>(cmd: CmdType<A>, actions: A): any[];
 export declare function app<State, Actions>(props: AppProps<State, Actions>): Context<State, Actions>;
 export default app;

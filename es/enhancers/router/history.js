@@ -57,24 +57,29 @@ var BaseHistory = /** @class */ (function () {
         if (props === void 0) { props = {}; }
         var _this = this;
         this._last = [];
-        this.listeners = [];
+        this._listeners = [];
+        this._fireInitPath = true;
         this._routes = {};
         this._routesTpls = [];
-        this.listen = function (listener) { return _this.listeners.push(listener); };
-        this.props = props = tslib_1.__assign({ basePath: '', initPath: '/' }, props);
-        this.listeners.push(function (path) {
+        this._props = props = tslib_1.__assign({ basePath: '', initPath: '/' }, props);
+        this._listeners.push(function (path) {
             _this._last = _this._last.concat(path).slice(-2);
             _this._updateLocation(path);
         });
-        this.handleChange(this.props.initPath);
+        if (this._fireInitPath) {
+            this._fireChange(this._props.initPath);
+        }
     }
     Object.defineProperty(BaseHistory.prototype, "last", {
         get: function () {
-            return this._last[0] || this.props.initPath;
+            return this._last[0] || this._props.initPath;
         },
         enumerable: true,
         configurable: true
     });
+    BaseHistory.prototype.listen = function (listener) {
+        this._listeners.push(listener);
+    };
     BaseHistory.prototype.go = function (delta) {
         history.go(delta);
     };
@@ -87,18 +92,19 @@ var BaseHistory = /** @class */ (function () {
     BaseHistory.prototype.parsePath = function (path) {
         return parsePath(path, this._routesTpls);
     };
+    /* @internal */
     BaseHistory.prototype._setRoutes = function (routes, routesMeta) {
         this._routesMeta = routesMeta;
         this._routes = routes;
         this._routesTpls = Object.keys(routes || {});
         this._updateLocation();
     };
-    BaseHistory.prototype.handleChange = function (path) {
-        if (path === void 0) { path = this.current(); }
-        this.listeners.forEach(function (f) { return f(path); });
+    BaseHistory.prototype._fireChange = function (path) {
+        if (path === void 0) { path = this.current; }
+        this._listeners.forEach(function (f) { return f(path); });
     };
     BaseHistory.prototype._updateLocation = function (path) {
-        if (path === void 0) { path = this.current(); }
+        if (path === void 0) { path = this.current; }
         var loc = this.parsePath(path);
         this.lastLocation = this.location || loc;
         this.location = loc;
@@ -115,19 +121,30 @@ var HashHistory = /** @class */ (function (_super) {
             return new MemoryHistory();
         }
         _this = _super.call(this, props) || this;
-        _this.props = props = tslib_1.__assign({ hash: '#!' }, _this.props);
-        _this._last = [_this.current()];
+        _this._props = props = tslib_1.__assign({ hash: '#!' }, _this._props);
+        _this._last = [_this.current];
         window.addEventListener('hashchange', function (e) {
-            _this.handleChange();
+            _this._fireChange();
         });
         return _this;
     }
     HashHistory.prototype.realPath = function (path) {
-        return this.props.hash + this.props.basePath + path;
+        return this._props.hash + this._props.basePath + path;
     };
-    HashHistory.prototype.current = function () {
-        return location.hash.slice(this.props.hash.length + this.props.basePath.length) || '/';
-    };
+    Object.defineProperty(HashHistory.prototype, "length", {
+        get: function () {
+            return history.length;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HashHistory.prototype, "current", {
+        get: function () {
+            return location.hash.slice(this._props.hash.length + this._props.basePath.length) || '/';
+        },
+        enumerable: true,
+        configurable: true
+    });
     HashHistory.prototype.push = function (path) {
         location.assign(this.realPath(path));
     };
@@ -146,26 +163,37 @@ var BrowserHistory = /** @class */ (function (_super) {
             return new MemoryHistory(props);
         }
         _this = _super.call(this, props) || this;
-        _this._last = [_this.current()];
+        _this._last = [_this.current];
         window.addEventListener('popstate', function (e) {
-            _this.handleChange();
+            _this._fireChange();
         });
         return _this;
     }
     BrowserHistory.prototype.realPath = function (path) {
-        return this.props.basePath + path;
+        return this._props.basePath + path;
     };
-    BrowserHistory.prototype.current = function () {
-        return location.pathname.slice(this.props.basePath.length)
-            + location.search;
-    };
+    Object.defineProperty(BrowserHistory.prototype, "length", {
+        get: function () {
+            return history.length;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(BrowserHistory.prototype, "current", {
+        get: function () {
+            return location.pathname.slice(this._props.basePath.length)
+                + location.search;
+        },
+        enumerable: true,
+        configurable: true
+    });
     BrowserHistory.prototype.push = function (path) {
         history.pushState(null, '', this.realPath(path));
-        this.handleChange(path);
+        this._fireChange(path);
     };
     BrowserHistory.prototype.replace = function (path) {
         history.replaceState(null, '', this.realPath(path));
-        this.handleChange(path);
+        this._fireChange(path);
     };
     return BrowserHistory;
 }(BaseHistory));
@@ -176,34 +204,60 @@ var MemoryHistory = /** @class */ (function (_super) {
         if (props === void 0) { props = {}; }
         var _this = _super.call(this, props) || this;
         _this._stack = [];
+        _this._storeKey = '@hydux-router/memoryhistory';
         _this._index = 0;
-        _this.props = props = tslib_1.__assign({}, _this.props);
+        _this._props = props = tslib_1.__assign({}, _this._props);
         // Override initialization in super class
-        _this._stack = [_this.props.basePath + _this.props.initPath];
-        _this._last = [_this.current()];
+        _this._stack = [_this._props.basePath + _this._props.initPath];
+        var storage = _this._getStorage();
+        if (storage) {
+            _this.listen(function (path) {
+                storage.setItem(_this._storeKey, JSON.stringify(_this._stack));
+            });
+            var stack = storage.getItem(_this._storeKey);
+            if (stack) {
+                _this._stack = JSON.parse(stack);
+                return _this;
+            }
+        }
+        _this._fireChange(_this._props.initPath);
         return _this;
     }
     MemoryHistory.prototype.realPath = function (path) {
-        return this.props.basePath + path;
+        return this._props.basePath + path;
     };
-    MemoryHistory.prototype.current = function () {
-        return this._stack[this._index].slice(this.props.basePath.length);
-    };
+    Object.defineProperty(MemoryHistory.prototype, "length", {
+        get: function () {
+            return this._stack.length;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(MemoryHistory.prototype, "current", {
+        get: function () {
+            return this._stack[this._index].slice(this._props.basePath.length);
+        },
+        enumerable: true,
+        configurable: true
+    });
     MemoryHistory.prototype.push = function (path) {
         this._reset();
-        this._stack.push(this.props.basePath + path);
-        this.handleChange(path);
+        this._stack.push(this._props.basePath + path);
+        this._index++;
+        this._fireChange(path);
     };
     MemoryHistory.prototype.replace = function (path) {
         this._reset();
-        this._stack[this._index] = this.props.basePath + path;
-        this.handleChange(path);
+        this._stack[this._index] = this._props.basePath + path;
+        this._fireChange(path);
     };
     MemoryHistory.prototype.go = function (delta) {
         var next = this._index + delta;
         next = Math.min(next, this._stack.length - 1);
         next = Math.max(next, 0);
         this._index = next;
+        this._updateLocation();
+        this._fireChange();
     };
     MemoryHistory.prototype.back = function () {
         this.go(-1);
@@ -213,6 +267,11 @@ var MemoryHistory = /** @class */ (function (_super) {
     };
     MemoryHistory.prototype._reset = function () {
         this._stack = this._stack.slice(0, this._index + 1);
+    };
+    MemoryHistory.prototype._getStorage = function () {
+        return (this._props.store && typeof this._props.store === 'boolean')
+            ? localStorage
+            : this._props.store || null;
     };
     return MemoryHistory;
 }(BaseHistory));

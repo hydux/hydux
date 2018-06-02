@@ -57,7 +57,7 @@ export function mkLink(history, h) {
 }
 export default function withRouter(props) {
     if (props === void 0) { props = { routes: {} }; }
-    var _a = props.history, history = _a === void 0 ? new HashHistory() : _a, routes = props.routes, _b = props.ssr, ssr = _b === void 0 ? false : _b, _c = props.isServer, isServer = _c === void 0 ? false : _c;
+    var _a = props.history, history = _a === void 0 ? new HashHistory() : _a, routes = props.routes, _b = props.ssr, ssr = _b === void 0 ? false : _b, _c = props.isServer, isServer = _c === void 0 ? typeof window === 'undefined' || (typeof self !== undefined && window !== self) : _c;
     var timer;
     return function (app) { return function (props) {
         var routesMap = routes;
@@ -81,12 +81,15 @@ export default function withRouter(props) {
             if (ret.length >= 3) {
                 renderOnServer = ret[2];
             }
-            if (ssr && fromInit && !isServer && renderOnServer) {
-                return dt('clientSSR', { key: key, comp: comp });
+            if (ssr) {
+                if (isServer && !renderOnServer) {
+                    return dt('normal', null);
+                }
+                if (fromInit && !isServer && renderOnServer) {
+                    return dt('clientSSR', { key: key, comp: comp });
+                }
             }
-            else {
-                return dt('dynamic', { key: key, comp: comp });
-            }
+            return dt('dynamic', { key: key, comp: comp });
         };
         var initComp = getRouteComp(meta, true);
         var isRenderable = false;
@@ -104,8 +107,7 @@ export default function withRouter(props) {
                             return ctx.render();
                         }
                         isRenderable = true;
-                        var res = actions[CHANGE_LOCATION](loc);
-                        return res;
+                        return actions[CHANGE_LOCATION](loc);
                     });
                 case 'normal':
                     isRenderable = true;
@@ -115,7 +117,13 @@ export default function withRouter(props) {
         }
         var ctx = app(tslib_1.__assign({}, props, { init: function () {
                 var result = normalizeInit(props.init());
-                var cmd = Cmd.batch(result[1], Cmd.ofSub(function (actions) { return runRoute(initComp, actions, loc, true); }));
+                var cmd = Cmd.batch(result[1], Cmd.ofSub(function (actions) {
+                    var ar = runRoute(initComp, actions, loc, true);
+                    if (ar instanceof Promise) {
+                        return ar;
+                    }
+                    return Promise.all(ar);
+                }));
                 var state = tslib_1.__assign({}, result[0], { location: loc, lazyComps: {} });
                 return [state, cmd];
             }, subscribe: function (state) { return Cmd.batch(Cmd.ofSub(function (actions) {
@@ -126,11 +134,11 @@ export default function withRouter(props) {
                     runRoute(comp, actions, loc);
                 });
             }), props.subscribe ? props.subscribe(state) : Cmd.none); }, actions: tslib_1.__assign({}, props.actions, (_a = { history: {
-                        push: function (path) { return history.push(path); },
-                        replace: function (path) { return history.replace(path); },
-                        go: function (delta) { return history.go(delta); },
-                        back: function () { return history.back(); },
-                        forward: function () { return history.forward(); },
+                        push: function (path) { return setTimeout(function () { return history.push(path); }); },
+                        replace: function (path) { return setTimeout(function () { return history.replace(path); }); },
+                        go: function (delta) { return setTimeout(function () { return history.go(delta); }); },
+                        back: function () { return setTimeout(function () { return history.back(); }); },
+                        forward: function () { return setTimeout(function () { return history.forward(); }); },
                     } }, _a[CHANGE_LOCATION] = function (loc, resolve) { return function (state, actions) {
                 if (loc.template) {
                     var patch = function () {

@@ -4,10 +4,13 @@ import { Dt } from '../../helpers';
 import { HistoryProps, BaseHistory, HashHistory, BrowserHistory, MemoryHistory, MemoryHistoryProps, parsePath, matchPath } from './history';
 export { parsePath, matchPath };
 export { HistoryProps, BaseHistory, HashHistory, BrowserHistory, MemoryHistory, MemoryHistoryProps, Context };
+export interface Param {
+    [key: string]: string;
+}
 export interface Query {
     [key: string]: string | string[];
 }
-export interface Location<P = any, Q extends Query = any> {
+export interface Location<P extends Param = Param, Q extends Query = Query> {
     template: string | null;
     pathname: string;
     params: P;

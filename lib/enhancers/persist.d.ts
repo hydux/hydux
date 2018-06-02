@@ -1,6 +1,6 @@
-import { App } from './../index';
+import { App } from '../index';
 export declare type Options = {
-    store?: Storage;
+    store?: Pick<Storage, 'getItem' | 'setItem'>;
     serialize?: (data: any) => string;
     deserialize?: (str: string) => any;
     debounce?: number;

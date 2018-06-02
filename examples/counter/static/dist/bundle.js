@@ -61,7 +61,7 @@
 /******/ 	
 /******/ 	
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "ef70b8e1237a3af5001f"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "2dd589c8dabfc1020959"; // eslint-disable-line no-unused-vars
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule; // eslint-disable-line no-unused-vars
@@ -716,7 +716,7 @@
 /******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
 /******/
 /******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "/static/dist";
+/******/ 	__webpack_require__.p = "/static/dist/";
 /******/
 /******/ 	// __webpack_hash__
 /******/ 	__webpack_require__.h = function() { return hotCurrentHash; };
@@ -5512,7 +5512,7 @@ function normalizeInit(initResult) {
     return [initResult, __WEBPACK_IMPORTED_MODULE_0__cmd__["a" /* default */].none];
 }
 function runCmd(cmd, actions) {
-    return Promise.all(cmd.map(function (sub) { return sub(actions); }));
+    return cmd.map(function (sub) { return sub(actions); });
 }
 function app(props) {
     // const appEvents = props.events || {}
@@ -5544,7 +5544,9 @@ function app(props) {
             }
             appState = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* setDeep */])(['lazyComps', path], comp, appState);
             appRender(appState);
-            return reuseState ? Promise.resolve() : runCmd(cmd, actions);
+            return reuseState
+                ? Promise.resolve()
+                : Promise.all(runCmd(cmd, actions));
         } });
     return appContext;
     function appRender(state) {
@@ -5572,34 +5574,36 @@ function app(props) {
                     }
                     state = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* get */])(path, appState);
                     // action = appMiddlewares.reduce((action, fn) => fn(action, key, path), action)
-                    var _a = [state, appState], nextState = _a[0], nextAppState = _a[1];
+                    var nextState = state;
+                    var nextAppState = appState;
                     var cmd = __WEBPACK_IMPORTED_MODULE_0__cmd__["a" /* default */].none;
-                    var _b = [undefined, undefined], parentState = _b[0], parentActions = _b[1];
+                    var parentState;
+                    var parentActions;
                     var actionResult = subFrom.apply(void 0, msgData);
                     if (Object(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* isFn */])(actionResult) && actionResult.length > 2) {
-                        var pPath = path.slice(0, -1);
-                        parentActions = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* get */])(pPath, appActions);
-                        parentState = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* get */])(pPath, appState);
+                        var pLen = path.length - 1;
+                        parentActions = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* get */])(path, appActions, pLen);
+                        parentState = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* get */])(path, appState, pLen);
                     }
-                    _c = runAction(actionResult, state, actions, parentState, parentActions), nextState = _c[0], cmd = _c[1];
+                    _a = runAction(actionResult, state, actions, parentState, parentActions), nextState = _a[0], cmd = _a[1];
                     if (props.onUpdate) {
-                        nextAppState = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* setDeep */])(path, Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* merge */])(state, nextState), appState);
+                        nextAppState = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* setDeep */])(path, Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* merge */])(state, nextState), appState, props.mutable);
                         props.onUpdate({
                             prevAppState: appState,
                             nextAppState: nextAppState,
                             msgData: subFrom.length ? msgData : [],
-                            action: path.concat(key).join('.'),
+                            action: path.join('.') + '.' + key,
                         });
                     }
-                    if (nextState !== state) {
+                    if (nextState !== state || props.mutable) {
                         appState =
-                            nextAppState !== appState
+                            props.onUpdate
                                 ? nextAppState
                                 : Object(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* setDeep */])(path, Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* merge */])(state, nextState), appState);
                         appRender(appState);
                     }
                     return runCmd(cmd, actions);
-                    var _c;
+                    var _a;
                 };
             }
             else if (typeof subFrom === 'object' && subFrom) {
@@ -5655,18 +5659,23 @@ function merge(to, from) {
 function clone(from) {
     return set(isPojo(from) ? {} : new from.constructor(), from);
 }
-function setDeep(path, value, from) {
-    var to = isPojo(from) ? {} : new from.constructor();
+function setDeep(path, value, from, mutable) {
+    if (mutable === void 0) { mutable = false; }
+    var to = isPojo(from)
+        ? mutable
+            ? from
+            : {}
+        : new from.constructor();
     return 0 === path.length
         ? value
         : ((to[path[0]] =
             1 < path.length
-                ? setDeep(path.slice(1), value, from[path[0]])
+                ? setDeep(path.slice(1), value, from[path[0]], mutable)
                 : value),
-            merge(from, to));
+            (mutable ? set : merge)(from, to));
 }
-function get(path, from) {
-    var len = path.length;
+function get(path, from, len) {
+    if (len === void 0) { len = path.length; }
     for (var i = 0; i < len; i++) {
         from = from[path[i]];
     }

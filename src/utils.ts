@@ -10,8 +10,7 @@ export const debug = (key: string, ...args: any[]) => {
 
 export function set(to, from) {
   const keys = Object.keys(from)
-  let i = keys.length
-  while (i--) {
+  for (let i = 0; i < keys.length; i++) {
     const key = keys[i]
     to[key] = from[key]
   }
@@ -27,18 +26,36 @@ export function clone(from) {
 }
 
 export function setDeep(path: string[], value, from) {
-  const to = isPojo(from) ? {} : new from.constructor()
-  return 0 === path.length
-    ? value
-    : ((to[path[0]] =
-        1 < path.length
-          ? setDeep(path.slice(1), value, from[path[0]])
-          : value),
-      merge(from, to))
+  if (path.length === 0) {
+    return value
+  }
+  let to =
+    isPojo(from)
+      ? {} : new from.constructor()
+  let toCursor = to
+  let fromCursor = from
+  let lastIdx = path.length - 1
+  set(toCursor, fromCursor)
+  for (let i = 0; i < lastIdx; i++) {
+    const key = path[i]
+    toCursor = toCursor[key]
+    fromCursor = fromCursor[key]
+    set(toCursor, fromCursor)
+  }
+  toCursor[path[lastIdx]] = value
+  return to
 }
 
-export function get(path: string[], from: any) {
-  let len = path.length
+export function setDeepMutable(path: string[], value, from) {
+  let cursor = from
+  for (let i = 0; i < path.length - 1; i++) {
+    cursor = cursor[path[i]]
+  }
+  cursor[path[path.length - 1]] = value
+  return from
+}
+
+export function get(path: string[], from: any, len: number = path.length) {
   for (let i = 0; i < len; i++) {
     from = from[path[i]]
   }

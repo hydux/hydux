@@ -1,8 +1,8 @@
-import { AppProps, App } from './../index'
-import Cmd from './../cmd'
+import { AppProps, App } from '../index'
+import Cmd from '../cmd'
 import { get } from '../utils'
 export type Options = {
-  store?: Storage,
+  store?: Pick<Storage, 'getItem' | 'setItem'>,
   serialize?: (data: any) => string,
   deserialize?: (str: string) => any,
   debounce?: number,
@@ -25,9 +25,13 @@ export default function withPersist<State, Actions>(props: Options = {}): (app: 
         if (!(result instanceof Array)) {
           result = [result, Cmd.none]
         }
-        const persistState = store.getItem(key)
-        if (persistState) {
-          result[0] = deserialize(persistState)
+        try {
+          const persistState = store.getItem(key)
+          if (persistState) {
+            result[0] = deserialize(persistState)
+          }
+        } catch (error) {
+          console.error(error)
         }
         return [result[0], result[1]]
       },

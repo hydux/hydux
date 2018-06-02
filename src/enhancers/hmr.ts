@@ -1,5 +1,5 @@
 
-import { AppProps, App } from './../index'
+import { AppProps, App, Cmd } from './../index'
 
 let globalState
 export default function withHmr<State, Actions>(): (app: App<State, Actions>) => App<State, Actions> {
@@ -8,9 +8,12 @@ export default function withHmr<State, Actions>(): (app: App<State, Actions>) =>
     init() {
       let result = props.init()
       if (!(result instanceof Array)) {
-        result = [result, []]
+        result = [result, Cmd.none]
       }
-      return [globalState || result[0], result[1]]
+      return [
+        globalState || result[0],
+        result[1],
+      ]
     },
     onUpdate(data) {
       props.onUpdate && props.onUpdate(data)

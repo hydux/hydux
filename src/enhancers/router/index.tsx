@@ -205,13 +205,12 @@ export default function withRouter<State, Actions>(props: Options<State, Actions
               }
 
               isRenderable = true
-              const res = actions[CHANGE_LOCATION](loc)
-              return res
+              return actions[CHANGE_LOCATION](loc) as CmdType<A>
             }
           )
         case 'normal':
           isRenderable = true
-          return actions[CHANGE_LOCATION](loc)
+          return actions[CHANGE_LOCATION](loc) as CmdType<A>
         default: return never(routeComp)
       }
     }
@@ -222,7 +221,13 @@ export default function withRouter<State, Actions>(props: Options<State, Actions
         let cmd = Cmd.batch(
           result[1],
           Cmd.ofSub<RouterActions<Actions>>(
-            actions => runRoute(initComp, actions, loc, true)
+            actions => {
+              const ar = runRoute(initComp, actions, loc, true)
+              if (ar instanceof Promise) {
+                return ar
+              }
+              return Promise.all(ar)
+            }
           )
         )
         let state = { ...result[0] as any, location: loc, lazyComps: {} } as RouterState<State>

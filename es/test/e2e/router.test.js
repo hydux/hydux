@@ -4,7 +4,7 @@ import * as getPort from 'get-port';
 import * as Utils from './utils';
 describe('router test', function () {
     var _this = this;
-    this.timeout(10000);
+    this.timeout(Utils.timeout);
     var browser = null;
     var page = null;
     var port = 0;

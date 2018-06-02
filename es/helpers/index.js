@@ -1,4 +1,4 @@
-import * as Cmd from './cmd';
+import * as Cmd from '../cmd';
 /**
  * ADT Helper for TS
  * e.g.
@@ -22,6 +22,7 @@ import * as Cmd from './cmd';
  * ```
  */
 export function dt(tag, data) {
+    if (data === void 0) { data = null; }
     return { tag: tag, data: data };
 }
 export var never = function (f) { return f; };
@@ -38,4 +39,4 @@ export function compose() {
         return fns.reduce(function (arg, fn) { return fn(arg); }, arg);
     };
 }
-//# sourceMappingURL=helpers.js.map
+//# sourceMappingURL=index.js.map

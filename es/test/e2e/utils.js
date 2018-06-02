@@ -5,6 +5,7 @@ import * as child from 'child_process';
 import * as assert from 'assert';
 export var IsCI = !!process.env.CI;
 export var Examples = process.cwd() + "/examples";
+export var timeout = 60000;
 export var runServer = function (app, port) { return tslib_1.__awaiter(_this, void 0, void 0, function () {
     var p;
     return tslib_1.__generator(this, function (_a) {
@@ -13,9 +14,12 @@ export var runServer = function (app, port) { return tslib_1.__awaiter(_this, vo
                 p = child.exec(process.cwd() + "/node_modules/.bin/serve -n -c 0 -s -p " + port, {
                     cwd: Examples + "/" + app,
                 });
-                p.on('error', console.error);
-                return [4 /*yield*/, sleep(1000)];
+                p.stderr.on('data', console.error);
+                return [4 /*yield*/, new Promise(function (res) { return p.stdout.on('data', function (d) { return (console.log(d), res()); }); })];
             case 1:
+                _a.sent();
+                return [4 /*yield*/, sleep(1000)];
+            case 2:
                 _a.sent();
                 return [2 /*return*/, p];
         }

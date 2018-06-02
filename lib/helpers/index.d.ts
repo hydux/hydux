@@ -1,4 +1,4 @@
-import * as Cmd from './cmd';
+import * as Cmd from '../cmd';
 export declare type Dt<T extends string, D = null> = {
     tag: T;
     data: D;

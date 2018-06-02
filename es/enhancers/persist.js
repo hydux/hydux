@@ -1,5 +1,5 @@
 import * as tslib_1 from "tslib";
-import Cmd from './../cmd';
+import Cmd from '../cmd';
 export default function withPersist(props) {
     if (props === void 0) { props = {}; }
     var _a = props.store, store = _a === void 0 ? localStorage : _a, _b = props.serialize, serialize = _b === void 0 ? JSON.stringify : _b, _c = props.deserialize, deserialize = _c === void 0 ? JSON.parse : _c, _d = props.debounce, debounce = _d === void 0 ? 50 : _d, _e = props.key, key = _e === void 0 ? 'hydux-persist' : _e;
@@ -10,9 +10,14 @@ export default function withPersist(props) {
                 if (!(result instanceof Array)) {
                     result = [result, Cmd.none];
                 }
-                var persistState = store.getItem(key);
-                if (persistState) {
-                    result[0] = deserialize(persistState);
+                try {
+                    var persistState = store.getItem(key);
+                    if (persistState) {
+                        result[0] = deserialize(persistState);
+                    }
+                }
+                catch (error) {
+                    console.error(error);
                 }
                 return [result[0], result[1]];
             }, onUpdate: function (data) {
