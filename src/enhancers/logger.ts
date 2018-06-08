@@ -1,18 +1,20 @@
 import { AppProps, App } from './../index'
 import { get } from '../utils'
-function defaultLogger (prevState, action, nextState, extra) {
+function defaultLogger (level: Required<Options>['level'], prevState, action, nextState, extra) {
   (console.group as any)('%c action', 'color: gray; font-weight: lighter;', action.name)
-  console.log('%c prev state', 'color: #9E9E9E; font-weight: bold;', prevState)
-  console.log('%c data', 'color: #03A9F4; font-weight: bold;', ...action.data, ...extra)
-  console.log('%c next state', 'color: #4CAF50; font-weight: bold;', nextState)
+  console[level]('%c prev state', 'color: #9E9E9E; font-weight: bold;', prevState)
+  console[level]('%c data', 'color: #03A9F4; font-weight: bold;', ...action.data, ...extra)
+  console[level]('%c next state', 'color: #4CAF50; font-weight: bold;', nextState)
   console.groupEnd()
 }
-export type Options<State> = {
-  logger?: (prevState: State, action: { name: string, data: any }, nextState: State, extra: any[]) => void,
-  windowInspectKey?: string,
-  filter?: (actionPath: string) => boolean,
-  logActionTime?: boolean,
-  logRenderTime?: boolean,
+
+export type Options<State = any> = {
+  logger?: (level: Required<Options>['level'], prevState: State, action: { name: string, data: any }, nextState: State, extra: any[]) => void
+  level?: 'debug' | 'info' | 'log' | 'warn' | 'error'
+  windowInspectKey?: string
+  filter?: (actionPath: string) => boolean
+  logActionTime?: boolean
+  logRenderTime?: boolean
 }
 export default function withLogger<State, Actions>(options: Options<State> = {}): (app: App<State, Actions>) => App<State, Actions> {
   const {
@@ -57,7 +59,7 @@ export default function withLogger<State, Actions>(options: Options<State> = {})
         const prevState = get(path, data.prevAppState)
         const nextState = get(path, data.nextAppState)
         if (filter(data.action)) {
-          logger(prevState, { name: data.action, data: data.msgData }, nextState, logActionTime ? ['time', (now() - timeMap[data.action]) + 'ms'] : [])
+          logger(options.level || 'log', prevState, { name: data.action, data: data.msgData }, nextState, logActionTime ? ['time', (now() - timeMap[data.action]) + 'ms'] : [])
         }
         if (windowInspectKey) {
           scope[windowInspectKey] = data

@@ -285,9 +285,6 @@ export function app<State, Actions>(props: AppProps<State, Actions>): Context<St
 
           if (props.onUpdate) {
             if (props.mutable) {
-              if (state !== nextState) {
-                set(state, nextState)
-              }
               nextAppState = setDeepMutable(
                 path,
                 state !== nextState
