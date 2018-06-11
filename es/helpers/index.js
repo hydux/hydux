@@ -40,7 +40,7 @@ export function compose() {
         return fns.reduce(function (arg, fn) { return fn(arg); }, arg);
     };
 }
-export function initAll(arg) {
+export function combineInit(arg) {
     var state = {};
     var cmd = Cmd.none;
     var _loop_1 = function (key) {
