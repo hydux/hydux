@@ -18,7 +18,7 @@
     "doc": "typedoc --theme minimal --exclude \"**/test/**/*.ts\"  --excludeNotExported --excludePrivate --out ./docs/api ./src && touch ./docs/.nojekyll",
     "build:all": "run-p build build:dist build:es",
     "flow": "flow check",
-    "preversion": "run-p flow test build:all && git add -A"
+    "preversion": "run-p flow test:all build:all && git add -A"
   },
   "pre-commit": [
     "test"

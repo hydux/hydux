@@ -39,7 +39,7 @@ export function main(path?: string) {
       ? withReact<State.State, State.Actions>(
         document.getElementById('root'),
         { hydrate: true },
-      )
+      ) as any as ((app: Hydux.App<State.State, State.Actions>) => Hydux.App<State.State, State.Actions>) // temporary fix for hydux-react
       : noop
   )
   let app = withEnhancers(Hydux.app)

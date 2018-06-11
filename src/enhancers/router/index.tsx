@@ -70,7 +70,7 @@ export function mkLink(history: History, h) {
       onClick,
       replace = false,
       prefetch = false,
-      ...props,
+      ...props
     }: LinkProps,
     children?: any
   ) {
@@ -219,7 +219,7 @@ export default function withRouter<State, Actions>(props: Options<State, Actions
       init: () => {
         let result = normalizeInit(props.init())
         let cmd = Cmd.batch(
-          result[1],
+          result.cmd,
           Cmd.ofSub<RouterActions<Actions>>(
             actions => {
               const ar = runRoute(initComp, actions, loc, true)
@@ -230,7 +230,7 @@ export default function withRouter<State, Actions>(props: Options<State, Actions
             }
           )
         )
-        let state = { ...result[0] as any, location: loc, lazyComps: {} } as RouterState<State>
+        let state = { ...result.state as any, location: loc, lazyComps: {} } as RouterState<State>
         return [state, cmd]
       },
       subscribe: state => Cmd.batch(
@@ -256,7 +256,7 @@ export default function withRouter<State, Actions>(props: Options<State, Actions
         [CHANGE_LOCATION]: (loc: Location<any, any>, resolve?: Function) => (state: State, actions: Actions) => {
           if (loc.template) {
             const patch: Patch = (...args) => (ctx.patch as any)(...args)
-            let [nextState, cmd] = runAction(routesMap[loc.template](loc, patch), state, actions)
+            let { state: nextState, cmd } = runAction(routesMap[loc.template](loc, patch), state, actions)
             return [{ ...(nextState as any as object), location: loc }, cmd]
           } else {
             return { ...(state as any), location: loc }

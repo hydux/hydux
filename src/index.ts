@@ -2,10 +2,11 @@ import {
   ActionResult,
   ActionState,
   ActionCmdResult,
+  ActionObjResult,
   ActionType,
   ActionsType,
   UnknownArgsActionType,
-  NormalAction,
+  NormalActionResult,
 } from './types'
 import Cmd, { CmdType, Sub } from './cmd'
 import { set, merge, setDeep, setDeepMutable, get, isFn, noop, isPojo, clone } from './utils'
@@ -55,7 +56,7 @@ export function runAction<S, A, PS, PA>(
   parentState?: PS,
   parentActions?: PA,
   appContext?: Context<any, any>
-): ActionCmdResult<S, A> {
+): Required<ActionObjResult<S, A>> {
   let rst: any = result
   isFn(rst)
     && (rst = rst(state, actions, parentState, parentActions))
@@ -66,18 +67,19 @@ export function runAction<S, A, PS, PA>(
     rst === undefined ||
     (rst.then && isFn(rst.then))
   ) {
-    return [state, Cmd.none]
+    return { state, cmd: Cmd.none }
   }
-  if (rst instanceof Array) {
-    return [rst[0] || state, rst[1] || Cmd.none]
+  rst = normalizeInit(rst)
+  return {
+    state: rst.state || state,
+    cmd: rst.cmd,
   }
-  return [rst, Cmd.none]
 }
 
 export function withParents<S, A, PS, PA, A1>(
   action: (a1: A1) => (s: S, a: A) => any,
   wrapper?: (
-    action: (a1: A1) => ActionCmdResult<S, A>,
+    action: (a1: A1) => NormalActionResult<S, A>,
     parentState: PS,
     parentActions: PA,
     state: S,
@@ -89,7 +91,7 @@ export function withParents<S, A, PS, PA, A1>(
 export function withParents<S, A, PS, PA, A1, A2>(
   action: (a1: A1, a2: A2) => (s: S, a: A) => any,
   wrapper?: (
-    action: (a1: A1, a2: A2) => ActionCmdResult<S, A>,
+    action: (a1: A1, a2: A2) => NormalActionResult<S, A>,
     parentState: PS,
     parentActions: PA,
     state: S,
@@ -101,7 +103,7 @@ export function withParents<S, A, PS, PA, A1, A2>(
 export function withParents<S, A, PS, PA, A1, A2, A3>(
   action: (a1: A1, a2: A2, a3: A3) => (s: S, a: A) => any,
   wrapper?: (
-    action: (a1: A1, a2: A2, a3: A3) => ActionCmdResult<S, A>,
+    action: (a1: A1, a2: A2, a3: A3) => NormalActionResult<S, A>,
     parentState: PS,
     parentActions: PA,
     state: S,
@@ -113,7 +115,7 @@ export function withParents<S, A, PS, PA, A1, A2, A3>(
 export function withParents<S, A, PS, PA, A1, A2, A3, A4>(
   action: (a1: A1, a2: A2, a3: A3, a4: A4) => (s: S, a: A) => any,
   wrapper?: (
-    action: (a1: A1, a2: A2, a3: A3, a4: A4) => ActionCmdResult<S, A>,
+    action: (a1: A1, a2: A2, a3: A3, a4: A4) => NormalActionResult<S, A>,
     parentState: PS,
     parentActions: PA,
     state: S,
@@ -125,7 +127,7 @@ export function withParents<S, A, PS, PA, A1, A2, A3, A4>(
 export function withParents<S, A, PS, PA, A1, A2, A3, A4, A5>(
   action: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5) => (s: S, a: A) => any,
   wrapper?: (
-    action: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5) => ActionCmdResult<S, A>,
+    action: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5) => NormalActionResult<S, A>,
     parentState: PS,
     parentActions: PA,
     state: S,
@@ -144,7 +146,7 @@ export function withParents<S, A, PS, PA, A1, A2, A3, A4, A5>(
 export function withParents<S, A, PS, PA>(
   action: UnknownArgsActionType<S, A>,
   wrapper?: (
-    action: NormalAction<any, S, A>,
+    action: (...args) => NormalActionResult<S, A>,
     parentState: PS,
     parentActions: PA,
     state: S,
@@ -190,27 +192,31 @@ export type App<State, Actions> = (props: AppProps<State, Actions>) => Context<S
 export type Enhancer<S, A> = (app: App<S, A>) => App<S, A>
 
 function isInitObj<S, A>(res: ReturnType<Init<S, A>>): res is InitObj<S, A> {
-  const keys = Object.keys(res).join('|')
-  return keys === 'state' || keys === 'state|cmd'
+  const keys = Object.keys(res).sort().join('|')
+  return keys === 'state' || keys === 'cmd|state' || keys === '0|1|cmd|state'
 }
 
 export function normalizeInit<S, A>(initResult: ReturnType<Init<S, A>>): Required<InitObj<S, A>> {
+  let ret = {} as Required<InitObj<S, A>>
   if (initResult instanceof Array) {
-    return {
+    ret = {
       state: initResult[0],
-      cmd: initResult[1]
+      cmd: initResult[1] || Cmd.none
     }
-  }
-  if (isInitObj(initResult)) {
-    return {
+  } else if (isInitObj(initResult)) {
+    ret = {
       state: initResult.state,
       cmd: initResult.cmd || Cmd.none,
     }
+  } else {
+    ret = {
+      state: initResult as S,
+      cmd: Cmd.none
+    }
   }
-  return {
-    state: initResult as S,
-    cmd: Cmd.none
-  }
+  ret[0] = ret.state
+  ret[1] = ret.cmd
+  return ret
 }
 
 export function runCmd<A>(cmd: CmdType<A>, actions: A) {
@@ -285,9 +291,7 @@ export function app<State, Actions>(props: AppProps<State, Actions>): Context<St
         actions[key] = function(...msgData) {
           state = get(path, appState)
           // action = appMiddlewares.reduce((action, fn) => fn(action, key, path), action)
-          let nextState = state
           let nextAppState = appState
-          let cmd = Cmd.none
           let parentState
           let parentActions
           const actionResult = subFrom(...msgData)
@@ -296,7 +300,7 @@ export function app<State, Actions>(props: AppProps<State, Actions>): Context<St
             parentActions = get(path, appActions, pLen)
             parentState = get(path, appState, pLen)
           }
-          [nextState, cmd] = runAction(
+          let { state: nextState, cmd } = runAction(
             actionResult,
             state,
             actions,

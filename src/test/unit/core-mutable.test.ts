@@ -206,7 +206,7 @@ describe('mutable core api', () => {
             _, __
           ) => {
             const pc = parentState.counter1.count
-            const [state, cmd] = action(n + 1)
+            const { state, cmd } = action(n + 1)
             assert.equal(state.count, pc + n + 1, 'call child action work')
             return [
               state,

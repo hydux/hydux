@@ -1,23 +1,23 @@
 import { React } from 'hydux-react'
-import { Cmd, noop, ActionsType, ActionType, CmdType } from '../../../../src/index'
+import * as Hydux from '../../../../src/index'
 import * as Utils from './utils'
+const Cmd = Hydux.Cmd
 
-const initStateValue = { count: 0 }
-
-export const initState = () => initStateValue
-export const initCmd = () => Cmd.ofSub<Actions>(
-  _ =>
-    Utils.fetch(`/api/initcount`)
-    .then(res => res.json())
-    .then(data => _.setCount(data.count)),
-)
-export const init = () => [initState(), initCmd()] as [State, CmdType<Actions>]
+export const init = () => ({
+  state: { count: 0 },
+  cmd: Cmd.ofSub(
+    (_: Actions) =>
+      Utils.fetch(`/api/initcount`)
+      .then(res => res.json())
+      .then(data => _.setCount(data.count)),
+  )
+})
 export const actions = {
-  setCount: count => (state: State) => ({ count }),
-  down: () => (state: State) => ({ count: state.count - 1 }),
-  up: () => (state: State) => ({ count: state.count + 1 }),
-  upN: n => (state: State) => ({ count: state.count + n }),
-  upLater: (() => (state: State, actions: Actions) =>
+  setCount: (count): any => (state: State) => ({ count }),
+  down: (): any => (state: State) => ({ count: state.count - 1 }),
+  up: (): any => (state: State) => ({ count: state.count + 1 }),
+  upN: (n): any => (state: State): Hydux.AR<State, Actions> => ({ count: state.count + n }),
+  upLater: (): any => (state: State, actions: Actions) =>
     [ state,
       Cmd.ofPromise(
         n => {
@@ -25,7 +25,7 @@ export const actions = {
             setTimeout(() => resolve(n), 1000))
         },
         10,
-        actions.upN) ])
+        actions.upN) ]
 }
 
 export const view = (state: State, actions: Actions) => (
@@ -38,4 +38,4 @@ export const view = (state: State, actions: Actions) => (
 )
 
 export type Actions = typeof actions
-export type State = typeof initStateValue
+export type State = ReturnType<typeof init>['state']

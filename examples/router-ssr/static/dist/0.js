@@ -486,8 +486,6 @@ module.exports = self.fetch.bind(self);
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "initState", function() { return initState; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "initCmd", function() { return initCmd; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "init", function() { return init; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "actions", function() { return actions; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "view", function() { return view; });
@@ -498,14 +496,15 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 
-var initStateValue = { count: 0 };
-var initState = function () { return initStateValue; };
-var initCmd = function () { return __WEBPACK_IMPORTED_MODULE_1__src_index__["a" /* Cmd */].ofSub(function (_) {
-    return __WEBPACK_IMPORTED_MODULE_2__utils__["a" /* fetch */]("/api/initcount")
-        .then(function (res) { return res.json(); })
-        .then(function (data) { return _.setCount(data.count); });
+var initState = { count: 0 };
+var init = function () { return ({
+    state: initState,
+    cmd: __WEBPACK_IMPORTED_MODULE_1__src_index__["a" /* Cmd */].ofSub(function (_) {
+        return __WEBPACK_IMPORTED_MODULE_2__utils__["a" /* fetch */]("/api/initcount")
+            .then(function (res) { return res.json(); })
+            .then(function (data) { return _.setCount(data.count); });
+    })
 }); };
-var init = function () { return [initState(), initCmd()]; };
 var actions = {
     setCount: function (count) { return function (state) { return ({ count: count }); }; },
     down: function () { return function (state) { return ({ count: state.count - 1 }); }; },

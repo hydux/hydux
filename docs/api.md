@@ -6,7 +6,7 @@ Run your app.
 
 #### AppProps<State, Actions>
 
-##### init: () => State | [ State, CmdType ]
+##### init: () => State | [ State, CmdType ] | { state: State, cmd?: CmdType }
 
 An function to get the initial state of your app, you can return a tuple including side effects like an action.
 

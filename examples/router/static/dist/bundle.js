@@ -61,7 +61,7 @@
 /******/ 	
 /******/ 	
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "d486a30fbc9fe1506eed"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "100a768d9a4112b5d5d6"; // eslint-disable-line no-unused-vars
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule; // eslint-disable-line no-unused-vars
@@ -1057,9 +1057,9 @@ function patchElement(
 /* unused harmony export ofFn */
 /* unused harmony export ofPromise */
 /* unused harmony export ofSub */
-/* unused harmony export batch */
-/* unused harmony export map */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return none; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return batch; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return map; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return none; });
 /* unused harmony export Cmd */
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__("../../src/utils.ts");
 
@@ -1090,7 +1090,7 @@ function ofFn(task, args, succeedAction, failedAction) {
                     failedAction(e);
                 }
             }
-            else {
+            else { // don't wrap in try cache, get better DX in `Pause on exceptions`
                 return fn();
             }
         }
@@ -1157,7 +1157,7 @@ var Cmd = {
     batch: batch,
     map: map,
 };
-/* harmony default export */ __webpack_exports__["a"] = (Cmd);
+/* harmony default export */ __webpack_exports__["b"] = (Cmd);
 
 
 /***/ }),
@@ -1249,8 +1249,8 @@ function matchPath(pathname, fmt) {
     var match = pathname.match(new RegExp(re));
     if (match) {
         var params = paramKeys.reduce(function (params, key, i) {
-            return (__assign({}, params, (_a = {}, _a[key] = match && match[i + 1], _a)));
             var _a;
+            return (__assign({}, params, (_a = {}, _a[key] = match && match[i + 1], _a)));
         }, {});
         return params;
     }
@@ -1493,7 +1493,7 @@ var MemoryHistory = /** @class */ (function (_super) {
 /* unused harmony export join */
 /* unused harmony export parseNestedRoutes */
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__index__ = __webpack_require__("../../src/index.ts");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__helpers__ = __webpack_require__("../../src/helpers.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__helpers__ = __webpack_require__("../../src/helpers/index.ts");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__cmd__ = __webpack_require__("../../src/cmd.ts");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils__ = __webpack_require__("../../src/utils.ts");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__history__ = __webpack_require__("../../src/enhancers/router/history.ts");
@@ -1581,6 +1581,7 @@ function withRouter(props) {
     var _a = props.history, history = _a === void 0 ? new __WEBPACK_IMPORTED_MODULE_4__history__["a" /* HashHistory */]() : _a, routes = props.routes, _b = props.ssr, ssr = _b === void 0 ? false : _b, _c = props.isServer, isServer = _c === void 0 ? typeof window === 'undefined' || (typeof self !== undefined && window !== self) : _c;
     var timer;
     return function (app) { return function (props) {
+        var _a;
         var routesMap = routes;
         var routesMeta = {};
         if (('path' in routes) && typeof routes.path === 'string') {
@@ -1623,13 +1624,12 @@ function withRouter(props) {
                     var key_2 = routeComp.data.key;
                     var isClientSSRInit_1 = routeComp.tag === 'clientSSR' && fromInit;
                     return routeComp.data.comp.then(function (comp) { return ctx.patch(key_2, comp, isClientSSRInit_1); }).then(function () {
-                        if (isClientSSRInit_1) {
+                        if (isClientSSRInit_1) { // trigger client ssr render
                             isRenderable = true;
                             return ctx.render();
                         }
                         isRenderable = true;
-                        var res = actions[CHANGE_LOCATION](loc);
-                        return res;
+                        return actions[CHANGE_LOCATION](loc);
                     });
                 case 'normal':
                     isRenderable = true;
@@ -1639,17 +1639,23 @@ function withRouter(props) {
         }
         var ctx = app(__assign({}, props, { init: function () {
                 var result = Object(__WEBPACK_IMPORTED_MODULE_0__index__["c" /* normalizeInit */])(props.init());
-                var cmd = __WEBPACK_IMPORTED_MODULE_2__cmd__["a" /* default */].batch(result[1], __WEBPACK_IMPORTED_MODULE_2__cmd__["a" /* default */].ofSub(function (actions) { return Promise.all(runRoute(initComp, actions, loc, true)); }));
-                var state = __assign({}, result[0], { location: loc, lazyComps: {} });
+                var cmd = __WEBPACK_IMPORTED_MODULE_2__cmd__["b" /* default */].batch(result.cmd, __WEBPACK_IMPORTED_MODULE_2__cmd__["b" /* default */].ofSub(function (actions) {
+                    var ar = runRoute(initComp, actions, loc, true);
+                    if (ar instanceof Promise) {
+                        return ar;
+                    }
+                    return Promise.all(ar);
+                }));
+                var state = __assign({}, result.state, { location: loc, lazyComps: {} });
                 return [state, cmd];
-            }, subscribe: function (state) { return __WEBPACK_IMPORTED_MODULE_2__cmd__["a" /* default */].batch(__WEBPACK_IMPORTED_MODULE_2__cmd__["a" /* default */].ofSub(function (actions) {
+            }, subscribe: function (state) { return __WEBPACK_IMPORTED_MODULE_2__cmd__["b" /* default */].batch(__WEBPACK_IMPORTED_MODULE_2__cmd__["b" /* default */].ofSub(function (actions) {
                 history.listen(function (path) {
                     var loc = history.location;
                     var meta = routesMeta[loc.template];
                     var comp = getRouteComp(meta, false);
                     runRoute(comp, actions, loc);
                 });
-            }), props.subscribe ? props.subscribe(state) : __WEBPACK_IMPORTED_MODULE_2__cmd__["a" /* default */].none); }, actions: __assign({}, props.actions, (_a = { history: {
+            }), props.subscribe ? props.subscribe(state) : __WEBPACK_IMPORTED_MODULE_2__cmd__["b" /* default */].none); }, actions: __assign({}, props.actions, (_a = { history: {
                         push: function (path) { return setTimeout(function () { return history.push(path); }); },
                         replace: function (path) { return setTimeout(function () { return history.replace(path); }); },
                         go: function (delta) { return setTimeout(function () { return history.go(delta); }); },
@@ -1676,7 +1682,6 @@ function withRouter(props) {
                 }
             } }));
         return ctx;
-        var _a;
     }; };
 }
 function join() {
@@ -1776,7 +1781,7 @@ function withUltradom(container, options) {
 
 /***/ }),
 
-/***/ "../../src/helpers.ts":
+/***/ "../../src/helpers/index.ts":
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1784,7 +1789,10 @@ function withUltradom(container, options) {
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return never; });
 /* unused harmony export mkInit */
 /* unused harmony export compose */
+/* unused harmony export combineInit */
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__cmd__ = __webpack_require__("../../src/cmd.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__index__ = __webpack_require__("../../src/index.ts");
+
 
 /**
  * ADT Helper for TS
@@ -1814,7 +1822,7 @@ function dt(tag, data) {
 }
 var never = function (f) { return f; };
 var mkInit = function (state, cmd) {
-    if (cmd === void 0) { cmd = __WEBPACK_IMPORTED_MODULE_0__cmd__["b" /* none */]; }
+    if (cmd === void 0) { cmd = __WEBPACK_IMPORTED_MODULE_0__cmd__["d" /* none */]; }
     return function () { return [state, cmd]; };
 };
 function compose() {
@@ -1825,6 +1833,19 @@ function compose() {
     return function (arg) {
         return fns.reduce(function (arg, fn) { return fn(arg); }, arg);
     };
+}
+function combineInit(arg) {
+    var state = {};
+    var cmd = __WEBPACK_IMPORTED_MODULE_0__cmd__["d" /* none */];
+    var _loop_1 = function (key) {
+        var init = Object(__WEBPACK_IMPORTED_MODULE_1__index__["c" /* normalizeInit */])(arg[key]);
+        state[key] = init.state;
+        cmd = __WEBPACK_IMPORTED_MODULE_0__cmd__["a" /* batch */](cmd, __WEBPACK_IMPORTED_MODULE_0__cmd__["c" /* map */](function (_) { return _[key]; }, init.cmd));
+    };
+    for (var key in arg) {
+        _loop_1(key);
+    }
+    return { state: state, cmd: cmd };
 }
 
 
@@ -1842,9 +1863,9 @@ function compose() {
 /* unused harmony export app */
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__cmd__ = __webpack_require__("../../src/cmd.ts");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__("../../src/utils.ts");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__helpers__ = __webpack_require__("../../src/helpers.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__helpers__ = __webpack_require__("../../src/helpers/index.ts");
 /* unused harmony namespace reexport */
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return __WEBPACK_IMPORTED_MODULE_0__cmd__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return __WEBPACK_IMPORTED_MODULE_0__cmd__["b"]; });
 /* unused harmony reexport noop */
 /* unused harmony reexport isFn */
 /* unused harmony reexport isPojo */
@@ -1876,12 +1897,12 @@ function runAction(result, state, actions, parentState, parentActions, appContex
     // action can be a function that return a promise or undefined(callback)
     if (rst === undefined ||
         (rst.then && Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* isFn */])(rst.then))) {
-        return [state, __WEBPACK_IMPORTED_MODULE_0__cmd__["a" /* default */].none];
+        return [state, __WEBPACK_IMPORTED_MODULE_0__cmd__["b" /* default */].none];
     }
     if (rst instanceof Array) {
-        return [rst[0] || state, rst[1] || __WEBPACK_IMPORTED_MODULE_0__cmd__["a" /* default */].none];
+        return [rst[0] || state, rst[1] || __WEBPACK_IMPORTED_MODULE_0__cmd__["b" /* default */].none];
     }
-    return [rst, __WEBPACK_IMPORTED_MODULE_0__cmd__["a" /* default */].none];
+    return [rst, __WEBPACK_IMPORTED_MODULE_0__cmd__["b" /* default */].none];
 }
 /**
  * Wrap a child action with parentState, parentActions.
@@ -1910,11 +1931,33 @@ function withParents(action, wrapper, parentState, parentActions) {
  * @deprecated Deprecated for `withParents`
  */
 var wrapActions = withParents;
+function isInitObj(res) {
+    var keys = Object.keys(res).sort().join('|');
+    return keys === 'state' || keys === 'cmd|state' || keys === '0|1|cmd|state';
+}
 function normalizeInit(initResult) {
+    var ret = {};
     if (initResult instanceof Array) {
-        return initResult;
+        ret = {
+            state: initResult[0],
+            cmd: initResult[1]
+        };
     }
-    return [initResult, __WEBPACK_IMPORTED_MODULE_0__cmd__["a" /* default */].none];
+    else if (isInitObj(initResult)) {
+        ret = {
+            state: initResult.state,
+            cmd: initResult.cmd || __WEBPACK_IMPORTED_MODULE_0__cmd__["b" /* default */].none,
+        };
+    }
+    else {
+        ret = {
+            state: initResult,
+            cmd: __WEBPACK_IMPORTED_MODULE_0__cmd__["b" /* default */].none
+        };
+    }
+    ret[0] = ret.state;
+    ret[1] = ret.cmd;
+    return ret;
 }
 function runCmd(cmd, actions) {
     return cmd.map(function (sub) { return sub(actions); });
@@ -1922,10 +1965,10 @@ function runCmd(cmd, actions) {
 function app(props) {
     // const appEvents = props.events || {}
     var appActions = {};
-    var appSubscribe = props.subscribe || (function (_) { return __WEBPACK_IMPORTED_MODULE_0__cmd__["a" /* default */].none; });
+    var appSubscribe = props.subscribe || (function (_) { return __WEBPACK_IMPORTED_MODULE_0__cmd__["b" /* default */].none; });
     var render = props.onRender || __WEBPACK_IMPORTED_MODULE_1__utils__["f" /* noop */];
     // const appMiddlewares = props.middlewares || []
-    var _a = normalizeInit(props.init()), appState = _a[0], cmd = _a[1];
+    var _a = normalizeInit(props.init()), appState = _a.state, cmd = _a.cmd;
     init(appState, appActions, props.actions, []);
     runCmd(cmd, appActions);
     appRender(appState);
@@ -1938,16 +1981,16 @@ function app(props) {
         } }, props, { actions: appActions, render: appRender, patch: function (path, comp, reuseState) {
             if (reuseState === void 0) { reuseState = false; }
             reuseState = reuseState && appState[path];
-            var _a = normalizeInit(comp.init()), state = _a[0], cmd = _a[1];
+            var _a = normalizeInit(comp.init()), state = _a.state, cmd = _a.cmd;
             var actions = appActions[path];
             if (!actions) {
                 actions = appActions[path] = {};
                 init(state, actions, comp.actions, [path]);
             }
             if (!reuseState) {
-                appState = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* setDeep */])([path], state, appState);
+                appState = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* setDeep */])([path], state, appState);
             }
-            appState = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* setDeep */])(['lazyComps', path], comp, appState);
+            appState = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* setDeep */])(['lazyComps', path], comp, appState);
             appRender(appState);
             return reuseState
                 ? Promise.resolve()
@@ -1973,6 +2016,7 @@ function app(props) {
             var subFrom = from[key];
             if (Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* isFn */])(subFrom)) {
                 actions[key] = function () {
+                    var _a;
                     var msgData = [];
                     for (var _i = 0; _i < arguments.length; _i++) {
                         msgData[_i] = arguments[_i];
@@ -1981,7 +2025,7 @@ function app(props) {
                     // action = appMiddlewares.reduce((action, fn) => fn(action, key, path), action)
                     var nextState = state;
                     var nextAppState = appState;
-                    var cmd = __WEBPACK_IMPORTED_MODULE_0__cmd__["a" /* default */].none;
+                    var cmd = __WEBPACK_IMPORTED_MODULE_0__cmd__["b" /* default */].none;
                     var parentState;
                     var parentActions;
                     var actionResult = subFrom.apply(void 0, msgData);
@@ -1992,7 +2036,14 @@ function app(props) {
                     }
                     _a = runAction(actionResult, state, actions, parentState, parentActions), nextState = _a[0], cmd = _a[1];
                     if (props.onUpdate) {
-                        nextAppState = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* setDeep */])(path, Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* merge */])(state, nextState), appState, props.mutable);
+                        if (props.mutable) {
+                            nextAppState = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* setDeepMutable */])(path, state !== nextState
+                                ? Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* set */])(state, nextState)
+                                : state, appState);
+                        }
+                        else {
+                            nextAppState = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* setDeep */])(path, Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* merge */])(state, nextState), appState);
+                        }
                         props.onUpdate({
                             prevAppState: appState,
                             nextAppState: nextAppState,
@@ -2000,15 +2051,22 @@ function app(props) {
                             action: path.join('.') + '.' + key,
                         });
                     }
-                    if (nextState !== state || props.mutable) {
-                        appState =
-                            props.onUpdate
-                                ? nextAppState
-                                : Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* setDeep */])(path, Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* merge */])(state, nextState), appState);
+                    if (props.mutable) {
+                        appState = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* setDeepMutable */])(path, state !== nextState
+                            ? Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* set */])(state, nextState)
+                            : state, appState);
+                        appRender(appState);
+                    }
+                    else if (nextState !== state) {
+                        if (props.onUpdate) {
+                            appState = nextAppState;
+                        }
+                        else {
+                            appState = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* setDeep */])(path, Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* merge */])(state, nextState), appState);
+                        }
                         appRender(appState);
                     }
                     return runCmd(cmd, actions);
-                    var _a;
                 };
             }
             else if (typeof subFrom === 'object' && subFrom) {
@@ -2032,10 +2090,11 @@ function app(props) {
 /* WEBPACK VAR INJECTION */(function(process) {/* unused harmony export isPojo */
 /* unused harmony export isDev */
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return debug; });
-/* unused harmony export set */
+/* harmony export (immutable) */ __webpack_exports__["g"] = set;
 /* harmony export (immutable) */ __webpack_exports__["e"] = merge;
 /* harmony export (immutable) */ __webpack_exports__["a"] = clone;
-/* harmony export (immutable) */ __webpack_exports__["g"] = setDeep;
+/* harmony export (immutable) */ __webpack_exports__["h"] = setDeep;
+/* harmony export (immutable) */ __webpack_exports__["i"] = setDeepMutable;
 /* harmony export (immutable) */ __webpack_exports__["c"] = get;
 /* harmony export (immutable) */ __webpack_exports__["d"] = isFn;
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return noop; });
@@ -2051,8 +2110,7 @@ var debug = function (key) {
 };
 function set(to, from) {
     var keys = Object.keys(from);
-    var i = keys.length;
-    while (i--) {
+    for (var i = 0; i < keys.length; i++) {
         var key = keys[i];
         to[key] = from[key];
     }
@@ -2064,20 +2122,32 @@ function merge(to, from) {
 function clone(from) {
     return set(isPojo(from) ? {} : new from.constructor(), from);
 }
-function setDeep(path, value, from, mutable) {
-    if (mutable === void 0) { mutable = false; }
+function setDeep(path, value, from) {
+    if (path.length === 0) {
+        return value;
+    }
     var to = isPojo(from)
-        ? mutable
-            ? from
-            : {}
-        : new from.constructor();
-    return 0 === path.length
-        ? value
-        : ((to[path[0]] =
-            1 < path.length
-                ? setDeep(path.slice(1), value, from[path[0]], mutable)
-                : value),
-            (mutable ? set : merge)(from, to));
+        ? {} : new from.constructor();
+    var toCursor = to;
+    var fromCursor = from;
+    var lastIdx = path.length - 1;
+    set(toCursor, fromCursor);
+    for (var i = 0; i < lastIdx; i++) {
+        var key = path[i];
+        toCursor = toCursor[key];
+        fromCursor = fromCursor[key];
+        set(toCursor, fromCursor);
+    }
+    toCursor[path[lastIdx]] = value;
+    return to;
+}
+function setDeepMutable(path, value, from) {
+    var cursor = from;
+    for (var i = 0; i < path.length - 1; i++) {
+        cursor = cursor[path[i]];
+    }
+    cursor[path[path.length - 1]] = value;
+    return from;
 }
 function get(path, from, len) {
     if (len === void 0) { len = path.length; }

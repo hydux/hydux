@@ -4,7 +4,7 @@ import withUltradom, { h, React } from '../../../src/enhancers/ultradom-render'
 import { ActionsType } from '../../../src/types'
 import './polyfill.js'
 import Intro from './intro'
-import Counter, { State as CounterState, Actions as CounterActions } from './counter'
+import * as Counter from './counter'
 
 // let app = withPersist<State, Actions>({
 //   key: 'time-game/v1'
@@ -25,15 +25,24 @@ const actions = {
   counter2: Counter.actions,
   change: (e: MouseEvent) => (state: State) => ({ ...state, value: e.target!['value'] })
 }
-
-const initState = {
-  counter1: Counter.initState(),
-  counter2: Counter.initState(),
-  value: '',
+function init() {
+  const subInit = Hydux.combineInit({
+    counter1: Counter.init(),
+    counter2: Counter.init(),
+  })
+  return {
+    state: {
+      ...subInit.state,
+      value: ''
+    },
+    cmd: Hydux.Cmd.batch(
+      subInit.cmd,
+    )
+  }
 }
 
 type Actions = typeof actions
-type State = typeof initState
+type State = ReturnType<typeof init>['state']
 const view = (state: State, actions: Actions) =>
     <main>
       <h1>Counter1:</h1>
@@ -45,7 +54,7 @@ const view = (state: State, actions: Actions) =>
     </main>
 
 export default app({
-  init: () => [initState, Hydux.Cmd.batch(Counter.initCmd(), Counter.initCmd())],
+  init,
   actions,
   view,
 })

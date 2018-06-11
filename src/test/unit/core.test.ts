@@ -202,7 +202,7 @@ describe('core api', () => {
             parentActions: Actions,
             _, __
           ) => {
-            const [state, cmd] = action(n + 1)
+            const { state, cmd } = action(n + 1)
             assert.equal(state.count, parentState.counter1.count + n + 1, 'call child action work')
             return [
               state,
