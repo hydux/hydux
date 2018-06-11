@@ -13,7 +13,11 @@ export * from './helpers'
 export * from './types'
 export { Cmd, CmdType, Sub, ActionResult, noop, isFn, isPojo }
 
-export type Init<S, A> = () => S | [S, CmdType<A>]
+export type Init<S, A> = () => S | [S, CmdType<A>] | InitObj<S, A>
+export type InitObj<S, A> = {
+  state: S
+  cmd?: CmdType<A>
+}
 // todo: Remove back compatible optional ctx
 export type View<S, A> = ((state: S, actions: A) => any)
 export type Subscribe<S, A> = (state: S) => CmdType<A>
@@ -185,11 +189,28 @@ export interface Context<State, Actions, RenderReturn = any> {
 export type App<State, Actions> = (props: AppProps<State, Actions>) => Context<State, Actions, any>
 export type Enhancer<S, A> = (app: App<S, A>) => App<S, A>
 
-export function normalizeInit<S, A>(initResult: S | [S, CmdType<A>]): [S, CmdType<A>] {
+function isInitObj<S, A>(res: ReturnType<Init<S, A>>): res is InitObj<S, A> {
+  const keys = Object.keys(res).join('|')
+  return keys === 'state' || keys === 'state|cmd'
+}
+
+export function normalizeInit<S, A>(initResult: ReturnType<Init<S, A>>): Required<InitObj<S, A>> {
   if (initResult instanceof Array) {
-    return initResult
+    return {
+      state: initResult[0],
+      cmd: initResult[1]
+    }
   }
-  return [initResult, Cmd.none]
+  if (isInitObj(initResult)) {
+    return {
+      state: initResult.state,
+      cmd: initResult.cmd || Cmd.none,
+    }
+  }
+  return {
+    state: initResult as S,
+    cmd: Cmd.none
+  }
 }
 
 export function runCmd<A>(cmd: CmdType<A>, actions: A) {
@@ -202,7 +223,7 @@ export function app<State, Actions>(props: AppProps<State, Actions>): Context<St
   const appSubscribe = props.subscribe || (_ => Cmd.none)
   const render = props.onRender || noop
   // const appMiddlewares = props.middlewares || []
-  let [appState, cmd] = normalizeInit(props.init())
+  let { state: appState, cmd } = normalizeInit(props.init())
   init(appState, appActions, props.actions, [])
   runCmd(cmd, appActions)
   appRender(appState)
@@ -219,7 +240,7 @@ export function app<State, Actions>(props: AppProps<State, Actions>): Context<St
     render: appRender,
     patch<S, A>(path: string, comp: Component<S, A>, reuseState = false): Promise<any> {
       reuseState = reuseState && appState[path]
-      let [state, cmd] = normalizeInit(comp.init())
+      let { state, cmd } = normalizeInit(comp.init())
       let actions = appActions[path]
       if (!actions) {
         actions = appActions[path] = {}

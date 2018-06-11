@@ -1,5 +1,5 @@
 import * as Cmd from '../cmd'
-import { ActionCmdResult } from '../index'
+import { ActionCmdResult, Init, InitObj, normalizeInit } from '../index'
 
 export type Dt<T extends string, D = null> = {
   tag: T,
@@ -104,4 +104,15 @@ export function compose<R>(...fns: Function[]): Fn1<any, R> {
       (arg, fn) => fn(arg),
       arg,
     )
+}
+
+export function initAll<S, A>(arg: { [k in keyof S]: InitObj<any, any> }): Required<InitObj<S, A>> {
+  let state = {} as S
+  let cmd = Cmd.none
+  for (const key in arg) {
+    let init = normalizeInit<any, any>(arg[key])
+    state[key] = init.state
+    cmd = Cmd.batch(cmd, Cmd.map(_ => _[key], init.cmd))
+  }
+  return { state, cmd }
 }
