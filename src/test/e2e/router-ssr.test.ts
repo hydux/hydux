@@ -31,7 +31,7 @@ describe('ssr + code-splitting test', function () {
       Utils.runServer('router-ssr', 8081),
       startBe(),
     ])
-    await Utils.sleep(1000)
+    await Utils.sleep(2000)
   })
   after(async () => {
     console.log('start close browser')

@@ -61,7 +61,7 @@
 /******/ 	
 /******/ 	
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "8b8f222edc2e5b8b9d72"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "ac78a67e8054d35a9d62"; // eslint-disable-line no-unused-vars
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule; // eslint-disable-line no-unused-vars
@@ -5488,12 +5488,13 @@ function runAction(result, state, actions, parentState, parentActions, appContex
     // action can be a function that return a promise or undefined(callback)
     if (rst === undefined ||
         (rst.then && Object(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* isFn */])(rst.then))) {
-        return [state, __WEBPACK_IMPORTED_MODULE_0__cmd__["b" /* default */].none];
+        return { state: state, cmd: __WEBPACK_IMPORTED_MODULE_0__cmd__["b" /* default */].none };
     }
-    if (rst instanceof Array) {
-        return [rst[0] || state, rst[1] || __WEBPACK_IMPORTED_MODULE_0__cmd__["b" /* default */].none];
-    }
-    return [rst, __WEBPACK_IMPORTED_MODULE_0__cmd__["b" /* default */].none];
+    rst = normalizeInit(rst);
+    return {
+        state: rst.state || state,
+        cmd: rst.cmd,
+    };
 }
 /**
  * Wrap a child action with parentState, parentActions.
@@ -5531,7 +5532,7 @@ function normalizeInit(initResult) {
     if (initResult instanceof Array) {
         ret = {
             state: initResult[0],
-            cmd: initResult[1]
+            cmd: initResult[1] || __WEBPACK_IMPORTED_MODULE_0__cmd__["b" /* default */].none
         };
     }
     else if (isInitObj(initResult)) {
@@ -5613,9 +5614,7 @@ function app(props) {
                     }
                     state = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* get */])(path, appState);
                     // action = appMiddlewares.reduce((action, fn) => fn(action, key, path), action)
-                    var nextState = state;
                     var nextAppState = appState;
-                    var cmd = __WEBPACK_IMPORTED_MODULE_0__cmd__["b" /* default */].none;
                     var parentState;
                     var parentActions;
                     var actionResult = subFrom.apply(void 0, msgData);
@@ -5624,7 +5623,7 @@ function app(props) {
                         parentActions = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* get */])(path, appActions, pLen);
                         parentState = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* get */])(path, appState, pLen);
                     }
-                    _a = runAction(actionResult, state, actions, parentState, parentActions), nextState = _a[0], cmd = _a[1];
+                    var _a = runAction(actionResult, state, actions, parentState, parentActions), nextState = _a.state, cmd = _a.cmd;
                     if (props.onUpdate) {
                         if (props.mutable) {
                             nextAppState = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* setDeepMutable */])(path, state !== nextState
@@ -5657,7 +5656,6 @@ function app(props) {
                         appRender(appState);
                     }
                     return runCmd(cmd, actions);
-                    var _a;
                 };
             }
             else if (typeof subFrom === 'object' && subFrom) {
@@ -8242,7 +8240,7 @@ var init = function () {
         state: {
             count: 0
         },
-        cmd: Cmd.ofSub(function (_) { return _.upN(1); })
+        cmd: Cmd.none
     };
 };
 var actions = {

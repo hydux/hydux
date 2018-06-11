@@ -496,10 +496,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 
-var initState = { count: 0 };
+var Cmd = __WEBPACK_IMPORTED_MODULE_1__src_index__["a" /* Cmd */];
 var init = function () { return ({
-    state: initState,
-    cmd: __WEBPACK_IMPORTED_MODULE_1__src_index__["a" /* Cmd */].ofSub(function (_) {
+    state: { count: 0 },
+    cmd: Cmd.ofSub(function (_) {
         return __WEBPACK_IMPORTED_MODULE_2__utils__["a" /* fetch */]("/api/initcount")
             .then(function (res) { return res.json(); })
             .then(function (data) { return _.setCount(data.count); });
@@ -510,14 +510,14 @@ var actions = {
     down: function () { return function (state) { return ({ count: state.count - 1 }); }; },
     up: function () { return function (state) { return ({ count: state.count + 1 }); }; },
     upN: function (n) { return function (state) { return ({ count: state.count + n }); }; },
-    upLater: (function () { return function (state, actions) {
+    upLater: function () { return function (state, actions) {
         return [state,
-            __WEBPACK_IMPORTED_MODULE_1__src_index__["a" /* Cmd */].ofPromise(function (n) {
+            Cmd.ofPromise(function (n) {
                 return new Promise(function (resolve) {
                     return setTimeout(function () { return resolve(n); }, 1000);
                 });
             }, 10, actions.upN)];
-    }; })
+    }; }
 };
 var view = function (state, actions) { return (__WEBPACK_IMPORTED_MODULE_0_hydux_react__["React"].createElement("div", null,
     __WEBPACK_IMPORTED_MODULE_0_hydux_react__["React"].createElement("h1", { className: "count" }, state.count),

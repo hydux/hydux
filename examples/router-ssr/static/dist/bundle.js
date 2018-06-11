@@ -85,7 +85,7 @@
 /******/ 	
 /******/ 	
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "5fae0139746b155aaca0"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "442e04923b65e99e97f4"; // eslint-disable-line no-unused-vars
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule; // eslint-disable-line no-unused-vars
@@ -1415,7 +1415,7 @@ function withRouter(props) {
                         }
                         return ctx.patch.apply(ctx, args);
                     };
-                    var _a = Object(__WEBPACK_IMPORTED_MODULE_0__index__["e" /* runAction */])(routesMap[loc.template](loc, patch), state, actions), nextState = _a[0], cmd = _a[1];
+                    var _a = Object(__WEBPACK_IMPORTED_MODULE_0__index__["e" /* runAction */])(routesMap[loc.template](loc, patch), state, actions), nextState = _a.state, cmd = _a.cmd;
                     return [__assign({}, nextState, { location: loc }), cmd];
                 }
                 else {
@@ -1675,12 +1675,13 @@ function runAction(result, state, actions, parentState, parentActions, appContex
     // action can be a function that return a promise or undefined(callback)
     if (rst === undefined ||
         (rst.then && Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* isFn */])(rst.then))) {
-        return [state, __WEBPACK_IMPORTED_MODULE_0__cmd__["b" /* default */].none];
+        return { state: state, cmd: __WEBPACK_IMPORTED_MODULE_0__cmd__["b" /* default */].none };
     }
-    if (rst instanceof Array) {
-        return [rst[0] || state, rst[1] || __WEBPACK_IMPORTED_MODULE_0__cmd__["b" /* default */].none];
-    }
-    return [rst, __WEBPACK_IMPORTED_MODULE_0__cmd__["b" /* default */].none];
+    rst = normalizeInit(rst);
+    return {
+        state: rst.state || state,
+        cmd: rst.cmd,
+    };
 }
 /**
  * Wrap a child action with parentState, parentActions.
@@ -1718,7 +1719,7 @@ function normalizeInit(initResult) {
     if (initResult instanceof Array) {
         ret = {
             state: initResult[0],
-            cmd: initResult[1]
+            cmd: initResult[1] || __WEBPACK_IMPORTED_MODULE_0__cmd__["b" /* default */].none
         };
     }
     else if (isInitObj(initResult)) {
@@ -1794,16 +1795,13 @@ function app(props) {
             var subFrom = from[key];
             if (Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* isFn */])(subFrom)) {
                 actions[key] = function () {
-                    var _a;
                     var msgData = [];
                     for (var _i = 0; _i < arguments.length; _i++) {
                         msgData[_i] = arguments[_i];
                     }
                     state = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* get */])(path, appState);
                     // action = appMiddlewares.reduce((action, fn) => fn(action, key, path), action)
-                    var nextState = state;
                     var nextAppState = appState;
-                    var cmd = __WEBPACK_IMPORTED_MODULE_0__cmd__["b" /* default */].none;
                     var parentState;
                     var parentActions;
                     var actionResult = subFrom.apply(void 0, msgData);
@@ -1812,7 +1810,7 @@ function app(props) {
                         parentActions = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* get */])(path, appActions, pLen);
                         parentState = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* get */])(path, appState, pLen);
                     }
-                    _a = runAction(actionResult, state, actions, parentState, parentActions), nextState = _a[0], cmd = _a[1];
+                    var _a = runAction(actionResult, state, actions, parentState, parentActions), nextState = _a.state, cmd = _a.cmd;
                     if (props.onUpdate) {
                         if (props.mutable) {
                             nextAppState = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* setDeepMutable */])(path, state !== nextState

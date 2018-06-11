@@ -48,30 +48,38 @@ export const launchBrowser = async () => {
 }
 
 export const text = async (e: puppeteer.ElementHandle, trim = true) => {
-  await sleep(20)
+  await sleep(100)
   return e.getProperty('innerText')
     .then(e => e.jsonValue())
     .then(e => trim ? e.trim() : e)
 }
-
 export const counterSuit = async (page: puppeteer.Page, n = 0, init = 0) => {
+  const _text = async (e: puppeteer.ElementHandle | string, trim = true) => {
+    await sleep(100)
+    if (typeof e === 'string') {
+      e = (await page.$$(e))[n]
+    }
+    return text(e, trim)
+  }
 
   await page.waitFor('.count')
   const c1 = (await page.$$('.count'))[n]
   const c1Up = (await page.$$('.up'))[n]
   const c1Down = (await page.$$('.down'))[n]
   const c1UpLater = (await page.$$('.upLater'))[n]
-  assert.equal(await text(c1), `${init}`, `count${n}`)
+  console.log('text 1')
+  assert.equal(await _text('.count'), `${init}`, `count${n}`)
   await c1Up.click()
-  assert.equal(await text(c1), `${init + 1}`, `count${n} up`)
+  console.log('text 2')
+  assert.equal(await _text(c1), `${init + 1}`, `count${n} up`)
   await c1Down.click()
-  assert.equal(await text(c1), `${init}`, `count${n} down`)
+  assert.equal(await _text(c1), `${init}`, `count${n} down`)
   await c1UpLater.click()
-  assert.equal(await text(c1), `${init}`, `count${n} upLater before`)
+  assert.equal(await _text(c1), `${init}`, `count${n} upLater before`)
   await sleep(1100)
-  assert.equal(await text(c1), `${init + 10}`, `count${n} upLater`)
+  assert.equal(await _text(c1), `${init + 10}`, `count${n} upLater`)
   await c1Up.click()
   await c1Up.click()
   await c1Up.click()
-  assert.equal(await text(c1), `${init + 13}`, `count${n} upLater`)
+  assert.equal(await _text(c1), `${init + 13}`, `count${n} upLater`)
 }
