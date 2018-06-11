@@ -1,18 +1,15 @@
 
-import { AppProps, App, Cmd } from './../index'
+import { AppProps, App, Cmd, normalizeInit } from './../index'
 
 let globalState
 export default function withHmr<State, Actions>(): (app: App<State, Actions>) => App<State, Actions> {
   return (app: App<State, Actions>) => (props: AppProps<State, Actions>) => app({
     ...props,
     init() {
-      let result = props.init()
-      if (!(result instanceof Array)) {
-        result = [result, Cmd.none]
-      }
+      let result = normalizeInit(props.init())
       return [
-        globalState || result[0],
-        result[1],
+        globalState || result.state,
+        result.cmd,
       ]
     },
     onUpdate(data) {

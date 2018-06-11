@@ -1,16 +1,14 @@
 import * as tslib_1 from "tslib";
+import { normalizeInit } from './../index';
 import Cmd from './../cmd';
 export default function withSSR(options) {
     var _this = this;
     return function (app) { return function (props) {
         var initCmd = Cmd.none;
         var ctx = app(tslib_1.__assign({}, props, { init: function () {
-                var result = props.init();
-                if (!(result instanceof Array)) {
-                    result = [result, Cmd.none];
-                }
-                initCmd = result[1];
-                return [result[0], Cmd.none];
+                var result = normalizeInit(props.init());
+                initCmd = result.cmd;
+                return [result.state, Cmd.none];
             },
             onRender: function () {
                 // ignore

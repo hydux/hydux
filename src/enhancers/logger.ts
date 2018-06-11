@@ -1,4 +1,4 @@
-import { AppProps, App } from './../index'
+import { AppProps, App, normalizeInit } from './../index'
 import { get } from '../utils'
 function defaultLogger (level: Required<Options>['level'], prevState, action, nextState, extra) {
   (console.group as any)('%c action', 'color: gray; font-weight: lighter;', action.name)
@@ -35,15 +35,11 @@ export default function withLogger<State, Actions>(options: Options<State> = {})
     return app({
       ...props,
       init: () => {
-        const result = props.init()
-        let state = result
-        if (result instanceof Array) {
-          state = result[0]
-        }
+        const result = normalizeInit(props.init())
         if (windowInspectKey) {
           scope[windowInspectKey] = {
             prevAppState: void 0,
-            nextAppState: state,
+            nextAppState: result.state,
             action: '@@hydux/INIT',
             msgData: void 0,
           }

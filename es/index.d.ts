@@ -4,7 +4,11 @@ import { isFn, noop, isPojo } from './utils';
 export * from './helpers';
 export * from './types';
 export { Cmd, CmdType, Sub, ActionResult, noop, isFn, isPojo };
-export declare type Init<S, A> = () => S | [S, CmdType<A>];
+export declare type Init<S, A> = () => S | [S, CmdType<A>] | InitObj<S, A>;
+export declare type InitObj<S, A> = {
+    state: S;
+    cmd?: CmdType<A>;
+};
 export declare type View<S, A> = ((state: S, actions: A) => any);
 export declare type Subscribe<S, A> = (state: S) => CmdType<A>;
 export declare type OnUpdate<S, A> = <M>(data: {
@@ -67,7 +71,7 @@ export interface Context<State, Actions, RenderReturn = any> {
 }
 export declare type App<State, Actions> = (props: AppProps<State, Actions>) => Context<State, Actions, any>;
 export declare type Enhancer<S, A> = (app: App<S, A>) => App<S, A>;
-export declare function normalizeInit<S, A>(initResult: S | [S, CmdType<A>]): [S, CmdType<A>];
+export declare function normalizeInit<S, A>(initResult: ReturnType<Init<S, A>>): Required<InitObj<S, A>>;
 export declare function runCmd<A>(cmd: CmdType<A>, actions: A): any[];
 export declare function app<State, Actions>(props: AppProps<State, Actions>): Context<State, Actions>;
 export default app;

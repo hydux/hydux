@@ -1,4 +1,4 @@
-import { AppProps, App } from '../index'
+import { AppProps, App, normalizeInit } from '../index'
 import Cmd from '../cmd'
 import { get } from '../utils'
 export type Options = {
@@ -21,19 +21,16 @@ export default function withPersist<State, Actions>(props: Options = {}): (app: 
     return app({
       ...props,
       init: () => {
-        let result = props.init()
-        if (!(result instanceof Array)) {
-          result = [result, Cmd.none]
-        }
+        let result = normalizeInit(props.init())
         try {
           const persistState = store.getItem(key)
           if (persistState) {
-            result[0] = deserialize(persistState)
+            result.state = deserialize(persistState)
           }
         } catch (error) {
           console.error(error)
         }
-        return [result[0], result[1]]
+        return result
       },
       onUpdate: (data) => {
         props.onUpdate && props.onUpdate(data)

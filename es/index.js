@@ -53,11 +53,27 @@ export function withParents(action, wrapper, parentState, parentActions) {
  * @deprecated Deprecated for `withParents`
  */
 export var wrapActions = withParents;
+function isInitObj(res) {
+    var keys = Object.keys(res).join('|');
+    return keys === 'state' || keys === 'state|cmd';
+}
 export function normalizeInit(initResult) {
     if (initResult instanceof Array) {
-        return initResult;
+        return {
+            state: initResult[0],
+            cmd: initResult[1]
+        };
     }
-    return [initResult, Cmd.none];
+    if (isInitObj(initResult)) {
+        return {
+            state: initResult.state,
+            cmd: initResult.cmd || Cmd.none,
+        };
+    }
+    return {
+        state: initResult,
+        cmd: Cmd.none
+    };
 }
 export function runCmd(cmd, actions) {
     return cmd.map(function (sub) { return sub(actions); });
@@ -68,7 +84,7 @@ export function app(props) {
     var appSubscribe = props.subscribe || (function (_) { return Cmd.none; });
     var render = props.onRender || noop;
     // const appMiddlewares = props.middlewares || []
-    var _a = normalizeInit(props.init()), appState = _a[0], cmd = _a[1];
+    var _a = normalizeInit(props.init()), appState = _a.state, cmd = _a.cmd;
     init(appState, appActions, props.actions, []);
     runCmd(cmd, appActions);
     appRender(appState);
@@ -81,7 +97,7 @@ export function app(props) {
         } }, props, { actions: appActions, render: appRender, patch: function (path, comp, reuseState) {
             if (reuseState === void 0) { reuseState = false; }
             reuseState = reuseState && appState[path];
-            var _a = normalizeInit(comp.init()), state = _a[0], cmd = _a[1];
+            var _a = normalizeInit(comp.init()), state = _a.state, cmd = _a.cmd;
             var actions = appActions[path];
             if (!actions) {
                 actions = appActions[path] = {};
@@ -136,9 +152,6 @@ export function app(props) {
                     _a = runAction(actionResult, state, actions, parentState, parentActions), nextState = _a[0], cmd = _a[1];
                     if (props.onUpdate) {
                         if (props.mutable) {
-                            if (state !== nextState) {
-                                set(state, nextState);
-                            }
                             nextAppState = setDeepMutable(path, state !== nextState
                                 ? set(state, nextState)
                                 : state, appState);

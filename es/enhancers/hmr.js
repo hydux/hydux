@@ -1,15 +1,12 @@
 import * as tslib_1 from "tslib";
-import { Cmd } from './../index';
+import { normalizeInit } from './../index';
 var globalState;
 export default function withHmr() {
     return function (app) { return function (props) { return app(tslib_1.__assign({}, props, { init: function () {
-            var result = props.init();
-            if (!(result instanceof Array)) {
-                result = [result, Cmd.none];
-            }
+            var result = normalizeInit(props.init());
             return [
-                globalState || result[0],
-                result[1],
+                globalState || result.state,
+                result.cmd,
             ];
         },
         onUpdate: function (data) {

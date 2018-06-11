@@ -14,7 +14,11 @@ export * from './helpers';
 export * from './types';
 export type { CmdType, Sub, ActionResult };
 export { Cmd, noop, isFn, isPojo };
-export type Init<S, A> = () => S | [S, CmdType<A>]
+export type InitObj<S, A> = {
+  state: S,
+  cmd?: A
+}
+export type Init<S, A> = () => S | [S, CmdType<A>] | InitObj<S, A>
 export type View = (...args: any[]) => any;
 export type Subscribe<S, A> = (state: S) => CmdType<A>;
 export type OnUpdate<S, A> = <M>(data: {

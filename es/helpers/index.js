@@ -1,4 +1,5 @@
 import * as Cmd from '../cmd';
+import { normalizeInit } from '../index';
 /**
  * ADT Helper for TS
  * e.g.
@@ -38,5 +39,18 @@ export function compose() {
     return function (arg) {
         return fns.reduce(function (arg, fn) { return fn(arg); }, arg);
     };
+}
+export function initAll(arg) {
+    var state = {};
+    var cmd = Cmd.none;
+    var _loop_1 = function (key) {
+        var init = normalizeInit(arg[key]);
+        state[key] = init.state;
+        cmd = Cmd.batch(cmd, Cmd.map(function (_) { return _[key]; }, init.cmd));
+    };
+    for (var key in arg) {
+        _loop_1(key);
+    }
+    return { state: state, cmd: cmd };
 }
 //# sourceMappingURL=index.js.map

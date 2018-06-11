@@ -1,6 +1,7 @@
 import * as tslib_1 from "tslib";
 import { connectViaExtension, extractState } from 'remotedev';
 import Cmd from '../cmd';
+import { normalizeInit } from './../index';
 export default function withDevtools(_options) {
     if (_options === void 0) { _options = {}; }
     var options = tslib_1.__assign({ remote: false, hostname: 'remotedev.io', port: 443, secure: true, getActionType: function (f) { return f; }, debounce: 10, filter: function (_) { return true; }, jsonToState: function (f) { return f; }, stateToJson: function (f) { return f; } }, _options);
@@ -9,9 +10,8 @@ export default function withDevtools(_options) {
     var timer;
     return function (app) { return function (props) {
         var ctx = app(tslib_1.__assign({}, props, { init: function () {
-                var result = props.init();
-                var state = (result instanceof Array) ? result[0] : result;
-                connection.init(stateToJson(state));
+                var result = normalizeInit(props.init());
+                connection.init(stateToJson(result.state));
                 return result;
             }, onUpdate: function (data) {
                 props.onUpdate && props.onUpdate(data);

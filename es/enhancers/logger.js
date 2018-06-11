@@ -1,10 +1,11 @@
 import * as tslib_1 from "tslib";
+import { normalizeInit } from './../index';
 import { get } from '../utils';
-function defaultLogger(prevState, action, nextState, extra) {
+function defaultLogger(level, prevState, action, nextState, extra) {
     console.group('%c action', 'color: gray; font-weight: lighter;', action.name);
-    console.log('%c prev state', 'color: #9E9E9E; font-weight: bold;', prevState);
-    console.log.apply(console, ['%c data', 'color: #03A9F4; font-weight: bold;'].concat(action.data, extra));
-    console.log('%c next state', 'color: #4CAF50; font-weight: bold;', nextState);
+    console[level]('%c prev state', 'color: #9E9E9E; font-weight: bold;', prevState);
+    console[level].apply(console, ['%c data', 'color: #03A9F4; font-weight: bold;'].concat(action.data, extra));
+    console[level]('%c next state', 'color: #4CAF50; font-weight: bold;', nextState);
     console.groupEnd();
 }
 export default function withLogger(options) {
@@ -19,15 +20,11 @@ export default function withLogger(options) {
     var now = function () { return (scope['performance'] || Date).now(); };
     return function (app) { return function (props) {
         return app(tslib_1.__assign({}, props, { init: function () {
-                var result = props.init();
-                var state = result;
-                if (result instanceof Array) {
-                    state = result[0];
-                }
+                var result = normalizeInit(props.init());
                 if (windowInspectKey) {
                     scope[windowInspectKey] = {
                         prevAppState: void 0,
-                        nextAppState: state,
+                        nextAppState: result.state,
                         action: '@@hydux/INIT',
                         msgData: void 0,
                     };
@@ -41,7 +38,7 @@ export default function withLogger(options) {
                 var prevState = get(path, data.prevAppState);
                 var nextState = get(path, data.nextAppState);
                 if (filter(data.action)) {
-                    logger(prevState, { name: data.action, data: data.msgData }, nextState, logActionTime ? ['time', (now() - timeMap[data.action]) + 'ms'] : []);
+                    logger(options.level || 'log', prevState, { name: data.action, data: data.msgData }, nextState, logActionTime ? ['time', (now() - timeMap[data.action]) + 'ms'] : []);
                 }
                 if (windowInspectKey) {
                     scope[windowInspectKey] = data;
