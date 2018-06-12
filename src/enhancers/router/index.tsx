@@ -231,7 +231,7 @@ export default function withRouter<State, Actions>(props: Options<State, Actions
           )
         )
         let state = { ...result.state as any, location: loc, lazyComps: {} } as RouterState<State>
-        return [state, cmd]
+        return { state, cmd }
       },
       subscribe: state => Cmd.batch(
         Cmd.ofSub<RouterActions<Actions>>(actions => {

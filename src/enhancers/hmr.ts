@@ -7,10 +7,8 @@ export default function withHmr<State, Actions>(): (app: App<State, Actions>) =>
     ...props,
     init() {
       let result = normalizeInit(props.init())
-      return [
-        globalState || result.state,
-        result.cmd,
-      ]
+      result.state = globalState || result.state
+      return result
     },
     onUpdate(data) {
       props.onUpdate && props.onUpdate(data)

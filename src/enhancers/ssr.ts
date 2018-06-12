@@ -16,7 +16,8 @@ export default function withSSR<State, Actions>(
       init() {
         let result = normalizeInit(props.init())
         initCmd = result.cmd
-        return [result.state, Cmd.none]
+        result.cmd = Cmd.none
+        return result
       },
       onRender() {
         // ignore
