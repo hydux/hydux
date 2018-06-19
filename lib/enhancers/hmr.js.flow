@@ -1,3 +1,0 @@
-// @flow
-import { type App } from './../index';
-declare export default function withHmr<State, Actions>(): (app: App<State, Actions>) => App<State, Actions>;

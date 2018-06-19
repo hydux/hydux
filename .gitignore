@@ -57,6 +57,6 @@ typings/
 # dotenv environment variables file
 .env
 
-./lib
-./es
-./dist
+/lib/
+/es/
+/dist/
