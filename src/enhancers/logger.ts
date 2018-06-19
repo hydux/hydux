@@ -1,4 +1,4 @@
-import { AppProps, App, normalizeInit } from './../index'
+import { AppProps, App, normalize } from './../index'
 import { get } from '../utils'
 function defaultLogger (level: Required<Options>['level'], prevState, action, nextState, extra) {
   (console.group as any)('%c action', 'color: gray; font-weight: lighter;', action.name)
@@ -35,7 +35,7 @@ export default function withLogger<State, Actions>(options: Options<State> = {})
     return app({
       ...props,
       init: () => {
-        const result = normalizeInit(props.init())
+        const result = normalize(props.init())
         if (windowInspectKey) {
           scope[windowInspectKey] = {
             prevAppState: void 0,
@@ -49,8 +49,8 @@ export default function withLogger<State, Actions>(options: Options<State> = {})
       onUpdateStart: (data) => {
         timeMap[data.action] = now()
       },
-      onUpdate: (data) => {
-        props.onUpdate && props.onUpdate(data)
+      onUpdated: (data) => {
+        props.onUpdated && props.onUpdated(data)
         const path = data.action.split('.').slice(0, -1)
         const prevState = get(path, data.prevAppState)
         const nextState = get(path, data.nextAppState)

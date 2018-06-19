@@ -1,24 +1,23 @@
 import {
-  ActionResult,
+  ActionReturn,
   ActionState,
-  ActionCmdResult,
-  ActionObjResult,
+  ActionCmdReturn,
+  ActionObjReturen,
+  InitObjReturn,
+  StandardActionReturn,
   ActionType,
   ActionsType,
+  InitReturn,
   UnknownArgsActionType,
-  NormalActionResult,
-} from './types'
-import Cmd, { CmdType, Sub } from './cmd'
-import { set, merge, setDeep, setDeepMutable, get, isFn, noop, isPojo, clone } from './utils'
-export * from './helpers'
-export * from './types'
-export { Cmd, CmdType, Sub, ActionResult, noop, isFn, isPojo }
+} from 'types'
+import Cmd, { CmdType, Sub } from 'cmd'
+import { set, merge, setDeep, setDeepMutable, get, isFn, noop, isPojo, clone } from 'utils'
+import { runAction } from 'helpers'
+export * from 'helpers'
+export * from 'types'
+export { Cmd, CmdType, Sub, ActionReturn, noop, isFn, isPojo }
 
-export type Init<S, A> = () => S | [S, CmdType<A>] | InitObj<S, A>
-export type InitObj<S, A> = {
-  state: S
-  cmd?: CmdType<A>
-}
+export type Init<S, A> = () => InitReturn<S, A>
 // todo: Remove back compatible optional ctx
 export type View<S, A> = ((state: S, actions: A) => any)
 export type Subscribe<S, A> = (state: S) => CmdType<A>
@@ -35,139 +34,13 @@ export interface AppProps<State, Actions> {
   subscribe?: Subscribe<State, Actions>
   // middlewares: ((action: MyAction<any, State, Actions>, key: string, path: string[]) => MyAction<any, State, Actions>)[],
   onRender?: (view: any) => void
-  onUpdate?: OnUpdate<State, Actions>
+  onUpdated?: OnUpdate<State, Actions>
   onUpdateStart?: OnUpdateStart<State, Actions>
   /**
    * Use mutable state, useful for high performance scenarios like graphics rendering, e.g. hydux-pixi
    */
   mutable?: boolean
 }
-/**
- * run action and return a normalized result ([State, CmdType<>]),
- * this is useful to write High-Order-Action, which take an action and return a wrapped action.
- * @param result result of `action(msg: Data)`
- * @param state
- * @param actions
- */
-export function runAction<S, A, PS, PA>(
-  result: ActionResult<S, A> | ((state: S, actions: A) => ActionResult<S, A>),
-  state: S,
-  actions: A,
-  parentState?: PS,
-  parentActions?: PA,
-  appContext?: Context<any, any>
-): Required<ActionObjResult<S, A>> {
-  let rst: any = result
-  isFn(rst)
-    && (rst = rst(state, actions, parentState, parentActions))
-    && isFn(rst)
-    && (rst = rst(actions))
-  // action can be a function that return a promise or undefined(callback)
-  if (
-    rst === undefined ||
-    (rst.then && isFn(rst.then))
-  ) {
-    return { state, cmd: Cmd.none }
-  }
-  rst = normalizeInit(rst)
-  return {
-    state: rst.state || state,
-    cmd: rst.cmd,
-  }
-}
-
-export function withParents<S, A, PS, PA, A1>(
-  action: (a1: A1) => (s: S, a: A) => any,
-  wrapper?: (
-    action: (a1: A1) => NormalActionResult<S, A>,
-    parentState: PS,
-    parentActions: PA,
-    state: S,
-    actions: A,
-  ) => ActionResult<S, A>,
-  parentState?: PS,
-  parentActions?: PA,
-)
-export function withParents<S, A, PS, PA, A1, A2>(
-  action: (a1: A1, a2: A2) => (s: S, a: A) => any,
-  wrapper?: (
-    action: (a1: A1, a2: A2) => NormalActionResult<S, A>,
-    parentState: PS,
-    parentActions: PA,
-    state: S,
-    actions: A,
-  ) => ActionResult<S, A>,
-  parentState?: PS,
-  parentActions?: PA,
-)
-export function withParents<S, A, PS, PA, A1, A2, A3>(
-  action: (a1: A1, a2: A2, a3: A3) => (s: S, a: A) => any,
-  wrapper?: (
-    action: (a1: A1, a2: A2, a3: A3) => NormalActionResult<S, A>,
-    parentState: PS,
-    parentActions: PA,
-    state: S,
-    actions: A,
-  ) => ActionResult<S, A>,
-  parentState?: PS,
-  parentActions?: PA,
-)
-export function withParents<S, A, PS, PA, A1, A2, A3, A4>(
-  action: (a1: A1, a2: A2, a3: A3, a4: A4) => (s: S, a: A) => any,
-  wrapper?: (
-    action: (a1: A1, a2: A2, a3: A3, a4: A4) => NormalActionResult<S, A>,
-    parentState: PS,
-    parentActions: PA,
-    state: S,
-    actions: A,
-  ) => ActionResult<S, A>,
-  parentState?: PS,
-  parentActions?: PA,
-)
-export function withParents<S, A, PS, PA, A1, A2, A3, A4, A5>(
-  action: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5) => (s: S, a: A) => any,
-  wrapper?: (
-    action: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5) => NormalActionResult<S, A>,
-    parentState: PS,
-    parentActions: PA,
-    state: S,
-    actions: A,
-  ) => ActionResult<S, A>,
-  parentState?: PS,
-  parentActions?: PA,
-)
-/**
- * Wrap a child action with parentState, parentActions.
- * @param action The action to be wrapped
- * @param wrapper
- * @param parentState
- * @param parentActions
- */
-export function withParents<S, A, PS, PA>(
-  action: UnknownArgsActionType<S, A>,
-  wrapper?: (
-    action: (...args) => NormalActionResult<S, A>,
-    parentState: PS,
-    parentActions: PA,
-    state: S,
-    actions: A,
-  ) => ActionResult<S, A>,
-  parentState?: PS,
-  parentActions?: PA,
-): any {
-  if (!wrapper) {
-    return action
-  }
-  const wrapped = (state: S, actions: A, parentState: PS, parentActions: PA) => {
-    const nactions = (...args) => runAction(action(...args), state, actions)
-    return wrapper(nactions, parentState, parentActions, state, actions)
-  }
-  return wrapped
-}
-/**
- * @deprecated Deprecated for `withParents`
- */
-export const wrapActions = withParents
 
 export interface Component<State, Actions> {
   init: Init<State, Actions>
@@ -182,7 +55,7 @@ export interface Context<State, Actions, RenderReturn = any> {
   view: View<State, Actions>
   subscribe?: Subscribe<State, Actions>
   onRender?: ((view: any) => RenderReturn)
-  onUpdate?: OnUpdate<State, Actions>
+  onUpdated?: OnUpdate<State, Actions>
   onUpdateStart?: OnUpdateStart<State, Actions>
   /** Patch a component in runtime, used for code-splitting */
   patch: Patch
@@ -191,26 +64,43 @@ export interface Context<State, Actions, RenderReturn = any> {
 export type App<State, Actions> = (props: AppProps<State, Actions>) => Context<State, Actions, any>
 export type Enhancer<S, A> = (app: App<S, A>) => App<S, A>
 
-function isInitObj<S, A>(res: ReturnType<Init<S, A>>): res is InitObj<S, A> {
+function isObjReturn<S, A>(res: ActionReturn<S, A> | InitReturn<S, A>): res is InitObjReturn<S, A> | ActionObjReturen<S, A> {
+  if (!res) return false
   const keys = Object.keys(res).sort().join('|')
-  return keys === 'state' || keys === 'cmd|state' || keys === '0|1|cmd|state'
+  return ['', 'state', 'cmd', 'cmd|state', '0|1|cmd|state'].indexOf(keys) >= 0
 }
 
-export function normalizeInit<S, A>(initResult: ReturnType<Init<S, A>>): Required<InitObj<S, A>> {
-  let ret = {} as Required<InitObj<S, A>>
+function isCmdType<A>(res: any[]): res is CmdType<A> {
+  return res.length === 0 || isFn(res[0])
+}
+
+export function normalize<S, A>(initResult: ActionReturn<S, A>, state: S): Required<ActionObjReturen<S, A>>
+export function normalize<S, A>(initResult: InitReturn<S, A>): Required<InitObjReturn<S, A>>
+export function normalize<S, A>(initResult: InitReturn<S, A> | ActionReturn<S, A>, state: S = {} as S): Required<ActionObjReturen<S, A> | InitObjReturn<S, A>> {
+  let ret = {} as Required<ActionObjReturen<S, A> | InitObjReturn<S, A>>
+  if (!initResult) {
+    return { state, cmd: Cmd.none }
+  }
   if (initResult instanceof Array) {
-    ret = {
-      state: initResult[0],
-      cmd: initResult[1] || Cmd.none
+    if (isCmdType(initResult)) {
+      ret = {
+        state,
+        cmd: initResult,
+      }
+    } else {
+      ret = {
+        state: initResult[0],
+        cmd: initResult[1] || Cmd.none
+      }
     }
-  } else if (isInitObj(initResult)) {
+  } else if (isObjReturn(initResult)) {
     ret = {
-      state: initResult.state,
+      state: initResult.state || state,
       cmd: initResult.cmd || Cmd.none,
     }
   } else {
     ret = {
-      state: initResult as S,
+      state: initResult,
       cmd: Cmd.none
     }
   }
@@ -229,7 +119,7 @@ export function app<State, Actions>(props: AppProps<State, Actions>): Context<St
   const appSubscribe = props.subscribe || (_ => Cmd.none)
   const render = props.onRender || noop
   // const appMiddlewares = props.middlewares || []
-  let { state: appState, cmd } = normalizeInit(props.init())
+  let { state: appState, cmd } = normalize(props.init())
   init(appState, appActions, props.actions, [])
   runCmd(cmd, appActions)
   appRender(appState)
@@ -246,7 +136,7 @@ export function app<State, Actions>(props: AppProps<State, Actions>): Context<St
     render: appRender,
     patch<S, A>(path: string, comp: Component<S, A>, reuseState = false): Promise<any> {
       reuseState = reuseState && appState[path]
-      let { state, cmd } = normalizeInit(comp.init())
+      let { state, cmd } = normalize(comp.init())
       let actions = appActions[path]
       if (!actions) {
         actions = appActions[path] = {}
@@ -291,9 +181,9 @@ export function app<State, Actions>(props: AppProps<State, Actions>): Context<St
         actions[key] = function(...msgData) {
           state = get(path, appState)
           // action = appMiddlewares.reduce((action, fn) => fn(action, key, path), action)
-          let nextAppState = appState
           let parentState
           let parentActions
+          let prevAppState = appState
           const actionResult = subFrom(...msgData)
           if (isFn(actionResult) && actionResult.length > 2) {
             let pLen = path.length - 1
@@ -307,24 +197,10 @@ export function app<State, Actions>(props: AppProps<State, Actions>): Context<St
             parentState,
             parentActions,
           )
-
-          if (props.onUpdate) {
-            if (props.mutable) {
-              nextAppState = setDeepMutable(
-                path,
-                state !== nextState
-                  ? set(state, nextState)
-                  : state,
-                appState,
-              )
-            } else {
-              nextAppState = setDeep(path, merge(state, nextState), appState)
-            }
-            props.onUpdate({
-              prevAppState: appState,
-              nextAppState,
-              msgData: subFrom.length ? msgData : [],
-              action: path.join('.') + '.' + key,
+          let actionName = path.join('.') + '.' + key
+          if (props.onUpdateStart) {
+            props.onUpdateStart({
+              action: actionName,
             })
           }
           if (props.mutable) {
@@ -337,12 +213,16 @@ export function app<State, Actions>(props: AppProps<State, Actions>): Context<St
             )
             appRender(appState)
           } else if (nextState !== state) {
-            if (props.onUpdate) {
-              appState = nextAppState
-            } else {
-              appState = setDeep(path, merge(state, nextState), appState)
-            }
+            appState = setDeep(path, merge(state, nextState), appState)
             appRender(appState)
+          }
+          if (props.onUpdated) {
+            props.onUpdated({
+              prevAppState,
+              nextAppState: appState,
+              msgData: subFrom.length ? msgData : [],
+              action: actionName,
+            })
           }
           return runCmd(cmd, actions)
         }

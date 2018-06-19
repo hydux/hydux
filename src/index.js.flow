@@ -1,8 +1,8 @@
 // @flow
 import {
-  type ActionResult,
+  type ActionReturn,
   type ActionState,
-  type ActionCmdResult,
+  type ActionCmdReturn,
   type ActionType,
   type ActionsType,
   type UnknownArgsActionType,
@@ -12,7 +12,7 @@ import Cmd, { type CmdType, type Sub } from './cmd';
 import { isFn, noop, isPojo } from './utils';
 export * from './helpers';
 export * from './types';
-export type { CmdType, Sub, ActionResult };
+export type { CmdType, Sub, ActionReturn };
 export { Cmd, noop, isFn, isPojo };
 export type InitObj<S, A> = {
   state: S,
@@ -46,12 +46,12 @@ export interface AppProps<State, Actions> {
  * @param state
  * @param actions
  */
-declare export function runAction<S, A, PS, PA>(result: ActionResult<S, A> | ((state: S, actions: A) => ActionResult<S, A>), state: S, actions: A, parentState?: PS, parentActions?: PA): ActionCmdResult<S, A>;
-declare export function withParents<S, A, PS, PA, A1>(action: (a1: A1) => (s: S, a: A) => any, wrapper?: (action: (a1: A1) => ActionCmdResult<S, A>, parentState: PS, parentActions: PA, state: S, actions: A) => ActionResult<S, A>, parentState?: PS, parentActions?: PA): any;
-declare export function withParents<S, A, PS, PA, A1, A2>(action: (a1: A1, a2: A2) => (s: S, a: A) => any, wrapper?: (action: (a1: A1, a2: A2) => ActionCmdResult<S, A>, parentState: PS, parentActions: PA, state: S, actions: A) => ActionResult<S, A>, parentState?: PS, parentActions?: PA): any;
-declare export function withParents<S, A, PS, PA, A1, A2, A3>(action: (a1: A1, a2: A2, a3: A3) => (s: S, a: A) => any, wrapper?: (action: (a1: A1, a2: A2, a3: A3) => ActionCmdResult<S, A>, parentState: PS, parentActions: PA, state: S, actions: A) => ActionResult<S, A>, parentState?: PS, parentActions?: PA): any;
-declare export function withParents<S, A, PS, PA, A1, A2, A3, A4>(action: (a1: A1, a2: A2, a3: A3, a4: A4) => (s: S, a: A) => any, wrapper?: (action: (a1: A1, a2: A2, a3: A3, a4: A4) => ActionCmdResult<S, A>, parentState: PS, parentActions: PA, state: S, actions: A) => ActionResult<S, A>, parentState?: PS, parentActions?: PA): any;
-declare export function withParents<S, A, PS, PA, A1, A2, A3, A4, A5>(action: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5) => (s: S, a: A) => any, wrapper?: (action: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5) => ActionCmdResult<S, A>, parentState: PS, parentActions: PA, state: S, actions: A) => ActionResult<S, A>, parentState?: PS, parentActions?: PA): any;
+declare export function runAction<S, A, PS, PA>(result: ActionReturn<S, A> | ((state: S, actions: A) => ActionReturn<S, A>), state: S, actions: A, parentState?: PS, parentActions?: PA): ActionCmdReturn<S, A>;
+declare export function withParents<S, A, PS, PA, A1>(action: (a1: A1) => (s: S, a: A) => any, wrapper?: (action: (a1: A1) => ActionCmdReturn<S, A>, parentState: PS, parentActions: PA, state: S, actions: A) => ActionReturn<S, A>, parentState?: PS, parentActions?: PA): any;
+declare export function withParents<S, A, PS, PA, A1, A2>(action: (a1: A1, a2: A2) => (s: S, a: A) => any, wrapper?: (action: (a1: A1, a2: A2) => ActionCmdReturn<S, A>, parentState: PS, parentActions: PA, state: S, actions: A) => ActionReturn<S, A>, parentState?: PS, parentActions?: PA): any;
+declare export function withParents<S, A, PS, PA, A1, A2, A3>(action: (a1: A1, a2: A2, a3: A3) => (s: S, a: A) => any, wrapper?: (action: (a1: A1, a2: A2, a3: A3) => ActionCmdReturn<S, A>, parentState: PS, parentActions: PA, state: S, actions: A) => ActionReturn<S, A>, parentState?: PS, parentActions?: PA): any;
+declare export function withParents<S, A, PS, PA, A1, A2, A3, A4>(action: (a1: A1, a2: A2, a3: A3, a4: A4) => (s: S, a: A) => any, wrapper?: (action: (a1: A1, a2: A2, a3: A3, a4: A4) => ActionCmdReturn<S, A>, parentState: PS, parentActions: PA, state: S, actions: A) => ActionReturn<S, A>, parentState?: PS, parentActions?: PA): any;
+declare export function withParents<S, A, PS, PA, A1, A2, A3, A4, A5>(action: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5) => (s: S, a: A) => any, wrapper?: (action: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5) => ActionCmdReturn<S, A>, parentState: PS, parentActions: PA, state: S, actions: A) => ActionReturn<S, A>, parentState?: PS, parentActions?: PA): any;
 
 
 export interface Component<State, Actions> {

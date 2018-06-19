@@ -1,7 +1,7 @@
 import { connectViaExtension, extractState } from 'remotedev'
 import Cmd from '../cmd'
 import { merge, setDeep } from '../utils'
-import { AppProps, App, normalizeInit } from './../index'
+import { AppProps, App, normalize } from './../index'
 export type Options<State> = {
   remote?: boolean,
   hostname?: string,
@@ -36,12 +36,12 @@ export default function withDevtools<State, Actions>(_options: Options<State> = 
     const ctx = app({
       ...props,
       init: () => {
-        const result = normalizeInit(props.init())
+        const result = normalize(props.init())
         connection.init(stateToJson(result.state))
         return result
       },
-      onUpdate: (data) => {
-        props.onUpdate && props.onUpdate(data)
+      onUpdated: (data) => {
+        props.onUpdated && props.onUpdated(data)
         if (!options.filter(data.action)) {
           return
         }

@@ -1,6 +1,7 @@
 import { noop } from './../../utils'
 import * as assert from 'assert'
-import app, { Cmd, withParents } from '../../index'
+import * as Hydux from '../../index'
+const { app, Cmd, withParents } = Hydux
 import logger from '../../enhancers/logger'
 function sleep(ns) {
   return new Promise(resolve => setTimeout(resolve, ns))
@@ -10,7 +11,7 @@ const Counter = {
   init: () => ({ count: 1 }),
   actions: {
     up: () => state => ({ count: state.count + 1 }),
-    upN: (n: number) => (state: CounterState, actions: CounterActions) => ({ count: state.count + n }),
+    upN: (n: number) => (state: State, actions: Actions) => ({ count: state.count + n }),
     down: () => state => ({ count: state.count - 1 }),
     reset: () => ({ count: 1 }),
     up12: () => (state, actions) => actions.upN(12),
@@ -35,12 +36,30 @@ const Counter = {
         void 0,
         actions.up,
       )
-    ])]
+    ])],
+    upObj1: () => (state: State, actions: Actions): Hydux.AR<State, Actions> => {
+      return {
+        state: { count: state.count + 1 }
+      }
+    },
+    upObj2: () => (state: State, actions: Actions): Hydux.AR<State, Actions> => {
+      return {
+        cmd: Cmd.ofSub(_ => setTimeout(() => _.upObj1()))
+      }
+    },
+    upObj3: () => (state: State, actions: Actions): Hydux.AR<State, Actions> => {
+      return Cmd.ofSub(_ => setTimeout(() => _.upObj1()))
+    },
+    upObj4: () => (state: State, actions: Actions): Hydux.AR<State, Actions> => {
+      return {
+        state: { count: state.count + 1 },
+        cmd: Cmd.ofSub(_ => setTimeout(() => _.upObj1()))
+      }
+    },
   }
 }
-let _dummyState = Counter.init()
-type CounterState = typeof _dummyState
-type CounterActions = typeof Counter.actions
+type State = ReturnType<(typeof Counter)['init']>
+type Actions = typeof Counter.actions
 
 describe('core api', () => {
   it('init', () => {
@@ -228,5 +247,43 @@ describe('core api', () => {
     ctx.actions.counter1.upN(1)
     assert.equal(ctx.state.counter1.count, 3, 'counter1 upN work')
     assert.equal(ctx.state.counter2.count, 2, 'counter2 upN work')
+  })
+
+  it('obj cmd/cmd only', async () => {
+    let state
+    let renderResult
+    const _state = {
+      counter1: Counter.init(),
+      counter2: Counter.init(),
+    }
+    const actions = {
+      counter1: Counter.actions,
+      counter2: Counter.actions,
+    }
+    let ctx = app<typeof _state, typeof actions>({
+      init: () => _state,
+      actions,
+      view: state => actions => actions,
+      onRender: view => renderResult = view
+    })
+    assert(ctx.state.counter1.count === 1, 'counter1 init should work')
+
+    ctx.actions.counter1.upObj1()
+    assert(ctx.state.counter1.count === 2, 'counter1 upObj1 should work 1')
+
+    ctx.actions.counter1.upObj2()
+    assert.equal(ctx.state.counter1.count, 2, 'counter1 upObj2 should work')
+    await sleep(10)
+    assert.equal(ctx.state.counter1.count, 3, 'counter1 upObj2 async should wor')
+
+    ctx.actions.counter1.upObj3()
+    assert.equal(ctx.state.counter1.count, 3, 'counter1 upObj3 should work')
+    await sleep(10)
+    assert.equal(ctx.state.counter1.count, 4, 'counter1 upObj3 async should work')
+
+    ctx.actions.counter1.upObj4()
+    assert.equal(ctx.state.counter1.count, 4, 'counter1 upObj4 should work')
+    await sleep(10)
+    assert.equal(ctx.state.counter1.count, 5, 'counter1 upObj4 async should work')
   })
 })

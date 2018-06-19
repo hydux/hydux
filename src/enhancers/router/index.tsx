@@ -2,7 +2,7 @@ import { ActionType, ActionsType, ActionType2 } from './../../types'
 import {
   AppProps, App, Init, View, Subscribe,
   OnUpdate, runAction, Context, Patch,
-  Component, normalizeInit
+  Component, normalize
 } from './../../index'
 import { Dt, dt, never } from '../../helpers'
 import Cmd, { CmdType } from './../../cmd'
@@ -134,7 +134,7 @@ export type Routes<State, Actions> = {
 
 export interface RouterAppProps<State, Actions> extends AppProps<State, Actions> {
   view: View<RouterState<State>, RouterActions<Actions>>
-  onUpdate?: OnUpdate<RouterState<State>, RouterActions<Actions>>,
+  onUpdated?: OnUpdate<RouterState<State>, RouterActions<Actions>>,
 }
 
 export type Options<S, A> = {
@@ -217,7 +217,7 @@ export default function withRouter<State, Actions>(props: Options<State, Actions
     const ctx = app({
       ...props,
       init: () => {
-        let result = normalizeInit(props.init())
+        let result = normalize(props.init())
         let cmd = Cmd.batch(
           result.cmd,
           Cmd.ofSub<RouterActions<Actions>>(

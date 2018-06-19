@@ -1,4 +1,4 @@
-import { AppProps, App, CmdType, Context, normalizeInit } from './../index'
+import { AppProps, App, CmdType, Context, normalize } from './../index'
 import Cmd from './../cmd'
 import { get } from '../utils'
 export type Options = {
@@ -14,7 +14,7 @@ export default function withSSR<State, Actions>(
     const ctx: Context<State, Actions, Promise<string>> = app({
       ...props,
       init() {
-        let result = normalizeInit(props.init())
+        let result = normalize(props.init())
         initCmd = result.cmd
         result.cmd = Cmd.none
         return result

@@ -1,4 +1,4 @@
-import { ActionResult, ActionType, ActionsType } from './types'
+import { ActionReturn, ActionType, ActionsType } from './types'
 import { isFn } from './utils'
 export interface Sub<Actions> {
   (actions: Actions): any

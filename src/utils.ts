@@ -8,7 +8,7 @@ export const debug = (key: string, ...args: any[]) => {
   isDev && console.log(`[hydux-${key}]`, ...args)
 }
 
-export function set(to, from) {
+export function set<S>(to: S, from: Partial<S>): S {
   const keys = Object.keys(from)
   for (let i = 0; i < keys.length; i++) {
     const key = keys[i]
@@ -17,21 +17,21 @@ export function set(to, from) {
   return to
 }
 
-export function merge(to, from) {
-  return set(set(isPojo(to) ? {} : new to.constructor(), to), from)
+export function merge<S>(to: S, from: Partial<S>): S {
+  return set(set(isPojo(to) ? {} : new (to as any).constructor(), to), from)
 }
 
-export function clone(from) {
-  return set(isPojo(from) ? {} : new from.constructor(), from)
+export function clone<S>(from: S): S {
+  return set(isPojo(from) ? {} : new (from as any).constructor(), from)
 }
 
-export function setDeep(path: string[], value, from) {
+export function setDeep<S, V>(path: string[], value: V, from: S): S {
   if (path.length === 0) {
-    return value
+    return value as any as S
   }
   let to =
     isPojo(from)
-      ? {} : new from.constructor()
+      ? {} : new (from as any).constructor()
   let toCursor = to
   let fromCursor = from
   let lastIdx = path.length - 1
@@ -46,7 +46,7 @@ export function setDeep(path: string[], value, from) {
   return to
 }
 
-export function setDeepMutable(path: string[], value, from) {
+export function setDeepMutable<S, V>(path: string[], value: V, from: S): S {
   let cursor = from
   for (let i = 0; i < path.length - 1; i++) {
     cursor = cursor[path[i]]

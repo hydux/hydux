@@ -1,6 +1,16 @@
 import * as Cmd from '../cmd'
-import { ActionCmdResult, Init, InitObj, normalizeInit } from '../index'
-
+import { Init, normalize, Context } from '../index'
+import { set, merge, setDeep, setDeepMutable, get, isFn, noop, isPojo, clone } from 'utils'
+import {
+  ActionReturn,
+  ActionState,
+  ActionCmdReturn,
+  StandardActionReturn,
+  ActionType,
+  ActionsType,
+  InitObjReturn,
+  UnknownArgsActionType,
+} from 'types'
 export type Dt<T extends string, D = null> = {
   tag: T,
   data: D
@@ -34,7 +44,9 @@ export function dt<T extends string, D = null>(tag: T, data: D = null as any) {
 
 export const never = (f: never) => f
 
-export const mkInit = <S, A>(state: S, cmd: Cmd.CmdType<A> = Cmd.none): () => ActionCmdResult<S, A> => () => [state, cmd]
+export function mkInit<S, A>(state: S, cmd: Cmd.CmdType<A> = Cmd.none): ActionCmdReturn<S, A> {
+  return { state, cmd }
+}
 
 export type Fn1<T1, R> = (a1: T1) => R
 
@@ -106,13 +118,183 @@ export function compose<R>(...fns: Function[]): Fn1<any, R> {
     )
 }
 
-export function combineInit<T extends { [k: string]: InitObj<any, any> }, A extends { [k: string]: any }>(arg: T) {
+export function combineInit<T extends { [k: string]: InitObjReturn<any, any> }, A extends { [k: string]: any }>(arg: T) {
   let state = {} as { [k in keyof T]: T[k]['state'] }
   let cmd = Cmd.none as Cmd.CmdType<A>
   for (const key in arg) {
-    let init = normalizeInit<any, any>(arg[key])
+    let init = normalize<any, any>(arg[key])
     state[key] = init.state
     cmd = Cmd.batch(cmd, Cmd.map(_ => _[key], init.cmd))
   }
   return { state, cmd }
+}
+
+/**
+ * run action and return a normalized result ([State, CmdType<>]),
+ * this is useful to write High-Order-Action, which take an action and return a wrapped action.
+ * @param result result of `action(msg: Data)`
+ * @param state
+ * @param actions
+ */
+export function runAction<S, A, PS, PA>(
+  result: ActionReturn<S, A> | ((state: S, actions: A) => ActionReturn<S, A>),
+  state: S,
+  actions: A,
+  parentState?: PS,
+  parentActions?: PA,
+): Required<StandardActionReturn<S, A>> {
+  let res: any = result
+  isFn(res)
+    && (res = res(state, actions, parentState, parentActions))
+    && isFn(res)
+    && (res = res(actions))
+  // action can be a function that return a promise or undefined(callback)
+  if (
+    res === undefined ||
+    (res.then && isFn(res.then))
+  ) {
+    return { state, cmd: Cmd.none }
+  }
+  let ret2 = normalize(res as ActionReturn<S, A>, state)
+  return {
+    state: ret2.state || state,
+    cmd: ret2.cmd,
+  }
+}
+
+export function withParents<S, A, PS, PA, A1>(
+  action: (a1: A1) => (s: S, a: A) => any,
+  wrapper?: (
+    action: (a1: A1) => StandardActionReturn<S, A>,
+    parentState: PS,
+    parentActions: PA,
+    state: S,
+    actions: A,
+  ) => ActionReturn<S, A>,
+)
+export function withParents<S, A, PS, PA, A1, A2>(
+  action: (a1: A1, a2: A2) => (s: S, a: A) => any,
+  wrapper?: (
+    action: (a1: A1, a2: A2) => StandardActionReturn<S, A>,
+    parentState: PS,
+    parentActions: PA,
+    state: S,
+    actions: A,
+  ) => ActionReturn<S, A>,
+)
+export function withParents<S, A, PS, PA, A1, A2, A3>(
+  action: (a1: A1, a2: A2, a3: A3) => (s: S, a: A) => any,
+  wrapper?: (
+    action: (a1: A1, a2: A2, a3: A3) => StandardActionReturn<S, A>,
+    parentState: PS,
+    parentActions: PA,
+    state: S,
+    actions: A,
+  ) => ActionReturn<S, A>,
+)
+export function withParents<S, A, PS, PA, A1, A2, A3, A4>(
+  action: (a1: A1, a2: A2, a3: A3, a4: A4) => (s: S, a: A) => any,
+  wrapper?: (
+    action: (a1: A1, a2: A2, a3: A3, a4: A4) => StandardActionReturn<S, A>,
+    parentState: PS,
+    parentActions: PA,
+    state: S,
+    actions: A,
+  ) => ActionReturn<S, A>,
+)
+export function withParents<S, A, PS, PA, A1, A2, A3, A4, A5>(
+  action: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5) => (s: S, a: A) => any,
+  wrapper?: (
+    action: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5) => StandardActionReturn<S, A>,
+    parentState: PS,
+    parentActions: PA,
+    state: S,
+    actions: A,
+  ) => ActionReturn<S, A>,
+)
+/**
+ * Wrap a child action with parentState, parentActions.
+ * @deprecated Deprecated for `watchActions`
+ * @param action The action to be wrapped
+ * @param wrapper
+ * @param parentState
+ * @param parentActions
+ */
+export function withParents<S, A, PS, PA>(
+  action: UnknownArgsActionType<S, A>,
+  wrapper?: (
+    action: (...args) => StandardActionReturn<S, A>,
+    parentState: PS,
+    parentActions: PA,
+    state: S,
+    actions: A,
+  ) => ActionReturn<S, A>,
+): any {
+  if (!wrapper) {
+    return action
+  }
+  const wrapped = (state: S, actions: A, parentState: PS, parentActions: PA) => {
+    const nactions = (...args) => runAction(action(...args), state, actions)
+    return wrapper(nactions, parentState, parentActions, state, actions)
+  }
+  return wrapped
+}
+/**
+ * @deprecated Deprecated for `withParents`
+ */
+export const wrapActions = withParents
+
+export function injectActions<S, A, PS, PA, A1>(
+  parentActions: PA,
+  getter: (_: PA) => (a1: A1) => (s: S, a: A) => any,
+  wrapper?: (
+    action: (a1: A1) => StandardActionReturn<S, A>,
+    parentState: PS,
+    parentActions: PA,
+    state: S,
+    actions: A,
+  ) => ActionReturn<S, A>,
+)
+/**
+ * Wrap a child action with parentState, parentActions.
+ * @param action The action to be wrapped
+ * @param wrapper
+ * @param parentState
+ * @param parentActions
+ */
+export function injectActions<S, A, PS, PA>(
+  parentActions: PA,
+  getter: (_: PA) => UnknownArgsActionType<S, A>,
+  wrapper?: (
+    action: (...args) => StandardActionReturn<S, A>,
+    parentState: PS,
+    parentActions: PA,
+    state: S,
+    actions: A,
+  ) => ActionReturn<S, A>,
+): any {
+  if (!wrapper) {
+    return parentActions
+  }
+  let action = getter(parentActions)
+  const wrapped = (state: S, actions: A, parentState: PS, parentActions: PA) => {
+    const normalActions = (...args) => runAction(action(...args), state, actions)
+    return wrapper(normalActions, parentState, parentActions, state, actions)
+  }
+  let keys = (getter.toString().match(/((?:[\w_$]+\.)+[\w_$]+)/) || [])[1].split('.').slice(1)
+  let cursor = parentActions
+  let replaced = false
+  for (let i = 0; i < keys.length; i++) {
+    const key = keys[i]
+    if (cursor[key] === action) {
+      cursor[key] = wrapped
+      replaced = true
+      break
+    }
+    cursor = cursor[key] = { ...cursor[key] }
+  }
+  if (!replaced) {
+    console.error(new Error(`Cannot find action in parentActions`), parentActions, getter)
+  }
+  return parentActions
 }
