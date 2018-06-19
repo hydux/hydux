@@ -1,0 +1,106 @@
+// @flow
+
+import { type ActionType } from './../../types';
+import { type AppProps, type App, type View, type OnUpdate, type Context, type Component } from './../../index';
+import { type HistoryProps, BaseHistory, HashHistory, BrowserHistory, MemoryHistory } from './history';
+export type { HistoryProps, Context };
+export { BaseHistory, HashHistory, BrowserHistory, MemoryHistory };
+export interface Query {
+    [string]: string | string[];
+}
+export interface Location<P, Q: Query> {
+    template: string | null;
+    pathname: string;
+    params: P;
+    query: Q;
+    search: string;
+}
+export interface History {
+    push: (path: string) => void;
+    replace: (path: string) => void;
+    go: (delta: number) => void;
+    back: () => void;
+    forward: () => void;
+}
+declare export function parsePath<P, Q: Query>(path: string): Location<P, Q>;
+declare export function matchPath(pathname: string, fmt: string): {}[];
+export type RouterActions<Actions> = Actions & {
+    history: History;
+};
+export type RouterState<State> = State & {
+    location: Location<any, any>;
+};
+
+
+export type LinkProps = {
+  to: string,
+  onClick?: (e: any) => void,
+  replace?: boolean,
+  /** Prefetch splitted components, this will work only if you add code splitting first. */
+  prefetch?: boolean,
+  onMouseOver?: (e: any) => void,
+  onMouseOut?: (e: any) => void,
+  onTouchStart?: (e: any) => void,
+  className?: string,
+  onTouchEnd?: (e: any) => void,
+  onTouchMove?: (e: any) => void,
+}
+declare export function mkLink(history: History, h: any): (options: LinkProps, children?: any) => any;
+export type Routes<State, Actions> = {
+    [string]: ActionType<Location<any, any>, State, Actions>;
+};
+export type RouterAppProps<State, Actions> = {
+    ...AppProps<State, Actions>,
+    view: View<RouterState<State>, RouterActions<Actions>>,
+    onUpdate?: OnUpdate<RouterState<State>, RouterActions<Actions>>,
+}
+
+export type Options<S, A> = {
+history?: BaseHistory,
+/** Whether is running in SSR mode, used for code-splitting */
+ssr?: boolean,
+/** Whether is running in the server side, if `ssr` is true, used for code-splitting */
+isServer?: boolean,
+routes: Routes<S, A> | NestedRoutes<S, A>,
+}
+
+declare export default function withRouter<State, Actions>(props?: Options<State, Actions>): (app: App<State, Actions>) => App<RouterState<State>, RouterActions<Actions>>;
+
+export type GetComp<S, A> = () => [string, Promise<Component<S, A>>] | [string, Promise<Component<S, A>>, boolean]
+export interface NestedRoutes<State, Actions> {
+    path: string;
+    label?: string;
+    action?: ActionType<Location<any, any>, State, Actions>;
+    children?: NestedRoutes<State, Actions>[];
+    /**
+     * Get a dynamic component, you need to return the key and the promise of the component, if you setup SSR, it would automatically rendered in the server side, but you can return a third boolean value to indicate whether rendering on the server side.
+     * e.g.
+     *  () =>
+     *   | [string /** key *\/, Promise<Component<S, A>>]
+     *   | [string /** key *\/, Promise<Component<S, A>>, boolean /** false to disable rendering on the server side *\/]
+     */
+    getComponent?: GetComp<State, Actions>
+}
+export interface RouteInfo<State, Actions> {
+    path: string;
+    label?: string;
+    action?: ActionType<Location<any, any>, State, Actions>;
+}
+export interface RouteMeta<State, Actions> {
+    path: string;
+    label?: string;
+    action?: ActionType<Location<any, any>, State, Actions>;
+    parents: RouteInfo<State, Actions>[];
+    children: RouteInfo<State, Actions>[];
+}
+export interface RoutesMeta<State, Actions> {
+    [key: string]: RouteMeta<State, Actions>;
+}
+declare export function join(...args: string[]): string;
+/**
+ * @param routes nested routes contains path, action, children, it would parse it to a `route` field (path:action map) for router enhancer, and a `meta` field which contains each route's parents.
+ */
+declare export function parseNestedRoutes<State, Actions>(routes: NestedRoutes<State, Actions>): {
+    routes: Routes<State, Actions>;
+    meta: RoutesMeta<State, Actions>;
+};

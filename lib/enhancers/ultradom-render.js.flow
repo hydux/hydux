@@ -1,0 +1,10 @@
+// @flow
+import { type App } from '../index';
+declare var React: {
+    createElement: <Props>(type: string | any, props?: Props | void, ...children: any[]) => any;
+};
+export { React };
+declare export function h<Props>(type: any | string, props?: Props, ...children: Array<any | string | number | null>): any;
+declare export default function withUltradom<State, Actions>(container?: HTMLElement, options?: {
+    raf?: boolean;
+}): (app: App<State, Actions>) => App<State, Actions>;

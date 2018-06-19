@@ -1,0 +1,64 @@
+// @flow
+export type Sub<Actions> = (actions: Actions) => any
+
+export type CmdType<Actions> = Sub<Actions>[]
+export type ActionType<T> =  (a: T) => any
+export type OfFn =
+| <A, T, State, Actions>(
+  task: (args: A) => T,
+  args: A,
+  succeedAction?: ActionType<T>,
+  failedAction?: ActionType<Error>
+) => CmdType<Actions>
+| <A, T, State, Actions>(
+  task?: () => T,
+  succeedAction?: ActionType<T>,
+  failedAction?: ActionType<Error>
+) => CmdType<Actions>
+| <A, T, State, Actions>(
+  task?: (args?: A) => T,
+  args?: A,
+  succeedAction?: ActionType<T>,
+  failedAction?: ActionType<Error>
+) => CmdType<Actions>
+
+export type OfPromise =
+| <A, T, State, Actions>(
+  task: (args: A) => Promise<T>,
+  args: A,
+  succeedAction?: ActionType<T>,
+  failedAction?: ActionType<Error>
+) => CmdType<Actions>
+| <A, T, State, Actions>(
+  task?: () => Promise<T>,
+  succeedAction?: ActionType<T>,
+  failedAction?: ActionType<Error>
+) => CmdType<Actions>
+| <A, T, State, Actions>(
+  task?: (args?: A) => Promise<T>,
+  args?: A,
+  succeedAction?: ActionType<T>,
+  failedAction?: ActionType<Error>
+) => CmdType<Actions>
+
+export type OfSub = <Actions>(sub: Sub<Actions>) => CmdType<Actions>
+
+export type Batch = <Actions>(...cmds: (CmdType<Actions> | CmdType<Actions>[])[]) => CmdType<Actions>
+
+export type Map = <Actions, SubActions>(
+  map: (action: Actions) => SubActions,
+  cmd: CmdType<SubActions>
+) => CmdType<Actions>
+
+
+
+declare var ofFn: OfFn
+declare var ofPromise: OfPromise
+declare var ofPromise: OfPromise
+declare var ofSub: OfSub
+declare var batch: Batch
+declare var map: Map
+declare var none: Sub<any>[]
+
+export { ofFn, ofPromise, ofSub, batch, map, none }
+export default { ofFn, ofPromise, ofSub, batch, map, none }
