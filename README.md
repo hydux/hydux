@@ -120,14 +120,14 @@ app({
     upLater: n => (
       state,
       actions/* actions of same level */
-    ) => {
+    ) => ({
       state, // don't change the state, won't trigger view update
       cmd: Cmd.ofPromise(
         upLater /* a function with single parameter and return a promise */,
         n /* the parameter of the funciton */,
         actions.upN /* success handler, optional */,
         console.error /* error handler, optional */ )
-    },
+    }),
     // Short hand of command only
     upLater2: n => (
       state,
@@ -142,14 +142,14 @@ app({
     upLater2: n => (
       state,
       actions/* actions of same level */
-    ) => {
+    ) => [
       state, // don't change the state, won't trigger view update
       cmd: Cmd.ofPromise(
         upLater /* a function with single parameter and return a promise */,
         n /* the parameter of the funciton */,
         actions.upN /* success handler, optional */,
         console.error /* error handler, optional */ )
-    },
+    ],
   },
   view: () => {/*...*/} ,
 })
