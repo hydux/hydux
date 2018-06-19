@@ -1,6 +1,8 @@
 import * as Cmd from '../cmd'
 import { Init, normalize, Context } from '../index'
-import { set, merge, setDeep, setDeepMutable, get, isFn, noop, isPojo, clone } from 'utils'
+export * from './hash'
+export * from './memoize'
+import { set, merge, setDeep, setDeepMutable, get, isFn, noop, isPojo, clone } from '../utils'
 import {
   ActionReturn,
   ActionState,
@@ -10,7 +12,7 @@ import {
   ActionsType,
   InitObjReturn,
   UnknownArgsActionType,
-} from 'types'
+} from '../types'
 export type Dt<T extends string, D = null> = {
   tag: T,
   data: D
@@ -244,7 +246,7 @@ export function withParents<S, A, PS, PA>(
  */
 export const wrapActions = withParents
 
-export function injectActions<S, A, PS, PA, A1>(
+export function overrideAction<S, A, PS, PA, A1>(
   parentActions: PA,
   getter: (_: PA) => (a1: A1) => (s: S, a: A) => any,
   wrapper?: (
@@ -262,7 +264,7 @@ export function injectActions<S, A, PS, PA, A1>(
  * @param parentState
  * @param parentActions
  */
-export function injectActions<S, A, PS, PA>(
+export function overrideAction<S, A, PS, PA>(
   parentActions: PA,
   getter: (_: PA) => UnknownArgsActionType<S, A>,
   wrapper?: (

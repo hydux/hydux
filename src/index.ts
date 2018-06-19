@@ -9,12 +9,12 @@ import {
   ActionsType,
   InitReturn,
   UnknownArgsActionType,
-} from 'types'
-import Cmd, { CmdType, Sub } from 'cmd'
-import { set, merge, setDeep, setDeepMutable, get, isFn, noop, isPojo, clone } from 'utils'
-import { runAction } from 'helpers'
-export * from 'helpers'
-export * from 'types'
+} from './types'
+import Cmd, { CmdType, Sub } from './cmd'
+import { set, merge, setDeep, setDeepMutable, get, isFn, noop, isPojo, clone } from './utils'
+import { runAction } from './helpers'
+export * from './helpers'
+export * from './types'
 export { Cmd, CmdType, Sub, ActionReturn, noop, isFn, isPojo }
 
 export type Init<S, A> = () => InitReturn<S, A>

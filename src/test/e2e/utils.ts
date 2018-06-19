@@ -4,7 +4,7 @@ import * as assert from 'assert'
 
 export const IsCI = !!process.env.CI
 export const Examples = `${process.cwd()}/examples`
-export const timeout = 120_000
+export const timeout = 60_000 * 10
 export const runServer = async (app: string, port: number) => {
   const p = child.exec(`${process.cwd()}/node_modules/.bin/serve -n -c 0 -s -p ${port}`, {
     cwd: `${Examples}/${app}`,

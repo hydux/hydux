@@ -282,8 +282,8 @@ describe('core api', () => {
     assert.equal(ctx.state.counter1.count, 4, 'counter1 upObj3 async should work')
 
     ctx.actions.counter1.upObj4()
-    assert.equal(ctx.state.counter1.count, 4, 'counter1 upObj4 should work')
+    assert.equal(ctx.state.counter1.count, 5, 'counter1 upObj4 should work')
     await sleep(10)
-    assert.equal(ctx.state.counter1.count, 5, 'counter1 upObj4 async should work')
+    assert.equal(ctx.state.counter1.count, 6, 'counter1 upObj4 async should work')
   })
 })

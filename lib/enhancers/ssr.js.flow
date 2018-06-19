@@ -1,6 +1,0 @@
-// @flow
-import { type App } from './../index';
-export type Options = {
-    renderToString: (view: any) => string;
-};
-declare export default function withSSR<State, Actions>(options: Options): (app: App<State, Actions>) => App<State, Actions>;

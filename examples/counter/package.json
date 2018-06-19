@@ -22,7 +22,7 @@
     "remotedev": "^0.2.7",
     "tslint": "^5.8.0",
     "tslint-config-standard": "^7.0.0",
-    "typescript": "^2.8.3",
+    "typescript": "^2.9.2",
     "webpack": "^3.10.0",
     "webpack-blocks": "^1.0.0-rc.2",
     "webpack-dev-server": "^2.9.5"

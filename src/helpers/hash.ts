@@ -7,7 +7,7 @@ function getType(key: any) {
   return t.slice(8, -1).toLowerCase()
 }
 
-export default function hash(key: any) {
+export function hashAny(key: any) {
   switch (getType(key)) {
     case 'undefined':
     case 'null':
@@ -23,7 +23,7 @@ export default function hash(key: any) {
       return '📝' + key
 
     case 'array':
-      return '🔗' + (key as any[]).map(k => hash(k)).join('⁞')
+      return '🔗' + (key as any[]).map(k => hashAny(k)).join('⁞')
 
     default:
       if (objUidMap) {

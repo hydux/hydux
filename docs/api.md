@@ -6,7 +6,7 @@ Run your app.
 
 #### AppProps<State, Actions>
 
-##### init: () => State | [ State, CmdType ] | { state: State, cmd?: CmdType }
+##### init: () => State | { state: State, cmd?: CmdType }
 
 An function to get the initial state of your app, you can return a tuple including side effects like an action.
 
@@ -25,21 +25,24 @@ app({
     // (msg: Msg) => (state: State), update the state by msg
     reset: n => ({ count: 1 })
     // (msg: Msg) => (state: State) => (state: State)
-    // update the state by msg and current state
+    // update the state by msg and current state, shorthand for state only
     add: n => state => ({ count: state.count + n }),
     // (msg: Msg) => (state: State, actions: Actions) => void
     // update the state by state and other same level actions
     add12: () => (state, actions) => actions.add(12),
-    // (msg: Msg) => (state: State, actions: Actions) => [state, CmdType<State, Actions>]
+    // (msg: Msg) => (state: State, actions: Actions) => { state:? State, cmd?: CmdType<State, Actions> } // action with side effect (command)
+    // (msg: Msg) => (state: State, actions: Actions) => CmdType<State, Actions // Shorthand for command only
     // update the state by side effects
-    remoteAdd: () => (state, actions) =>
-      [ state,
-        Cmd.ofPromise(
-          () => fetch('http://your.server/some/path'),
-          null,
-          actions.add,
-          console.log
-        ) ],
+    remoteAdd: () => (state, actions) => ({
+      state,
+      cmd: Cmd.ofPromise(
+        () => fetch('http://your.server/some/path'),
+        null,
+        actions.add,
+        console.log
+      )
+    })
+      ,
   },
   view: //...
 })
@@ -80,3 +83,9 @@ Cmd from a cmd array.
 ##### Cmd.map<Actions, SubActions>(map: (action: Actions) => SubActions, cmd: CmdType<SubActions>): CmdType<Actions>
 
 Map a command to a low level command.
+
+
+### Helpers
+
+
+### replace
