@@ -161,36 +161,41 @@ In Elm, we can intercept child component's message in parent component, because 
 
 ```js
 import * as assert from 'assert'
-import app, { Cmd, withParents, noop } from '../index'
+import * as Hydux from '../index'
 import Counter from './counter'
 
-const initState = {
-  counter1: Counter.init(),
-  counter2: Counter.init(),
+const { Cmd } = Hydux
+
+export function init() {
+  return {
+    state: {
+      counter1: Counter.init(),
+      counter2: Counter.init(),
+    }
+  }
 }
 const actions = {
   counter2: counter.actions,
-  counter1: {
-    ...counter.actions,
-    upN: (
-      n: number
-    ) => withParents(
-      counter.actions.upN,
-      (
-        action,
-        parentState: State,
-        parentActions: Actions,
-      ) => {
-        const [state, cmd] = action(n + 1)
-        assert.equal(state.count, parentState.counter1.count + n + 1, 'call child action work')
-        return [state, Cmd.batch(cmd, Cmd.ofFn(() => parentActions.counter2.up()))]
-      }
-    )
-  },
+  counter1: counter.actions
 }
-type State = typeof initState
+Hydux.overrideAction(
+  actions,
+  _ => _.counter1.upN,
+  (n: number) => (
+      action,
+      ps: State, // parent state (State)
+      pa, // parent actions (Actions)
+      // s: State['counter1'], // child state
+      // a: Actions['counter1'], // child actions
+  ) => {
+    const [state, cmd] = action(n + 1)
+    assert.equal(state.count, ps.counter1.count + n + 1, 'call child action work')
+    return [state, Cmd.batch(cmd, Cmd.ofFn(() => pa.counter2.up()))]
+  }
+)
+type State = ReturnType<typeof init>['state']
 type Actions = typeof actions
-let ctx = app<State, Actions>({
+let ctx = Hydux.app<State, Actions>({
   init: () => initState,
   actions,
   view: noop,

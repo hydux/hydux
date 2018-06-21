@@ -211,6 +211,47 @@ describe('core api', () => {
     // const counter1Actions: CounterActions =
     const actions = {
       counter2: Counter.actions,
+      counter1: Counter.actions,
+    }
+    Hydux.overrideAction(actions, _ => _.counter1.upN, n => (
+      action,
+      parentState: State,
+      parentActions,
+    ) => {
+      const { state, cmd } = action(n + 1)
+      assert.equal(state.count, parentState.counter1.count + n + 1, 'call child action work')
+      return [
+        state,
+        Cmd.batch(
+          cmd,
+          Cmd.ofFn(
+            () => parentActions.counter2.up()
+          ),
+        )
+      ]
+    })
+    type State = typeof initState
+    type Actions = typeof actions
+    let ctx = app<typeof initState, typeof actions>({
+      init: () => initState,
+      actions,
+      view: state => actions => actions,
+      onRender: noop
+    })
+
+    ctx.actions.counter1.upN(1)
+    assert.equal(ctx.state.counter1.count, 3, 'counter1 upN work')
+    assert.equal(ctx.state.counter2.count, 2, 'counter2 upN work')
+  })
+
+  it('legacy parent actions', () => {
+    const initState = {
+      counter1: Counter.init(),
+      counter2: Counter.init(),
+    }
+    // const counter1Actions: CounterActions =
+    const actions = {
+      counter2: Counter.actions,
       counter1: {
         ...Counter.actions,
         upN: (n: number) => withParents(
@@ -248,7 +289,6 @@ describe('core api', () => {
     assert.equal(ctx.state.counter1.count, 3, 'counter1 upN work')
     assert.equal(ctx.state.counter2.count, 2, 'counter2 upN work')
   })
-
   it('obj cmd/cmd only', async () => {
     let state
     let renderResult

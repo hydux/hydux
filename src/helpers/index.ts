@@ -216,7 +216,7 @@ export function withParents<S, A, PS, PA, A1, A2, A3, A4, A5>(
 )
 /**
  * Wrap a child action with parentState, parentActions.
- * @deprecated Deprecated for `watchActions`
+ * @deprecated Deprecated for `overrideAction`
  * @param action The action to be wrapped
  * @param wrapper
  * @param parentState
@@ -242,15 +242,48 @@ export function withParents<S, A, PS, PA>(
   return wrapped
 }
 /**
- * @deprecated Deprecated for `withParents`
+ * @deprecated Deprecated for `overrideAction`
  */
 export const wrapActions = withParents
 
-export function overrideAction<S, A, PS, PA, A1>(
+export function overrideAction<PS, PA, S, A, A1>(
   parentActions: PA,
   getter: (_: PA) => (a1: A1) => (s: S, a: A) => any,
-  wrapper?: (
+  wrapper?: (a1: A1) => (
     action: (a1: A1) => StandardActionReturn<S, A>,
+    parentState: PS,
+    parentActions: PA,
+    state: S,
+    actions: A,
+  ) => ActionReturn<S, A>,
+)
+export function overrideAction<S, A, PS, PA, A1, A2>(
+  parentActions: PA,
+  getter: (_: PA) => (a1: A1) => (s: S, a: A) => any,
+  wrapper?: (a1: A1, a2: A2) => (
+    action: (a1: A1, a2: A2) => StandardActionReturn<S, A>,
+    parentState: PS,
+    parentActions: PA,
+    state: S,
+    actions: A,
+  ) => ActionReturn<S, A>,
+)
+export function overrideAction<S, A, PS, PA, A1, A2, A3>(
+  parentActions: PA,
+  getter: (_: PA) => (a1: A1) => (s: S, a: A) => any,
+  wrapper?: (a1: A1, a2: A2, a3: A3) => (
+    action: (a1: A1, a2: A2, a3: A3) => StandardActionReturn<S, A>,
+    parentState: PS,
+    parentActions: PA,
+    state: S,
+    actions: A,
+  ) => ActionReturn<S, A>,
+)
+export function overrideAction<S, A, PS, PA, A1, A2, A3, A4>(
+  parentActions: PA,
+  getter: (_: PA) => (a1: A1) => (s: S, a: A) => any,
+  wrapper?: (a1: A1, a2: A2, a3: A3, a4: A4) => (
+    action: (a1: A1, a2: A2, a3: A3, a4: A4) => StandardActionReturn<S, A>,
     parentState: PS,
     parentActions: PA,
     state: S,
@@ -267,7 +300,7 @@ export function overrideAction<S, A, PS, PA, A1>(
 export function overrideAction<S, A, PS, PA>(
   parentActions: PA,
   getter: (_: PA) => UnknownArgsActionType<S, A>,
-  wrapper?: (
+  wrapper?: (...args) => (
     action: (...args) => StandardActionReturn<S, A>,
     parentState: PS,
     parentActions: PA,
@@ -279,9 +312,9 @@ export function overrideAction<S, A, PS, PA>(
     return parentActions
   }
   let action = getter(parentActions)
-  const wrapped = (state: S, actions: A, parentState: PS, parentActions: PA) => {
-    const normalActions = (...args) => runAction(action(...args), state, actions)
-    return wrapper(normalActions, parentState, parentActions, state, actions)
+  const wrapped = (...args) => (state: S, actions: A, parentState: PS, parentActions: PA) => {
+    const normalAction = (...args) => runAction(action(...args), state, actions)
+    return wrapper(...args)(normalAction, parentState, parentActions, state, actions)
   }
   let keys = (getter.toString().match(/((?:[\w_$]+\.)+[\w_$]+)/) || [])[1].split('.').slice(1)
   let cursor = parentActions
