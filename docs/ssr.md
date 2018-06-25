@@ -4,7 +4,7 @@
 
 Server-Side Rendering is super simple in the Elm Architechture, because we already split our code with init, update and view.
 
-Not like next.js, we don't need to add a conventional magic lifecycle method(`getInitialProps`), because we already have a powerful `init` funciton, which contains initial model and initial command, what we need to do is just running initial command on the server side, and ignore it on the client side, then synchronize state between the client and server by adding some conditionals. Then we get an **isomorphic app** for free!
+Not like next.js, we don't need to add a conventional magic lifecycle method(`getInitialProps`), because we already have a powerful `init` function, which contains initial model and initial command, what we need to do is just running initial command on the server side, and ignore it on the client side, then synchronize state between the client and server by adding some conditionals. Then we get an **isomorphic app** for free!
 
 ## Example App
 
