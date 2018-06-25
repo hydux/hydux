@@ -188,9 +188,17 @@ Hydux.overrideAction(
       // s: State['counter1'], // child state
       // a: Actions['counter1'], // child actions
   ) => {
-    const [state, cmd] = action(n + 1)
+    const { state, cmd } = action(n + 1)
     assert.equal(state.count, ps.counter1.count + n + 1, 'call child action work')
-    return [state, Cmd.batch(cmd, Cmd.ofFn(() => pa.counter2.up()))]
+    return {
+      state,
+      cmd: Cmd.batch(
+        cmd,
+        Cmd.ofFn(
+          () => pa.counter2.up()
+        )
+      )
+    }
   }
 )
 type State = ReturnType<typeof init>['state']
