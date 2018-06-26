@@ -100,12 +100,150 @@ export default app({
 })
 ```
 
-## Actions with Cmd
+## Init with Command
+
+You can init the state of your app via plain object, or with side effects, like fetch remote data.
+
+```ts
+import * as Hydux from 'hydux'
+
+const { Cmd } = Hydux
+
+export function init() {
+  return {
+    state: { // pojo state
+      count: 1,
+    },
+    cmd: Cmd.ofSub( // update your state via side effects.
+      _ => fetch('https://your.server/init/count') // `_` is the real actions, don't confuse with the plain object `actions` that we created below, calling functions from plain object won't trigger state update!
+        .then(res => res.json())
+        .then(count => _.setCount(count))
+    )
+  }
+}
+
+
+export const actions = {
+  setCount: n => (state, actions) => {
+    return { count: n }
+  }
+}
+
+```
+
+It might be verbose if we want to init a child component with init command.
+
+```ts
+// Counter.tsx
+import { React } from 'hydux-react'
+import * as Hydux from 'hydux'
+const Cmd = Hydux.Cmd
+
+export const init = () => ({
+  state: { count: 0 },
+  cmd: Cmd.ofSub(
+    (_: Actions) =>
+      fetch(`/api/initcount`)
+      .then(res => res.json())
+      .then(data => _.setCount(data.count)),
+  )
+})
+export const actions = {
+  setCount: (count): any => (state: State) => ({ count }),
+  down: (): any => (state: State) => ({ count: state.count - 1 }),
+  up: (): any => (state: State) => ({ count: state.count + 1 }),
+  upN: (n): any => (state: State): Hydux.AR<State, Actions> => ({ count: state.count + n }),
+  upLater: (): any => (state: State, actions: Actions) =>
+    [ state,
+      Cmd.ofPromise(
+        n => {
+          return new Promise(resolve =>
+            setTimeout(() => resolve(n), 1000))
+        },
+        10,
+        actions.upN) ]
+}
+
+export const view = (state: State, actions: Actions) => (
+  <div>
+    <h1 className="count">{state.count}</h1>
+    <button className="down" onClick={actions.down}>–</button>
+    <button className="up" onClick={actions.up}>+</button>
+    <button className="upLater" onClick={actions.upLater}>+ later</button>
+  </div>
+)
+
+export type Actions = typeof actions
+export type State = ReturnType<typeof init>['state']
+```
+
+```ts
+// App.tsx
+import { React } from 'hydux-react'
+import * as Hydux from 'hydux'
+import * as Counter from 'Counter'
+const Cmd = Hydux.Cmd
+
+export const init = () => {
+  const counter1 = Counter.init()
+  const counter2 = Counter.init()
+  return {
+    state: {
+      counter1: counter1.state,
+      counter2: counter2.state,
+    },
+    cmd: Cmd.batch(
+      Cmd.map((_: Actions) => _.counter1, counter1.cmd),
+      Cmd.map((_: Actions) => _.counter2, counter2.cmd),
+      Cmd.ofSub(
+        _ => // some other commands of App
+      )
+    )
+  }
+}
+// but hei, we provide a helper function to simplify this case, now you can:
+export const init2 = () => {
+  const subInit = Hydux.combineInit({
+    counter1: Counter.init(),
+    counter2: Counter.init(),
+  })
+  return {
+    state: {
+      ...subInit.state,
+      // other state
+    },
+    cmd: Cmd.batch(
+      subInit.cmd,
+      // other commands
+    )
+  }
+}
+
+export const actions = {
+  counter1: Counter.actions,
+  counter2: Counter.actions,
+  // ... other actions
+}
+
+export const view = (state: State, actions: Actions) => (
+  <main>
+    <h1>Counter1:</h1>
+    {Counter.view(state.counter1, actions.counter1)}
+    <h1>Counter2:</h1>
+    {Counter.view(state.counter2, actions.counter2)}
+  </main>
+)
+
+export type Actions = typeof actions
+export type State = ReturnType<typeof init>['state']
+```
+
+## Actions with Command
 
 This library also implemented a Elm-like side effects manager, you can simple return a tuple (two elements array) in your action, and put the Cmd as the second element.
 e.g.
 
-```js
+```ts
 import app, { Cmd } from 'hydux'
 
 function upLater(n) {
@@ -138,18 +276,6 @@ app({
       actions.upN /* success handler, optional */,
       console.error /* error handler, optional */
     ),
-    // Deprecated for object style
-    upLater2: n => (
-      state,
-      actions/* actions of same level */
-    ) => [
-      state, // don't change the state, won't trigger view update
-      cmd: Cmd.ofPromise(
-        upLater /* a function with single parameter and return a promise */,
-        n /* the parameter of the funciton */,
-        actions.upN /* success handler, optional */,
-        console.error /* error handler, optional */ )
-    ],
   },
   view: () => {/*...*/} ,
 })
