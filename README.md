@@ -153,15 +153,15 @@ export const actions = {
   down: (): any => (state: State) => ({ count: state.count - 1 }),
   up: (): any => (state: State) => ({ count: state.count + 1 }),
   upN: (n): any => (state: State): Hydux.AR<State, Actions> => ({ count: state.count + n }),
-  upLater: (): any => (state: State, actions: Actions) =>
-    [ state,
-      Cmd.ofPromise(
-        n => {
-          return new Promise(resolve =>
-            setTimeout(() => resolve(n), 1000))
-        },
-        10,
-        actions.upN) ]
+  upLater: (): any => (state: State, actions: Actions) => ({
+    state,
+    cmd: Cmd.ofPromise(
+      n => new Promise(resolve => setTimeout(() => resolve(n), 1000)),
+      10,
+      actions.upN
+    )
+  })
+
 }
 
 export const view = (state: State, actions: Actions) => (
