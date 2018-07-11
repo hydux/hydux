@@ -18,6 +18,13 @@ export type Dt<T extends string, D = null> = {
   data: D
 } & { __tsTag: 'DateType' }
 
+declare global {
+  type Dt<T extends string, D = null> = {
+    tag: T,
+    data: D
+  } & { __tsTag: 'DateType' }
+}
+
 /**
  * ADT Helper for TS
  * e.g.
