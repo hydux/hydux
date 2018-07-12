@@ -44,7 +44,7 @@ export interface AppProps<State, Actions> {
 
 export interface Component<State = any, Actions = any> {
   init: Init<State, Actions>
-  view: View<State, Actions>
+  view: View<State, Actions> | ((...args: any[]) => any)
   actions: ActionsType<State, Actions>
 }
 

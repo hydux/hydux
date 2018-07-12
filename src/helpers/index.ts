@@ -128,7 +128,7 @@ export interface CombinedComps<
 export function combine<
   T extends { [k: string]: [Component, InitObjReturn<any, any>] },
   A extends { [k: string]: any }
->(arg: T): CombinedComps<T, A> {
+>(arg: T, _acts: A = null as any): CombinedComps<T, A> {
   let state = {} as { [k in keyof T]: T[k][1]['state'] }
   let cmd = Cmd.none as Cmd.CmdType<A>
   let cmds = {} as { [k in keyof T]: Cmd.CmdType<A> }
