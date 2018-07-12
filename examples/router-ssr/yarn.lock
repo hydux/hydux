@@ -2802,11 +2802,11 @@ hydux-mutator@^0.1.11:
     quick-lru "^1.1.0"
     tslib "^1.8.1"
 
-hydux-react@^0.3.0:
-  version "0.3.0"
-  resolved "https://registry.npmjs.org/hydux-react/-/hydux-react-0.3.0.tgz#4212de5e0bb21081257eb15380f978158dde1cdd"
+hydux-react@^0.3.2:
+  version "0.3.2"
+  resolved "http://registry.npm.taobao.org/hydux-react/download/hydux-react-0.3.2.tgz#6aa705d7e140b4f3d638730e8f493e4276fcbd29"
   dependencies:
-    hydux "^0.4.0"
+    hydux "^0.5.1"
     lru-cache "^4.1.1"
     react "^16.2.0"
     react-dom "^16.2.0"
@@ -2819,10 +2819,11 @@ hydux@^0.1.3:
   optionalDependencies:
     remotedev "^0.2.7"
 
-hydux@^0.4.0:
-  version "0.4.5"
-  resolved "https://registry.npmjs.org/hydux/-/hydux-0.4.5.tgz#2d64638f4dd29678b6b9afe8fe7767dfe189cc57"
+hydux@^0.5.1:
+  version "0.5.1"
+  resolved "http://registry.npm.taobao.org/hydux/download/hydux-0.5.1.tgz#73aa5a4965ee30e430ed5570112cdf79acaf829c"
   dependencies:
+    lru-cache "^4.1.3"
     tslib "^1.8.1"
     ultradom "2.0.0"
   optionalDependencies:
@@ -3541,6 +3542,13 @@ lowercase-keys@^1.0.0:
 lru-cache@^4.0.1, lru-cache@^4.1.1:
   version "4.1.1"
   resolved "http://registry.npm.taobao.org/lru-cache/download/lru-cache-4.1.1.tgz#622e32e82488b49279114a4f9ecf45e7cd6bba55"
+  dependencies:
+    pseudomap "^1.0.2"
+    yallist "^2.1.2"
+
+lru-cache@^4.1.3:
+  version "4.1.3"
+  resolved "http://registry.npm.taobao.org/lru-cache/download/lru-cache-4.1.3.tgz#a1175cf3496dfc8436c156c334b4955992bce69c"
   dependencies:
     pseudomap "^1.0.2"
     yallist "^2.1.2"

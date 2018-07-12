@@ -15,7 +15,7 @@ import { set, merge, setDeep, setDeepMutable, get, isFn, noop, isPojo, clone } f
 import { runAction } from './helpers'
 export * from './helpers'
 export * from './types'
-export { Cmd, CmdType, Sub, ActionReturn, noop, isFn, isPojo }
+export { set, merge, setDeep, Cmd, CmdType, Sub, ActionReturn, noop, isFn, isPojo }
 
 export type Init<S, A> = () => InitReturn<S, A>
 // todo: Remove back compatible optional ctx
@@ -42,7 +42,7 @@ export interface AppProps<State, Actions> {
   mutable?: boolean
 }
 
-export interface Component<State, Actions> {
+export interface Component<State = any, Actions = any> {
   init: Init<State, Actions>
   view: View<State, Actions>
   actions: ActionsType<State, Actions>

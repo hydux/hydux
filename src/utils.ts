@@ -7,6 +7,10 @@ export const isDev = typeof process !== 'undefined' && process.env.NODE_ENV === 
 export const debug = (key: string, ...args: any[]) => {
   isDev && console.log(`[hydux-${key}]`, ...args)
 }
+export const error = (key: string, msg: string, ...args: any[]) => {
+  console.error(`[hydux-${key}]`, msg, ...args)
+  throw new TypeError(msg)
+}
 
 export function set<S>(to: S, from: Partial<S>): S {
   const keys = Object.keys(from)

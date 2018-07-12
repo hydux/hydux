@@ -2,11 +2,11 @@ import { ActionType, ActionsType, ActionType2 } from './../../types'
 import {
   AppProps, App, Init, View, Subscribe,
   OnUpdate, runAction, Context, Patch,
-  Component, normalize
+  Component, normalize, ActionReturn
 } from './../../index'
-import { Dt, dt, never } from '../../helpers'
+import { Dt, dt, never, CombinedComps } from '../../helpers'
 import Cmd, { CmdType } from './../../cmd'
-import { get, isFn, debug } from '../../utils'
+import { get, isFn, debug, error } from '../../utils'
 import {
   HistoryProps, BaseHistory, HashHistory,
   BrowserHistory, MemoryHistory, MemoryHistoryProps,
@@ -129,7 +129,7 @@ export function mkLink(history: History, h) {
 }
 
 export type Routes<State, Actions> = {
-  [key: string]: ActionType2<Location<any, any>, Patch, State, Actions>
+  [key: string]: ActionType<Location<any, any>, State, Actions>
 }
 
 export interface RouterAppProps<State, Actions> extends AppProps<State, Actions> {
@@ -255,8 +255,8 @@ export default function withRouter<State, Actions>(props: Options<State, Actions
         } as History),
         [CHANGE_LOCATION]: (loc: Location<any, any>, resolve?: Function) => (state: State, actions: Actions) => {
           if (loc.template) {
-            const patch: Patch = (...args) => (ctx.patch as any)(...args)
-            let { state: nextState, cmd } = runAction(routesMap[loc.template](loc, patch), state, actions)
+            let action = routesMap[loc.template]
+            let { state: nextState, cmd } = runAction(action(loc), state, actions)
             return [{ ...(nextState as any as object), location: loc }, cmd]
           } else {
             return { ...(state as any), location: loc }
@@ -285,8 +285,14 @@ export type GetComp<S, A> = () =>
 export interface NestedRoutes<State, Actions> {
   path: string,
   label?: string,
+  // key?: keyof Actions
+  // component?: Component<any, any>
+  update?: (loc: Location, state: State, actions: Actions) => ActionReturn<State, Actions>
+  /**
+   * @deprecated Deprecated for `update`
+   */
   action?: ActionType<Location<any, any>, State, Actions>,
-  children?: NestedRoutes<any, any>[],
+  children?: NestedRoutes<State, Actions>[],
   /**
    * Get a dynamic component, you need to return the key and the promise of the component, if you setup SSR, it would automatically rendered in the server side, but you can return a third boolean value to indicate whether rendering on the server side.
    * e.g.
@@ -294,7 +300,7 @@ export interface NestedRoutes<State, Actions> {
    *   | [string /** key *\/, Promise<Component<S, A>>]
    *   | [string /** key *\/, Promise<Component<S, A>>, boolean /** false to disable rendering on the server side *\/]
    */
-  getComponent?: GetComp<State, Actions>
+  getComponent?: GetComp<any, any>
 }
 export interface RouteInfo<State, Actions> {
   path: string,
@@ -333,17 +339,25 @@ export function parseNestedRoutes<State, Actions>(routes: NestedRoutes<State, Ac
       children: children.map(r => ({ ...r, parents: void 0, children: void 0 }))
     }
     children
-      .map(r => ({
-        ...r,
-        path: join(routes.path, r.path),
-        action: r.action,
-        parents: ((routes as any).parents || []).concat({
-          ...routes,
-          parents: void 0,
-          children: void 0,
-        }),
-        children: r.children,
-      }))
+      .map(r => {
+        let action = r.action
+        if (!action && r.update) {
+          action = loc => (state, actions) => {
+            return r.update!(loc, state, actions)
+          }
+        }
+        return {
+          ...r,
+          path: join(routes.path, r.path),
+          action,
+          parents: ((routes as any).parents || []).concat({
+            ...routes,
+            parents: void 0,
+            children: void 0,
+          }),
+          children: r.children,
+        }
+      })
       .forEach(r => rec(r as any, newRoutes))
     return newRoutes
   }

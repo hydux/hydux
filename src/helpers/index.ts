@@ -1,5 +1,5 @@
 import * as Cmd from '../cmd'
-import { Init, normalize, Context } from '../index'
+import { Init, normalize, Context, Component } from '../index'
 export * from './hash'
 export * from './memoize'
 import { set, merge, setDeep, setDeepMutable, get, isFn, noop, isPojo, clone } from '../utils'
@@ -14,7 +14,7 @@ import {
   UnknownArgsActionType,
 } from '../types'
 export type Dt<T extends string, D = null> = {
-  tag: T,
+  tag: T
   data: D
 } & { __tsTag: 'DateType' }
 
@@ -52,10 +52,7 @@ export function mkInit<S, A>(state: S, cmd: Cmd.CmdType<A> = Cmd.none): ActionCm
 
 export type Fn1<T1, R> = (a1: T1) => R
 
-export function compose<T1, T2, R>(
-  fn1: Fn1<T1, T2>,
-  fn2: Fn1<T2, R>,
-): Fn1<T1, R>
+export function compose<T1, T2, R>(fn1: Fn1<T1, T2>, fn2: Fn1<T2, R>): Fn1<T1, R>
 export function compose<T1, T2, T3, R>(
   fn1: Fn1<T1, T2>,
   fn2: Fn1<T2, T3>,
@@ -113,22 +110,49 @@ export function compose<T1, T2, T3, T4, T5, T6, T7, T8, T9, R>(
   fn9: Fn1<T9, R>,
 ): Fn1<T1, R>
 export function compose<R>(...fns: Function[]): Fn1<any, R> {
-  return arg =>
-    fns.reduce(
-      (arg, fn) => fn(arg),
-      arg,
-    )
+  return arg => fns.reduce((arg, fn) => fn(arg), arg)
 }
 
-export function combineInit<T extends { [k: string]: InitObjReturn<any, any> }, A extends { [k: string]: any }>(arg: T) {
-  let state = {} as { [k in keyof T]: T[k]['state'] }
+export interface CombinedComps<
+  T extends { [k: string]: [Component, InitObjReturn<any, any>] },
+  A extends { [k: string]: any }
+> {
+  state: { [k in keyof T]: T[k][1]['state'] }
+  cmd: Cmd.Sub<A>[]
+  cmds: { [k in keyof T]: Cmd.Sub<A>[] }
+  actions: { [k in keyof T]: T[k][0]['actions'] }
+  views: { [k in keyof T]: T[k][0]['view'] }
+  render: <K extends Extract<keyof T, keyof S>, S>(k: K, state: S, actions: ActionsType<S, any>) => any
+}
+
+export function combine<
+  T extends { [k: string]: [Component, InitObjReturn<any, any>] },
+  A extends { [k: string]: any }
+>(arg: T): CombinedComps<T, A> {
+  let state = {} as { [k in keyof T]: T[k][1]['state'] }
   let cmd = Cmd.none as Cmd.CmdType<A>
+  let cmds = {} as { [k in keyof T]: Cmd.CmdType<A> }
+  let actions = {} as { [k in keyof T]: T[k][0]['actions'] }
+  let views = {} as { [k in keyof T]: T[k][0]['view'] }
   for (const key in arg) {
-    let init = normalize<any, any>(arg[key])
+    let comp = arg[key][0]
+    let init = normalize<any, any>(arg[key][1])
     state[key] = init.state
+    actions[key] = comp.actions
+    views[key] = comp.view
+    cmds[key] = init.cmd
     cmd = Cmd.batch(cmd, Cmd.map(_ => _[key], init.cmd))
   }
-  return { state, cmd }
+  return {
+    state,
+    cmd,
+    cmds,
+    actions,
+    views,
+    render(k, state, actions) {
+      return views[k](state[k], actions[k])
+    }
+  }
 }
 
 /**
@@ -146,15 +170,12 @@ export function runAction<S, A, PS, PA>(
   parentActions?: PA,
 ): Required<StandardActionReturn<S, A>> {
   let res: any = result
-  isFn(res)
-    && (res = res(state, actions, parentState, parentActions))
-    && isFn(res)
-    && (res = res(actions))
+  isFn(res) &&
+    (res = res(state, actions, parentState, parentActions)) &&
+    isFn(res) &&
+    (res = res(actions))
   // action can be a function that return a promise or undefined(callback)
-  if (
-    res === undefined ||
-    (res.then && isFn(res.then))
-  ) {
+  if (res === undefined || (res.then && isFn(res.then))) {
     return { state, cmd: Cmd.none }
   }
   let ret2 = normalize(res as ActionReturn<S, A>, state)
@@ -249,7 +270,9 @@ export const wrapActions = withParents
 export function overrideAction<PS, PA, S, A, A1>(
   parentActions: PA,
   getter: (_: PA) => (a1: A1) => (s: S, a: A) => any,
-  wrapper?: (a1: A1) => (
+  wrapper?: (
+    a1: A1,
+  ) => (
     action: (a1: A1) => StandardActionReturn<S, A>,
     parentState: PS,
     parentActions: PA,
@@ -260,7 +283,10 @@ export function overrideAction<PS, PA, S, A, A1>(
 export function overrideAction<S, A, PS, PA, A1, A2>(
   parentActions: PA,
   getter: (_: PA) => (a1: A1) => (s: S, a: A) => any,
-  wrapper?: (a1: A1, a2: A2) => (
+  wrapper?: (
+    a1: A1,
+    a2: A2,
+  ) => (
     action: (a1: A1, a2: A2) => StandardActionReturn<S, A>,
     parentState: PS,
     parentActions: PA,
@@ -271,7 +297,11 @@ export function overrideAction<S, A, PS, PA, A1, A2>(
 export function overrideAction<S, A, PS, PA, A1, A2, A3>(
   parentActions: PA,
   getter: (_: PA) => (a1: A1) => (s: S, a: A) => any,
-  wrapper?: (a1: A1, a2: A2, a3: A3) => (
+  wrapper?: (
+    a1: A1,
+    a2: A2,
+    a3: A3,
+  ) => (
     action: (a1: A1, a2: A2, a3: A3) => StandardActionReturn<S, A>,
     parentState: PS,
     parentActions: PA,
@@ -282,7 +312,12 @@ export function overrideAction<S, A, PS, PA, A1, A2, A3>(
 export function overrideAction<S, A, PS, PA, A1, A2, A3, A4>(
   parentActions: PA,
   getter: (_: PA) => (a1: A1) => (s: S, a: A) => any,
-  wrapper?: (a1: A1, a2: A2, a3: A3, a4: A4) => (
+  wrapper?: (
+    a1: A1,
+    a2: A2,
+    a3: A3,
+    a4: A4,
+  ) => (
     action: (a1: A1, a2: A2, a3: A3, a4: A4) => StandardActionReturn<S, A>,
     parentState: PS,
     parentActions: PA,
@@ -300,7 +335,9 @@ export function overrideAction<S, A, PS, PA, A1, A2, A3, A4>(
 export function overrideAction<S, A, PS, PA>(
   parentActions: PA,
   getter: (_: PA) => UnknownArgsActionType<S, A>,
-  wrapper?: (...args) => (
+  wrapper?: (
+    ...args
+  ) => (
     action: (...args) => StandardActionReturn<S, A>,
     parentState: PS,
     parentActions: PA,
