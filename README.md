@@ -201,23 +201,6 @@ export const init = () => {
     )
   }
 }
-// but hei, we provide a helper function to simplify this case, now you can:
-export const init2 = () => {
-  const subInit = Hydux.combineInit({
-    counter1: Counter.init(),
-    counter2: Counter.init(),
-  })
-  return {
-    state: {
-      ...subInit.state,
-      // other state
-    },
-    cmd: Cmd.batch(
-      subInit.cmd,
-      // other commands
-    )
-  }
-}
 
 export const actions = {
   counter1: Counter.actions,
@@ -236,6 +219,47 @@ export const view = (state: State, actions: Actions) => (
 
 export type Actions = typeof actions
 export type State = ReturnType<typeof init>['state']
+```
+
+This might be too much boilerplate code, but hey, we provide a type-frendly helper function! See:
+
+```ts
+// Combine all sub components's init/actions/views, auto map init commands.
+const subComps = Hydux.combine({
+  counter1: Counter.init(),
+  counter2: Counter.init(),
+})
+export const init2 = () => {
+  return {
+    state: {
+      ...subComps.state,
+      // other state
+    },
+    cmd: Cmd.batch(
+      subComps.cmd,
+      // other commands
+    )
+  }
+}
+
+
+export const actions = {
+  ...subComps.actions,
+  // ... other actions
+}
+
+export const view = (state: State, actions: Actions) => (
+  <main>
+    <h1>Counter1:</h1>
+    {subComps.views.render('counter1', state, actions)}
+    // euqal to:
+    // {subComps.views.counter1(state.counter1, actions.counter1)}
+    // .render('<key>', ...) won't not work with custom views that not match `(state, actions) => VNode` signature, e.g. jsx style views.
+    // So we still need `.views.counter1(props)` in this case.
+    <h1>Counter2:</h1>
+    {subComps.views.render('counter2', state, actions)}
+  </main>
+)
 ```
 
 ## Actions with Command
