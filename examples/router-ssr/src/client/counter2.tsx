@@ -30,7 +30,7 @@ export const actions = {
 
 export const view = (state: State, actions: Actions) => (
   <div>
-    <h1 className="count">{state.title}: {state.count}</h1>
+    <h1>{state.title}: <span className="count">{state.count}</span></h1>
     <button className="down" onClick={actions.down}>–</button>
     <button className="up" onClick={actions.up}>+</button>
     <button className="upLater" onClick={actions.upLater}>+ later</button>

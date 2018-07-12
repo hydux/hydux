@@ -49,24 +49,29 @@ describe('ssr + code-splitting test', function () {
   })
   it('simple', async () => {
     await page.waitFor('.main')
+    const _text = async (e: puppeteer.ElementHandle | string, trim = true) => {
+      await Utils.sleep(100)
+      if (typeof e === 'string') {
+        e = (await page.$$(e))[0]
+      }
+      return Utils.text(e, trim)
+    }
     const routeTo = async (sel: string) => {
       await (await page.$(sel))!.click()
       await Utils.sleep(50)
     }
     let $main = (await page.$('.main'))!
-    assert.equal(await Utils.text($main), 'Home', `route home`)
+    assert.equal(await _text('.main'), 'Home', `route home`)
     await routeTo('a.users')
-    assert.equal(await Utils.text($main), 'User: 1', `route users`)
+    assert.equal(await _text('.main'), 'User: 1', `route users`)
     await routeTo('a.counter')
     await Utils.counterSuit(page, 0, 100)
-    await Utils.sleep(200)
     await routeTo('a.counter2')
     await Utils.counterSuit(page, 0, 100)
-    await Utils.sleep(200)
     await routeTo('a.counter3')
     await Utils.counterSuit(page, 0, 100)
     await routeTo('a.e404')
-    assert.equal(await Utils.text($main), '404', 'route 404')
+    assert.equal(await _text('.main'), '404', 'route 404')
     await page.goto(`http://127.0.0.1:${port}`)
     let loading = await page.evaluateHandle(
       () => {

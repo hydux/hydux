@@ -140,15 +140,15 @@ export function combine<
     state[key] = init.state
     actions[key] = comp.actions
     views[key] = comp.view
-    cmds[key] = init.cmd
-    cmd = Cmd.batch(cmd, Cmd.map(_ => _[key], init.cmd))
+    cmds[key] = Cmd.map(_ => _[key], init.cmd)
+    cmd = Cmd.batch(cmd, cmds[key])
   }
   return {
     state,
     cmd,
     cmds,
-    actions,
     views,
+    actions,
     render(k, state, actions) {
       return views[k](state[k], actions[k])
     }

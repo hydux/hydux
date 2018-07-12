@@ -91,7 +91,7 @@ export const routes: NestedRoutes<State, Actions> = {
       state: {
         page: 'counter3'
       },
-      cmd: subComps.cmds.counter2,
+      cmd: subComps.cmds.counter3,
     }),
   }, {
     path: '*',

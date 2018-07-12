@@ -62,24 +62,25 @@ export const counterSuit = async (page: puppeteer.Page, n = 0, init = 0) => {
     return text(e, trim)
   }
 
+  async function click(text: string) {
+    return (await page.$$(text))[n].click()
+  }
+
   await page.waitFor('.count')
-  const c1 = (await page.$$('.count'))[n]
-  const c1Up = (await page.$$('.up'))[n]
-  const c1Down = (await page.$$('.down'))[n]
-  const c1UpLater = (await page.$$('.upLater'))[n]
+  await sleep(800)
   console.log('text 1')
   assert.equal(await _text('.count'), `${init}`, `count${n}`)
-  await c1Up.click()
+  await click('.up')
   console.log('text 2')
-  assert.equal(await _text(c1), `${init + 1}`, `count${n} up`)
-  await c1Down.click()
-  assert.equal(await _text(c1), `${init}`, `count${n} down`)
-  await c1UpLater.click()
-  assert.equal(await _text(c1), `${init}`, `count${n} upLater before`)
+  assert.equal(await _text('.count'), `${init + 1}`, `count${n} up`)
+  await click('.down')
+  assert.equal(await _text('.count'), `${init}`, `count${n} down`)
+  await click('.upLater')
+  assert.equal(await _text('.count'), `${init}`, `count${n} upLater before`)
   await sleep(1100)
-  assert.equal(await _text(c1), `${init + 10}`, `count${n} upLater`)
-  await c1Up.click()
-  await c1Up.click()
-  await c1Up.click()
-  assert.equal(await _text(c1), `${init + 13}`, `count${n} upLater`)
+  assert.equal(await _text('.count'), `${init + 10}`, `count${n} upLater`)
+  await click('.up')
+  await click('.up')
+  await click('.up')
+  assert.equal(await _text('.count'), `${init + 13}`, `count${n} upLater`)
 }

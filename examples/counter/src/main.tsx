@@ -20,23 +20,22 @@ if (process.env.NODE_ENV === 'development') {
   app = hmr()(app)
 }
 
+const subComps = Hydux.combine({
+  counter1: [Counter, Counter.init()],
+  counter2: [Counter, Counter.init()],
+})
 const actions = {
-  counter1: Counter.actions,
-  counter2: Counter.actions,
+  ...subComps.actions,
   change: (e: MouseEvent) => (state: State) => ({ ...state, value: e.target!['value'] })
 }
 function init() {
-  const subInit = Hydux.combineInit({
-    counter1: Counter.init(),
-    counter2: Counter.init(),
-  })
   return {
     state: {
-      ...subInit.state,
+      ...subComps.state,
       value: ''
     },
     cmd: Hydux.Cmd.batch(
-      subInit.cmd,
+      subComps.cmd,
     )
   }
 }

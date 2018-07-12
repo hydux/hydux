@@ -60,4 +60,8 @@ typings/
 /lib/
 /es/
 /dist/
-/examples/**/static
+/examples/**/static/dist/bundle*
+/examples/**/static/dist/0*
+/examples/**/static/dist/1*
+/examples/**/static/dist/2*
+/examples/**/lib
