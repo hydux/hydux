@@ -188,13 +188,13 @@ export default function withRouter<State, Actions>(props: Options<State, Actions
     let initComp = getRouteComp(meta, true)
 
     let isRenderable = false
-    function runRoute<S, A>(routeComp: RouteComp<S, A>, actions: A, loc: Location, fromInit = false) {
+    function runRoute<S, A>(routeComp: RouteComp<S, A>, actions: A, loc: Location) {
       const meta = routesMeta[loc.template!]
       switch (routeComp.tag) {
         case 'dynamic':
         case 'clientSSR':
           const key = routeComp.data.key
-          const isClientSSRInit = routeComp.tag === 'clientSSR' && fromInit
+          const isClientSSRInit = routeComp.tag === 'clientSSR'
           return routeComp.data.comp.then(
             comp => ctx.patch(key, comp, isClientSSRInit)
           ).then(
@@ -222,7 +222,7 @@ export default function withRouter<State, Actions>(props: Options<State, Actions
           result.cmd,
           Cmd.ofSub<RouterActions<Actions>>(
             actions => {
-              const ar = runRoute(initComp, actions, loc, true)
+              const ar = runRoute(initComp, actions, loc)
               if (ar instanceof Promise) {
                 return ar
               }

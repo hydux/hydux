@@ -51,26 +51,11 @@ Then we can compose it in Elm way, you can easily reuse your components.
 
 ```js
 import _app from 'hydux'
-import withPersist from 'hydux/lib/enhancers/persist'
 import withUltradom, { h, React } from 'hydux/lib/enhancers/ultradom-render'
 import Counter from './counter'
 
-// let app = withPersist<State, Actions>({
-//   key: 'my-counter-app/v1'
-// })(_app)
-
 // use built-in 1kb ultradom to render the view.
 let app = withUltradom()(_app)
-
-if (process.env.NODE_ENV === 'development') {
-  // built-in dev tools, without pain.
-  const devTools = require('hydux/lib/enhancers/devtools').default
-  const logger = require('hydux/lib/enhancers/logger').default
-  const hmr = require('hydux/lib/enhancers/hmr').default
-  app = logger()(app)
-  app = devTools()(app)
-  app = hmr()(app)
-}
 
 const actions = {
   counter1: Counter.actions,
@@ -122,7 +107,6 @@ export function init() {
   }
 }
 
-
 export const actions = {
   setCount: n => (state, actions) => {
     return { count: n }
@@ -131,52 +115,7 @@ export const actions = {
 
 ```
 
-It might be verbose if we want to init a child component with init command.
-
-```ts
-// Counter.tsx
-import { React } from 'hydux-react'
-import * as Hydux from 'hydux'
-const Cmd = Hydux.Cmd
-
-export const init = () => ({
-  state: { count: 0 },
-  cmd: Cmd.ofSub(
-    (_: Actions) =>
-      fetch(`/api/initcount`)
-      .then(res => res.json())
-      .then(data => _.setCount(data.count)),
-  )
-})
-export const actions = {
-  setCount: (count): any => (state: State) => ({ count }),
-  down: (): any => (state: State) => ({ count: state.count - 1 }),
-  up: (): any => (state: State) => ({ count: state.count + 1 }),
-  upN: (n): any => (state: State): Hydux.AR<State, Actions> => ({ count: state.count + n }),
-  upLater: (): any => (state: State, actions: Actions) => ({
-    state,
-    cmd: Cmd.ofPromise(
-      n => new Promise(resolve => setTimeout(() => resolve(n), 1000)),
-      10,
-      actions.upN
-    )
-  })
-
-}
-
-export const view = (state: State, actions: Actions) => (
-  <div>
-    <h1 className="count">{state.count}</h1>
-    <button className="down" onClick={actions.down}>–</button>
-    <button className="up" onClick={actions.up}>+</button>
-    <button className="upLater" onClick={actions.upLater}>+ later</button>
-  </div>
-)
-
-export type Actions = typeof actions
-export type State = ReturnType<typeof init>['state']
-```
-
+If we want to init a child component with init command, we need to map it to the sub level via lambda function, just like **type lift** in Elm.
 ```ts
 // App.tsx
 import { React } from 'hydux-react'
@@ -193,8 +132,8 @@ export const init = () => {
       counter2: counter2.state,
     },
     cmd: Cmd.batch(
-      Cmd.map((_: Actions) => _.counter1, counter1.cmd),
-      Cmd.map((_: Actions) => _.counter2, counter2.cmd),
+      Cmd.map((_: Actions) => _.counter1, counter1.cmd), // Map counter1's init command to parent component
+      Cmd.map((_: Actions) => _.counter2, counter2.cmd), // Map counter2's init command to parent component
       Cmd.ofSub(
         _ => // some other commands of App
       )
@@ -226,8 +165,8 @@ This might be too much boilerplate code, but hey, we provide a type-frendly help
 ```ts
 // Combine all sub components's init/actions/views, auto map init commands.
 const subComps = Hydux.combine({
-  counter1: Counter.init(),
-  counter2: Counter.init(),
+  counter1: [Counter, Counter.init()],
+  counter2: [Counter, Counter.init()],
 })
 export const init2 = () => {
   return {

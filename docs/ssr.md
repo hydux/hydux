@@ -24,6 +24,31 @@ Add `withSSR` enhancer and add remove `withReact` enhancer when running on the s
 
 ```ts
 import * as Hydux from 'hydux'
+
+
+export const routes: NestedRoutes<State, Actions> = {
+  path: '/',
+  action: loc => state => ({
+    ...state,
+    page: 'home'
+  }),
+  children: [{
+    path: '/counter2',
+    update: (loc) => ({
+      state: {
+        page: 'counter2'
+      },
+      cmd: subComps.cmds.counter2, // init side effect commands in router changes
+    }),
+  }, {
+    path: '*',
+    action: loc => state => ({
+      ...state,
+      page: '404'
+    }),
+  }]
+}
+
 export function main(path?: string) {
   let withEnhancers = Hydux.compose(
     withRouter<State.State, State.Actions>({
@@ -32,7 +57,7 @@ export function main(path?: string) {
           ? State.history
           // Since there are no history API on the server side, we should use MemoryHistory here. The initPath are from your server controller.
           : new MemoryHistory({ initPath: path }) ,
-      routes: State.routes,
+      routes: routes,
     }),
     __is_browser
       ? withReact<State.State, State.Actions>(
@@ -61,16 +86,11 @@ On your top `init` function, running commands only when on the server side,
 const initState = {
   //... the empty initial state of your app
 }
-export const init: Init<State, Actions> = () => [
-  // Synchronize the server-side state to client by print the state on the html
-  global.__INIT_STATE__ || initState,
-  // Since the init command is already executed on the server side, we can simply ignore it on the browser side.
-  __is_browser
-    ? Cmd.none
-    : Cmd.batch(
-        Cmd.map(_ => _.counter, Counter.initCmd())
-      )
-]
+export const init: Init<State, Actions> = () => {
+  // Synchronize the server-side state to client by print the state on the html,
+  // we don't need init commands here, because we need to init commands in router actions.
+  state: global.__INIT_STATE__ || initState,
+}
 ```
 
 ### Step 3
