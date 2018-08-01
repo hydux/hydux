@@ -6,6 +6,7 @@ A light-weight Elm-like alternative for Redux ecosystem, inspired by [Hyperapp](
 
 ## Features
 
+* Elm Architecture, split your whole app with **init**, **state**, **actions**.
 * [hyperapp](https://github.com/hyperapp/hyperapp) compatible API
 * Elm-like [side effect manager](https://github.com/hydux/hydux#actions-with-cmd) and subscribe API
 * Support any vdom library, including react ([official support](https://github.com/hydux/hydux-react))

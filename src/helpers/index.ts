@@ -289,7 +289,7 @@ export function overrideAction<PS, PA, S, A, A1>(
 )
 export function overrideAction<S, A, PS, PA, A1, A2>(
   parentActions: PA,
-  getter: (_: PA) => (a1: A1) => (s: S, a: A) => any,
+  getter: (_: PA) => (a1: A1, a2: A2) => (s: S, a: A) => any,
   wrapper?: (
     a1: A1,
     a2: A2,
@@ -303,7 +303,7 @@ export function overrideAction<S, A, PS, PA, A1, A2>(
 )
 export function overrideAction<S, A, PS, PA, A1, A2, A3>(
   parentActions: PA,
-  getter: (_: PA) => (a1: A1) => (s: S, a: A) => any,
+  getter: (_: PA) => (a1: A1, a2: A2, a3: A3) => (s: S, a: A) => any,
   wrapper?: (
     a1: A1,
     a2: A2,
@@ -318,7 +318,7 @@ export function overrideAction<S, A, PS, PA, A1, A2, A3>(
 )
 export function overrideAction<S, A, PS, PA, A1, A2, A3, A4>(
   parentActions: PA,
-  getter: (_: PA) => (a1: A1) => (s: S, a: A) => any,
+  getter: (_: PA) => (a1: A1, a2: A2, a3: A3, a4: A4) => (s: S, a: A) => any,
   wrapper?: (
     a1: A1,
     a2: A2,

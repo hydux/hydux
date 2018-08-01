@@ -61,7 +61,7 @@ export interface Context<State, Actions, RenderReturn = any> {
   patch: Patch
   render(state?: State): RenderReturn
 }
-export type App<State, Actions> = (props: AppProps<State, Actions>) => Context<State, Actions, any>
+export type App<State, Actions> = (props: AppProps<State, Actions>) => Context<State, Actions>
 export type Enhancer<S, A> = (app: App<S, A>) => App<S, A>
 
 function isObjReturn<S, A>(res: ActionReturn<S, A> | InitReturn<S, A>): res is InitObjReturn<S, A> | ActionObjReturen<S, A> {
