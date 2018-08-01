@@ -1,6 +1,6 @@
 {
   "name": "hydux",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "description": "A light-weight Elm-like alternative for Redux ecosystem, inspired by Hyperapp, Elmish, Elm, Redux, etc. Working with any vdom library!",
   "main": "./lib/index.js",
   "typings": "./lib/index",
