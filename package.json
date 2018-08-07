@@ -64,7 +64,7 @@
     "power-assert": "^1.4.4",
     "pre-commit": "^1.2.2",
     "puppeteer": "^1.5.0",
-    "serve": "^6.5.6",
+    "serve": "^9.4.0",
     "source-map-loader": "^0.2.3",
     "timekeeper": "^2.0.0",
     "ts-node": "^6.1.1",

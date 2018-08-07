@@ -29,7 +29,7 @@ export type ActionType2<D1, D2, State, Actions> =
   | ActionReturn<State, Actions>
   | ((state: State, actions: Actions) => ActionReturn<State, Actions>)
 
-export type UnknownArgsActionType<State, Actions> =
+export type GeneralActionType<State, Actions> =
   (...args: any[]) =>
   | ActionReturn<State, Actions>
   | ((state: State, actions: Actions) => ActionReturn<State, Actions>)

@@ -3,7 +3,7 @@ import { AppProps, App, Cmd, normalize } from './../index'
 
 let globalState
 export default function withHmr<State, Actions>(): (app: App<State, Actions>) => App<State, Actions> {
-  return (app: App<State, Actions>) => (props: AppProps<State, Actions>) => app({
+  return app => props => app({
     ...props,
     init() {
       let result = normalize(props.init())

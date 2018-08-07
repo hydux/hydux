@@ -11,7 +11,7 @@ import {
   ActionType,
   ActionsType,
   InitObjReturn,
-  UnknownArgsActionType,
+  GeneralActionType,
 } from '../types'
 export type Dt<T extends string, D = null> = {
   tag: T
@@ -273,7 +273,7 @@ export function withParents<S, A, PS, PA, A1, A2, A3, A4, A5>(
  * @param parentActions
  */
 export function withParents<S, A, PS, PA>(
-  action: UnknownArgsActionType<S, A>,
+  action: GeneralActionType<S, A>,
   wrapper?: (
     action: (...args) => StandardActionReturn<S, A>,
     parentState: PS,
@@ -363,7 +363,7 @@ export function overrideAction<S, A, PS, PA, A1, A2, A3, A4>(
  */
 export function overrideAction<S, A, PS, PA>(
   parentActions: PA,
-  getter: (_: PA) => UnknownArgsActionType<S, A>,
+  getter: (_: PA) => GeneralActionType<S, A>,
   wrapper?: (
     ...args
   ) => (
