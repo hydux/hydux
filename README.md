@@ -319,6 +319,7 @@ let ctx = Hydux.app<State, Actions>({
 * [hydux-transitions](https://github.com/hydux/hydux-transitions): A css transition library inspired by [animajs](http://animejs.com/)'s timeline, follow **The Elm Architecture**.
 * [hydux-data](https://github.com/hydux/hydux-data): Statically-typed data-driven development for hydux, in the Elm way. Inspired by apollo-client.
 * [hydux-pixi](https://github.com/hydux/hydux-pixi): High performance [pixi.js](https://github.com/pixijs/pixi.js) renderer for Hydux.
+* [hydux code snippets for vscode (TS)](https://github.com/hydux/hydux/tree/master/docs/hydux.code-snippets) Best practice for using hydux + typescript without boilerplate code.
 
 ### Samples
 
@@ -328,6 +329,8 @@ let ctx = Hydux.app<State, Actions>({
 
 ```sh
 git clone https://github.com/hydux/hydux.git
+cd hydux
+yarn # or npm i
 cd examples/counter
 yarn # or npm i
 npm start

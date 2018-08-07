@@ -71,13 +71,13 @@ module.exports = createConfig([
         chunks: false,
         children: false,
       },
-    }),
-    devServer.proxy({
-      '/api': {
-        target: 'http://localhost:3000',
-        secure: false,
-        changeOrigin: true,
-      },
+      proxy: {
+        '/api': {
+          target: 'http://localhost:3000',
+          secure: false,
+          changeOrigin: true,
+        },
+      }
     }),
     addPlugins([
       // prints more readable module names in the browser console on HMR updates

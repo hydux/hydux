@@ -11,7 +11,7 @@ import {
   UnknownArgsActionType,
 } from './types'
 import Cmd, { CmdType, Sub } from './cmd'
-import { set, merge, setDeep, setDeepMutable, get, isFn, noop, isPojo, clone } from './utils'
+import { set, merge, setDeep, setDeepMutable, get, isFn, noop, isPojo, clone, OverrideLength, weakVal } from './utils'
 import { runAction } from './helpers'
 export * from './helpers'
 export * from './types'
@@ -186,7 +186,8 @@ export function app<State, Actions>(props: AppProps<State, Actions>): Context<St
           let prevAppState = appState
           const actionResult = subFrom(...msgData)
           if (isFn(actionResult) && actionResult.length > 2) {
-            let pLen = path.length - 1
+            let offset = weakVal<number>(subFrom, OverrideLength) || 1
+            let pLen = path.length - offset
             parentActions = get(path, appActions, pLen)
             parentState = get(path, appState, pLen)
           }
@@ -229,7 +230,7 @@ export function app<State, Actions>(props: AppProps<State, Actions>): Context<St
       } else if (typeof subFrom === 'object' && subFrom) {
         init(
           state[key] || (state[key] = {}),
-          (actions[key] = clone(subFrom)),
+          actions[key] = clone(subFrom),
           subFrom,
           path.concat(key),
         )

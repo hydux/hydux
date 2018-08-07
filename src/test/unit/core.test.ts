@@ -207,9 +207,15 @@ describe('core api', () => {
     const initState = {
       counter1: Counter.init(),
       counter2: Counter.init(),
+      counter3: {
+        child: Counter.init(),
+      },
     }
     // const counter1Actions: CounterActions =
     const actions = {
+      counter3: {
+        child: Counter.actions,
+      },
       counter2: Counter.actions,
       counter1: Counter.actions,
     }
@@ -220,6 +226,23 @@ describe('core api', () => {
     ) => {
       const { state, cmd } = action(n + 1)
       assert.equal(state.count, parentState.counter1.count + n + 1, 'call child action work')
+      return [
+        state,
+        Cmd.batch(
+          cmd,
+          Cmd.ofFn(
+            () => parentActions.counter2.up()
+          ),
+        )
+      ]
+    })
+    Hydux.overrideAction(actions, _ => _.counter3.child.upN, n => (
+      action,
+      parentState: State,
+      parentActions,
+    ) => {
+      const { state, cmd } = action(n + 1)
+      assert.equal(state.count, parentState.counter3.child.count + n + 1, 'call nested child action work')
       return [
         state,
         Cmd.batch(
@@ -242,6 +265,10 @@ describe('core api', () => {
     ctx.actions.counter1.upN(1)
     assert.equal(ctx.state.counter1.count, 3, 'counter1 upN work')
     assert.equal(ctx.state.counter2.count, 2, 'counter2 upN work')
+
+    ctx.actions.counter3.child.upN(1)
+    assert.equal(ctx.state.counter3.child.count, 3, 'counter1 upN work')
+    assert.equal(ctx.state.counter2.count, 3, 'counter2 for 3 upN work')
   })
 
   it('legacy parent actions', () => {

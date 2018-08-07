@@ -1,0 +1,120 @@
+{
+  "Add hydux full action": {
+    "scope": "typescript,typescriptreact",
+    "prefix": "ha",
+    "body": [
+      "$1: ($2) => (state: State, actions: Actions): Hydux.AR<State, Actions> => {",
+      "  $3",
+      "  return $4",
+      "},"
+    ],
+    "description": "Add a hydux action"
+  },
+  "Add hydux component": {
+    "scope": "typescript,typescriptreact",
+    "prefix": "hc",
+    "body": [
+      "import * as React from 'react'",
+      "import * as Hydux from 'hydux'",
+			"const { Cmd } = Hydux",
+			"",
+      "export function init() {",
+      "  return {",
+      "    state: {",
+      "      $1",
+      "    },",
+      "    cmd: ${2:Cmd.none},",
+      "  }",
+      "}",
+      "export const actions = {",
+			"  ${3:update}: () => (state: State, actions: Actions): Hydux.AR<State, Actions> => {",
+			"    ${4}",
+      "    return $5",
+      "  },",
+      "}",
+
+      "export const view = (state: State, actions: Actions) => {",
+      "  return (",
+      "    <div>",
+			"      ${5}",
+      "    </div>",
+      "  )",
+      "}",
+
+      "export type Actions = typeof actions",
+      "export type State = ReturnType<typeof init>['state']"
+    ],
+    "description": "Add a hydux component"
+  },
+  "Add hydux state page": {
+    "scope": "typescript,typescriptreact",
+    "prefix": "hsp",
+    "body": [
+      "import * as Hydux from 'hydux'",
+			"const { Cmd } = Hydux",
+			"",
+      "export function init() {",
+      "  return {",
+      "    state: ({",
+      "      $1",
+      "    }),",
+      "    cmd: ${2:Cmd.none},",
+      "  }",
+      "}",
+      "",
+      "export const actions = {",
+			"  ${3:update}: () => (state: State, actions: Actions): Hydux.AR<State, Actions> => {",
+			"    ${4}",
+      "    return $5",
+      "  },",
+      "}",
+      "",
+      "export type Actions = typeof actions",
+      "export type State = ReturnType<typeof init>['state']"
+    ],
+    "description": "Add a hydux component"
+  },
+  "Add hydux view page": {
+    "scope": "typescript,typescriptreact",
+    "prefix": "hvp",
+    "body": [
+      "import * as React from 'react'",
+      "import * as Hydux from 'hydux'",
+      "import * as State from './State'",
+			"",
+
+      "export const view = (state: State, actions: Actions) => {",
+      "  return (",
+      "    <div>",
+			"      ${1}",
+      "    </div>",
+      "  )",
+      "}",
+    ],
+    "description": "Add a hydux component"
+  },
+  "override action": {
+    "scope": "typescript,typescriptreact",
+    "prefix": "hoa",
+    "body": [
+      "Hydux.overrideAction(",
+      "  actions,",
+      "  _ => _${1},",
+      "  ($2) => (action, ps: State, pa) => {",
+      "    let res = action($2)",
+      "    return res",
+      "})"
+    ],
+    "description": "Override a child action"
+  },
+  "combind chile components": {
+    "scope": "typescript,typescriptreact",
+    "prefix": "hcc",
+    "body": [
+      "Hydux.combine({",
+      "  ${1:comp}: [${2:Comp}, ${2:Comp}.init(${3})],",
+      "})"
+    ],
+    "description": "Override a child action"
+  }
+}

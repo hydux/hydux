@@ -1,5 +1,5 @@
 
-const isSet = val => typeof val !== 'undefined' && val !== null
+const isSet = <T>(val: T | undefined | null): val is T => typeof val !== 'undefined' && val !== null
 export const isPojo = obj => !isSet(obj.constructor) || obj.constructor === Object
 
 export const isDev = typeof process !== 'undefined' && process.env.NODE_ENV === 'development'
@@ -71,3 +71,16 @@ export function isFn(data): data is Function {
 }
 
 export const noop = f => f
+
+export const OverrideLength = '@hydux/override_length'
+
+export function weakVal<T, O = any>(obj: O, key: string, value?: T): T | void {
+  if (isSet(value)) {
+    Object.defineProperty(obj, key, {
+      enumerable: false,
+      value
+    })
+  } else {
+    return obj[key]
+  }
+}

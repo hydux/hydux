@@ -2,7 +2,7 @@ import * as Cmd from '../cmd'
 import { Init, normalize, Context, Component } from '../index'
 export * from './hash'
 export * from './memoize'
-import { set, merge, setDeep, setDeepMutable, get, isFn, noop, isPojo, clone } from '../utils'
+import { set, merge, setDeep, setDeepMutable, get, isFn, noop, isPojo, clone, OverrideLength, weakVal } from '../utils'
 import {
   ActionReturn,
   ActionState,
@@ -124,11 +124,28 @@ export interface CombinedComps<
   T extends { [k: string]: [Component, InitObjReturn<any, any>] },
   A extends { [k: string]: any }
 > {
+  /** Combined state object for child components */
   state: { [k in keyof T]: T[k][1]['state'] }
+  /** Combined and mapped cmd object for child components */
   cmd: Cmd.Sub<A>[]
+  /**
+   * Splited mapped cmd object for child components, useful for router config, so you can call init cmd when each page routing.
+   *
+   */
   cmds: { [k in keyof T]: Cmd.Sub<A>[] }
+  /** Combined action object for child components */
   actions: { [k in keyof T]: T[k][0]['actions'] }
+  /** Combined view function for child components */
   views: { [k in keyof T]: T[k][0]['view'] }
+  /**
+   * helper function for render routes views, so you can do
+   * `subComps.render('somePage', state, actions)` instead of
+   * `SomePage.views(state.somePage, actions.somePage)` or
+   * `<SomePage.views
+   *    state={state.somePage}
+   *    actions={actions.somePage}
+   *  />`
+   */
   render: <K extends Extract<keyof T, keyof S>, S>(k: K, state: S, actions: ActionsType<S, any>) => any
 }
 
@@ -157,7 +174,12 @@ export function combine<
     views,
     actions,
     render(k, state, actions) {
-      return views[k](state[k], actions[k])
+      let view = views[k]
+      if (view.length === 1) {
+        return (view as any)({ state: state[k], actions: actions[k] })
+      } else {
+        return view(state[k], actions[k])
+      }
     }
   }
 }
@@ -356,9 +378,9 @@ export function overrideAction<S, A, PS, PA>(
     return parentActions
   }
   let action = getter(parentActions)
-  const wrapped = (...args) => (state: S, actions: A, parentState: PS, parentActions: PA) => {
-    const normalAction = (...args) => runAction(action(...args), state, actions)
-    return wrapper(...args)(normalAction, parentState, parentActions, state, actions)
+  const wrapped = (...args) => (s: S, a: A, ps: PS, pa: PA) => {
+    const normalAction = (...args) => runAction(action(...args), s, a, ps, pa)
+    return wrapper(...args)(normalAction, ps, pa, s, a)
   }
   let keys = (getter.toString().match(/((?:[\w_$]+\.)+[\w_$]+)/) || [])[1].split('.').slice(1)
   let cursor = parentActions
@@ -372,8 +394,10 @@ export function overrideAction<S, A, PS, PA>(
     }
     cursor = cursor[key] = { ...cursor[key] }
   }
+  weakVal(wrapped, OverrideLength, keys.length)
   if (!replaced) {
     console.error(new Error(`Cannot find action in parentActions`), parentActions, getter)
   }
+
   return parentActions
 }
