@@ -1,6 +1,6 @@
 # Hydux
 
-[![Build Status](https://travis-ci.org/hydux/hydux.svg?branch=master)](https://travis-ci.org/hydux/hydux) [![npm](https://img.shields.io/npm/v/hydux.svg)](https://www.npmjs.com/package/hydux) [![npm](https://img.shields.io/npm/dm/hydux.svg)](https://www.npmjs.com/package/hydux) [![Join the chat at https://gitter.im/hydux/hydux](https://badges.gitter.im/ hydux/hydux.svg)](https://gitter.im/hydux/hydux?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Build Status](https://travis-ci.org/hydux/hydux.svg?branch=master)](https://travis-ci.org/hydux/hydux) [![npm](https://img.shields.io/npm/v/hydux.svg)](https://www.npmjs.com/package/hydux) [![npm](https://img.shields.io/npm/dm/hydux.svg)](https://www.npmjs.com/package/hydux) [![Join the chat at https://gitter.im/hydux/hydux](https://badges.gitter.im/hydux/hydux.svg)](https://gitter.im/hydux/hydux?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 A light-weight Elm-like alternative for Redux ecosystem, inspired by [Hyperapp](https://github.com/hyperapp/hyperapp) and [Elmish](https://github.com/fable-elmish/elmish).
 
