@@ -116,7 +116,7 @@ export const actions = {
 
 ```
 
-If we want to init a child component with init command, we need to map it to the sub level via lambda function, just like **type lift** in Elm.
+If we want to init a child component with init command, we need to map it to the sub level via lambda function, just like **type lifting** in Elm.
 ```ts
 // App.tsx
 import { React } from 'hydux-react'
@@ -161,7 +161,7 @@ export type Actions = typeof actions
 export type State = ReturnType<typeof init>['state']
 ```
 
-This might be too much boilerplate code, but hey, we provide a type-frendly helper function! See:
+This might be too much boilerplate code, but hey, we provide a type-friendly helper function! See:
 
 ```ts
 // Combine all sub components's init/actions/views, auto map init commands.
