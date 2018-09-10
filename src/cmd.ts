@@ -104,7 +104,10 @@ export function ofPromise<A, T, State, Actions>(
             console.error(error)
           }
         })
-        .catch(failedAction)
+        .catch(err => {
+          console.error(err)
+          failedAction && failedAction(err)
+        })
   ]
 }
 /**

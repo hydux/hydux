@@ -167,7 +167,7 @@ export default function withRouter<State, Actions>(props: Options<State, Actions
     const meta = routesMeta[loc.template!]
     const getRouteComp = (meta?: RouteMeta<State, Actions>, fromInit = false): RouteComp<State, Actions> => {
       if (!meta || !meta.getComponent) {
-        return dt('normal', null)
+        return dt('crossNormal', null)
       }
       const ret = meta.getComponent()
       const [key, comp] = ret
@@ -177,13 +177,13 @@ export default function withRouter<State, Actions>(props: Options<State, Actions
       }
       if (ssr) {
         if (isServer && !renderOnServer) {
-          return dt('normal', null)
+          return dt('crossNormal', null)
         }
         if (fromInit && !isServer && renderOnServer) {
-          return dt('clientSSR', { key, comp })
+          return dt('clientHydrate', { key, comp })
         }
       }
-      return dt('dynamic', { key, comp })
+      return dt('crossDynamic', { key, comp })
     }
     let initComp = getRouteComp(meta, true)
 
@@ -191,15 +191,15 @@ export default function withRouter<State, Actions>(props: Options<State, Actions
     function runRoute<S, A>(routeComp: RouteComp<S, A>, actions: A, loc: Location) {
       const meta = routesMeta[loc.template!]
       switch (routeComp.tag) {
-        case 'dynamic':
-        case 'clientSSR':
+        case 'crossDynamic':
+        case 'clientHydrate':
           const key = routeComp.data.key
-          const isClientSSRInit = routeComp.tag === 'clientSSR'
+          const isClientHydrate = routeComp.tag === 'clientHydrate'
           return routeComp.data.comp.then(
-            comp => ctx.patch(key, comp, isClientSSRInit)
+            comp => ctx.patch(key, comp, isClientHydrate)
           ).then(
             () => {
-              if (isClientSSRInit) { // trigger client ssr render
+              if (isClientHydrate) { // trigger client ssr render
                 isRenderable = true
                 return ctx.render()
               }
@@ -208,7 +208,7 @@ export default function withRouter<State, Actions>(props: Options<State, Actions
               return actions[CHANGE_LOCATION](loc) as CmdType<A>
             }
           )
-        case 'normal':
+        case 'crossNormal':
           isRenderable = true
           return actions[CHANGE_LOCATION](loc) as CmdType<A>
         default: return never(routeComp)
@@ -274,9 +274,18 @@ export default function withRouter<State, Actions>(props: Options<State, Actions
 }
 
 export type RouteComp<S, A> =
-| Dt<'dynamic', {key: string, comp: Promise<Component<S, A>>}>
-| Dt<'clientSSR', {key: string, comp: Promise<Component<S, A>>}>
-| Dt<'normal', null>
+/**
+ * patch and render dynamic component on the server or client
+ */
+| Dt<'crossDynamic', {key: string, comp: Promise<Component<S, A>>}>
+/**
+ * client hydrate for dynamic component on the client side
+ */
+| Dt<'clientHydrate', {key: string, comp: Promise<Component<S, A>>}>
+/**
+ * render as normal static component on the server or client
+ */
+| Dt<'crossNormal', null>
 
 export type GetComp<S, A> = () =>
   | [string /** key */, Promise<Component<S, A>>]
