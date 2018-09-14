@@ -120,6 +120,10 @@ export function compose<R>(...fns: Function[]): Fn1<any, R> {
   return arg => fns.reduce((arg, fn) => fn(arg), arg)
 }
 
+export function defaults<T>(value: T | null | undefined, defaults: T): T {
+  return value == null ? defaults : value
+}
+
 export interface CombinedComps<
   T extends { [k: string]: [Component, InitObjReturn<any, any>] },
   A extends { [k: string]: any }

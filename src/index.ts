@@ -15,7 +15,7 @@ export * from './helpers'
 export * from './types'
 export { set, merge, setDeep, Cmd, CmdType, Sub, ActionReturn, noop, isFn, isPojo }
 
-export type Init<S, A> = () => InitReturn<S, A>
+export type Init<S, A> = (...args: any[]) => InitReturn<S, A>
 // todo: Remove back compatible optional ctx
 export type View<S, A> = ((state: S, actions: A) => any)
 export type Subscribe<S, A> = (state: S) => CmdType<A>
