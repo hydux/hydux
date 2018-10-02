@@ -184,7 +184,7 @@ export function app<State, Actions>(props: AppProps<State, Actions>): Context<St
           let prevAppState = appState
           const actionResult = subFrom(...msgData)
           if (isFn(actionResult) && actionResult.length > 2) {
-            let offset = weakVal<number>(subFrom, OverrideLength) || 1
+            let offset = (weakVal<number>(subFrom, OverrideLength) || 2) - 1
             let pLen = path.length - offset
             parentActions = get(path, appActions, pLen)
             parentState = get(path, appState, pLen)

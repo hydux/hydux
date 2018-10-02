@@ -60,6 +60,7 @@ export function setDeepMutable<S, V>(path: string[], value: V, from: S): S {
 }
 
 export function get(path: string[], from: any, len: number = path.length) {
+  if (len < 0) throw new TypeError('parameter len cannot be negative:' + len)
   for (let i = 0; i < len; i++) {
     from = from[path[i]]
   }
@@ -80,6 +81,7 @@ export function weakVal<T, O = any>(obj: O, key: string, value?: T): T | void {
       enumerable: false,
       value
     })
+    return value
   } else {
     return obj[key]
   }
