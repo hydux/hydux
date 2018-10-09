@@ -33,16 +33,14 @@ export function setDeep<S, V>(path: string[], value: V, from: S): S {
   if (path.length === 0) {
     return value as any as S
   }
-  let to =
-    isPojo(from)
-      ? {} : new (from as any).constructor()
+  let to = clone(from)
   let toCursor = to
   let fromCursor = from
   let lastIdx = path.length - 1
   set(toCursor, fromCursor)
   for (let i = 0; i < lastIdx; i++) {
     const key = path[i]
-    toCursor = toCursor[key]
+    toCursor = toCursor[key] = clone(toCursor[key])
     fromCursor = fromCursor[key]
     set(toCursor, fromCursor)
   }

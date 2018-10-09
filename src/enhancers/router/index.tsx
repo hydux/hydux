@@ -63,7 +63,9 @@ export interface LinkProps {
   // Feel free to add more...
 }
 
-export function mkLink(history: History, h) {
+export function mkLink(history: History, h, opts: {
+  comp?: string
+} = {}) {
   const React = { createElement: h }
   return function Link({
       to,
@@ -84,7 +86,7 @@ export function mkLink(history: History, h) {
       e.stopPropagation()
       onClick && onClick(e)
     }
-    const Comp: any = 'a'
+    const Comp: any = opts.comp || 'a'
     if ('children' in props) {
       children = (props as any).children
     }
@@ -109,7 +111,7 @@ export function mkLink(history: History, h) {
       }
     }
     return (
-      <a
+      <Comp
         href={to}
         {...props}
         onMouseOver={e => {
@@ -123,7 +125,7 @@ export function mkLink(history: History, h) {
         onClick={handleClick}
       >
         {children}
-      </a>
+      </Comp>
     )
   }
 }

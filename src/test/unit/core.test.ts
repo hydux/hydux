@@ -1,4 +1,4 @@
-import { noop } from './../../utils'
+import { noop, setDeep } from './../../utils'
 import * as assert from 'assert'
 import * as Hydux from '../../index'
 const { app, Cmd, withParents } = Hydux
@@ -352,5 +352,20 @@ describe('core api', () => {
     assert.equal(ctx.state.counter1.count, 5, 'counter1 upObj4 should work')
     await sleep(10)
     assert.equal(ctx.state.counter1.count, 6, 'counter1 upObj4 async should work')
+  })
+
+  it('setDeep', () => {
+    let a = {
+      b: {
+        c: {
+          d: 1
+        }
+      }
+    }
+    let b = setDeep(['b', 'c'], { d: 2 }, a)
+    assert.notEqual(a, b, 'a !== b')
+    assert.notEqual(a.b, b.b, 'a.b !== b.b')
+    assert.notEqual(a.b.c, b.b.c, 'a.b.c !== b.b.c')
+    assert.notEqual(a.b.c.d, b.b.c.d, 'a.b.c.d !== b.b.c.d')
   })
 })
