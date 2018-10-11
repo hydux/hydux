@@ -191,13 +191,13 @@ export const actions = {
 export const view = (state: State, actions: Actions) => (
   <main>
     <h1>Counter1:</h1>
-    {subComps.views.render('counter1', state, actions)}
+    {subComps.render('counter1', state, actions)}
     // euqal to:
     // {subComps.views.counter1(state.counter1, actions.counter1)}
     // .render('<key>', ...) won't not work with custom views that not match `(state, actions) => VNode` signature, e.g. jsx style views.
     // So we still need `.views.counter1(props)` in this case.
     <h1>Counter2:</h1>
-    {subComps.views.render('counter2', state, actions)}
+    {subComps.render('counter2', state, actions)}
   </main>
 )
 ```
