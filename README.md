@@ -194,8 +194,8 @@ export const view = (state: State, actions: Actions) => (
     {subComps.render('counter1', state, actions)}
     // euqal to:
     // {subComps.views.counter1(state.counter1, actions.counter1)}
-    // .render('<key>', ...) won't not work with custom views that not match `(state, actions) => VNode` signature, e.g. jsx style views.
-    // So we still need `.views.counter1(props)` in this case.
+    // .render('<key>', ...) won't not work with custom views that not match `(state, actions) => any` or `(props) => any` signature
+    // So we still need `.views.counter1(...args)` in this case.
     <h1>Counter2:</h1>
     {subComps.render('counter2', state, actions)}
   </main>
@@ -204,7 +204,7 @@ export const view = (state: State, actions: Actions) => (
 
 ## Actions with Command
 
-This library also implemented a Elm-like side effects manager, you can simple return a tuple (two elements array) in your action, and put the Cmd as the second element.
+This library also implemented a Elm-like side effects manager, you can simple return a record with state, cmd in your action
 e.g.
 
 ```ts
