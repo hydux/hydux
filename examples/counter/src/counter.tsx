@@ -17,15 +17,16 @@ export const actions = {
   },
   down: (): any => state => ({ count: state.count - 1 }),
   upN: (n): any => (state: State) => ({ count: state.count + n }),
-  upLater: (): any => (state) => (actions) =>
-    [ state,
-      Cmd.ofPromise(
-        n => {
-          return new Promise(resolve =>
-            setTimeout(() => resolve(n), 1000))
-        },
-        10,
-        actions.upN) ]
+  upLater: (): any => (state) => (actions) => ({
+    state,
+    cmd: Cmd.ofPromise(
+      n => {
+        return new Promise(resolve =>
+          setTimeout(() => resolve(n), 1000))
+      },
+      10,
+      actions.upN)
+  })
 }
 
 export const view = (state: State, actions: Actions) =>

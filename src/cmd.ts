@@ -114,7 +114,7 @@ export function ofPromise<A, T, State, Actions>(
  * Create a command from a sub function, you can access all same level actions in a `sub`.
  * @param sub
  */
-export const ofSub = <Actions>(sub: Sub<Actions>): CmdType<Actions> => [sub]
+export const ofSub = <Actions>(...subs: Sub<Actions>[]): CmdType<Actions> => subs
 const _concat = Array.prototype.concat
 /**
  * Batch multi commands to one command

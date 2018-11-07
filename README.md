@@ -27,6 +27,50 @@ A light-weight Elm-like alternative for Redux ecosystem, inspired by [Hyperapp](
 yarn add hydux # or npm i hydux
 ```
 
+## React-hooks like dependency injection for state/actions<sup style="color: red;">New!</sup>
+
+This is an experimental dependency injection API for actions inspired by react-hooks, totally downward compatible, with this we don't need curring to inject state and actions or manually markup types for the return value any more!
+
+> Note: please don't use it in production, it's not stable yet, if you want to live on the bleeding edge, you can try with the alpha release:
+
+```sh
+yarn add hydux@^v0.5.8-beta0
+```
+
+```ts
+import { inject } from 'hydux'
+
+export default {
+  init: () => ({ count: 1 }),
+  actions: {
+    down() {
+      let { state, actions, setState, Cmd } = inject<State, Actions>()
+      setState({ count: state.count - 1 })
+      Cmd.addSub(_ => _.log('down -1'))
+      actions.up()
+    },
+    up() {
+      let { state, actions } = inject<State, Actions>()
+      return { count: state.count + 1 }
+    },
+    log(msg) {
+      console.log(msg)
+    }
+  },
+  view: () => {
+    let [state, actions] = inject<State, Actions>()
+    return (
+      <div>
+        <h1>{state.count}</h1>
+        <button onclick={actions.down}>–</button>
+        <button onclick={actions.up}>+</button>
+      </div>
+    )
+  }
+}
+
+```
+
 ## Quick Example
 
 Let's say we got a counter, like this.

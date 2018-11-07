@@ -33,5 +33,7 @@ describe('counter test', function () {
     await page.waitFor('.count')
     await Utils.counterSuit(page, 0)
     await Utils.counterSuit(page, 1)
+    await Utils.counterSuit(page, 2)
+    await Utils.counterSuit(page, 3)
   })
 })

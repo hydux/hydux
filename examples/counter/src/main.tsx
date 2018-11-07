@@ -5,6 +5,7 @@ import { ActionsType } from '../../../src/types'
 import './polyfill.js'
 import Intro from './intro'
 import * as Counter from './counter'
+import * as CounterInject from './counter-inject'
 
 // let app = withPersist<State, Actions>({
 //   key: 'time-game/v1'
@@ -23,6 +24,7 @@ if (process.env.NODE_ENV === 'development') {
 const subComps = Hydux.combine({
   counter1: [Counter, Counter.init()],
   counter2: [Counter, Counter.init()],
+  counter3: [CounterInject, CounterInject.init()]
 })
 const actions = {
   ...subComps.actions,
@@ -48,6 +50,8 @@ const view = (state: State, actions: Actions) =>
       {Counter.view(state.counter1, actions.counter1)}
       <h1>Counter2:</h1>
       {Counter.view(state.counter2, actions.counter2)}
+      <h1>Counter3(inject):</h1>
+      {CounterInject.view(state.counter3, actions.counter3)}
       <Intro />
       <input value={state.value} onChange={actions.change} />
     </main>

@@ -46,7 +46,7 @@ export interface AppProps<State, Actions> {
  * @param state
  * @param actions
  */
-declare export function runAction<S, A, PS, PA>(result: ActionReturn<S, A> | ((state: S, actions: A) => ActionReturn<S, A>), state: S, actions: A, parentState?: PS, parentActions?: PA): ActionCmdReturn<S, A>;
+declare export function runAction<S, A, PS, PA>(result: ActionReturn<S, A> | ((state: S, actions: A) => ActionReturn<S, A>)): ActionCmdReturn<S, A>;
 declare export function withParents<S, A, PS, PA, A1>(action: (a1: A1) => (s: S, a: A) => any, wrapper?: (action: (a1: A1) => ActionCmdReturn<S, A>, parentState: PS, parentActions: PA, state: S, actions: A) => ActionReturn<S, A>, parentState?: PS, parentActions?: PA): any;
 declare export function withParents<S, A, PS, PA, A1, A2>(action: (a1: A1, a2: A2) => (s: S, a: A) => any, wrapper?: (action: (a1: A1, a2: A2) => ActionCmdReturn<S, A>, parentState: PS, parentActions: PA, state: S, actions: A) => ActionReturn<S, A>, parentState?: PS, parentActions?: PA): any;
 declare export function withParents<S, A, PS, PA, A1, A2, A3>(action: (a1: A1, a2: A2, a3: A3) => (s: S, a: A) => any, wrapper?: (action: (a1: A1, a2: A2, a3: A3) => ActionCmdReturn<S, A>, parentState: PS, parentActions: PA, state: S, actions: A) => ActionReturn<S, A>, parentState?: PS, parentActions?: PA): any;

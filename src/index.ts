@@ -7,13 +7,17 @@ import {
   ActionType,
   ActionsType,
   InitReturn,
+  AR,
+  StandardActionReturn,
 } from './types'
 import Cmd, { CmdType, Sub } from './cmd'
 import { set, merge, setDeep, setDeepMutable, get, isFn, noop, isPojo, clone, OverrideLength, weakVal } from './utils'
 import { runAction } from './helpers'
+import { dispatcher, inject } from './dispatcher'
 export * from './helpers'
 export * from './types'
-export { set, merge, setDeep, Cmd, CmdType, Sub, ActionReturn, noop, isFn, isPojo }
+
+export { set, merge, setDeep, Cmd, CmdType, Sub, ActionReturn, noop, isFn, isPojo, inject, dispatcher }
 
 export type Init<S, A> = (...args: any[]) => InitReturn<S, A>
 // todo: Remove back compatible optional ctx
@@ -76,7 +80,9 @@ export function normalize<S, A>(initResult: ActionReturn<S, A>, state: S): Requi
 export function normalize<S, A>(initResult: InitReturn<S, A>): Required<InitObjReturn<S, A>>
 export function normalize<S, A>(initResult: InitReturn<S, A> | ActionReturn<S, A>, state: S = {} as S): Required<ActionObjReturen<S, A> | InitObjReturn<S, A>> {
   let ret = {} as Required<ActionObjReturen<S, A> | InitObjReturn<S, A>>
-  if (!initResult) {
+  if (!initResult || (initResult['then'] && isFn(initResult['then']))) {
+    let res = dispatcher.getResult()
+    if (res) return res
     return { state, cmd: Cmd.none }
   }
   if (initResult instanceof Array) {
@@ -117,9 +123,9 @@ export function app<State, Actions>(props: AppProps<State, Actions>): Context<St
   const appSubscribe = props.subscribe || (_ => Cmd.none)
   const render = props.onRender || noop
   // const appMiddlewares = props.middlewares || []
-  let { state: appState, cmd } = normalize(props.init())
+  let { state: appState, cmd: initCmd } = normalize(props.init())
   init(appState, appActions, props.actions, [])
-  runCmd(cmd, appActions)
+  runCmd(initCmd, appActions)
   appRender(appState)
   appSubscribe(appState).forEach(sub => sub(appActions))
 
@@ -182,38 +188,54 @@ export function app<State, Actions>(props: AppProps<State, Actions>): Context<St
           let parentState
           let parentActions
           let prevAppState = appState
-          const actionResult = subFrom(...msgData)
-          if (isFn(actionResult) && actionResult.length > 2) {
-            let offset = (weakVal<number>(subFrom, OverrideLength) || 2) - 1
-            let pLen = path.length - offset
-            parentActions = get(path, appActions, pLen)
-            parentState = get(path, appState, pLen)
+          let setState = nextState => {
+            if (props.mutable) {
+              appState = setDeepMutable(
+                path,
+                state !== nextState
+                  ? set(state, nextState)
+                  : state,
+                appState,
+              )
+              appRender(appState)
+            } else if (nextState !== state) {
+              appState = setDeep(path, merge(state, nextState), appState)
+              appRender(appState)
+            }
           }
-          let { state: nextState, cmd } = runAction(
-            actionResult,
-            state,
-            actions,
-            parentState,
-            parentActions,
-          )
           let actionName = path.join('.') + '.' + key
           if (props.onUpdateStart) {
             props.onUpdateStart({
               action: actionName,
             })
           }
-          if (props.mutable) {
-            appState = setDeepMutable(
-              path,
-              state !== nextState
-                ? set(state, nextState)
-                : state,
-              appState,
-            )
-            appRender(appState)
-          } else if (nextState !== state) {
-            appState = setDeep(path, merge(state, nextState), appState)
-            appRender(appState)
+          {
+            let offset = (weakVal<number>(subFrom, OverrideLength) || 2) - 1
+            let pLen = path.length - offset
+            if (pLen >= 0) {
+              parentActions = get(path, appActions, pLen)
+              parentState = get(path, appState, pLen)
+            }
+          }
+          dispatcher.active({
+            state,
+            actions,
+            parentState,
+            parentActions,
+            setState,
+          })
+          const actionResult = subFrom(...msgData)
+          let cmd = dispatcher.getContext().cmd
+          if (actionResult) {
+            let ret = runAction(actionResult)
+            setState(ret.state)
+            if (cmd.length === 0) {
+              cmd = ret.cmd
+            } else {
+              cmd = cmd
+                .filter(c => ret.cmd.indexOf(c) < 0)
+                .concat(ret.cmd)
+            }
           }
           if (props.onUpdated) {
             props.onUpdated({
@@ -223,6 +245,7 @@ export function app<State, Actions>(props: AppProps<State, Actions>): Context<St
               action: actionName,
             })
           }
+          dispatcher.deactive()
           return runCmd(cmd, actions)
         }
       } else if (typeof subFrom === 'object' && subFrom) {

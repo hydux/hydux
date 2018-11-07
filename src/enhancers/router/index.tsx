@@ -258,7 +258,7 @@ export default function withRouter<State, Actions>(props: Options<State, Actions
         [CHANGE_LOCATION]: (loc: Location<any, any>, resolve?: Function) => (state: State, actions: Actions) => {
           if (loc.template) {
             let action = routesMap[loc.template]
-            let { state: nextState, cmd } = runAction(action(loc), state, actions)
+            let { state: nextState, cmd } = runAction(action(loc))
             return [{ ...(nextState as any as object), location: loc }, cmd]
           } else {
             return { ...(state as any), location: loc }

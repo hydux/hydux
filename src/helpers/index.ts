@@ -1,8 +1,20 @@
 import * as Cmd from '../cmd'
-import { Init, normalize, Context, Component } from '../index'
+import { Init, normalize, Context, Component, CmdType } from '../index'
 export * from './hash'
 export * from './memoize'
-import { set, merge, setDeep, setDeepMutable, get, isFn, noop, isPojo, clone, OverrideLength, weakVal } from '../utils'
+import {
+  set,
+  merge,
+  setDeep,
+  setDeepMutable,
+  get,
+  isFn,
+  noop,
+  isPojo,
+  clone,
+  OverrideLength,
+  weakVal,
+} from '../utils'
 import {
   ActionReturn,
   ActionState,
@@ -13,6 +25,7 @@ import {
   InitObjReturn,
   GeneralActionType,
 } from '../types'
+import { dispatcher } from '../dispatcher'
 export type Dt<T extends string, D = null> = {
   tag: T
   data: D
@@ -20,7 +33,7 @@ export type Dt<T extends string, D = null> = {
 
 declare global {
   type Dt<T extends string, D = null> = {
-    tag: T,
+    tag: T
     data: D
   } & { __tsTag: 'DateType' }
 }
@@ -42,7 +55,7 @@ declare global {
  *      //...
  *      break
  *   default:
- *      never(msg.tag) // incomplete check from TS
+ *      never(msg) // incomplete check from TS
  *      break
  * }
  * ```
@@ -150,7 +163,11 @@ export interface CombinedComps<
    *    actions={actions.somePage}
    *  />`
    */
-  render: <K extends Extract<keyof T, keyof S>, S>(k: K, state: S, actions: ActionsType<S, any>) => any
+  render: <K extends Extract<keyof T, keyof S>, S>(
+    k: K,
+    state: S,
+    actions: ActionsType<S, any>,
+  ) => any
 }
 
 export function combine<
@@ -184,10 +201,9 @@ export function combine<
       } else {
         return view(state[k], actions[k])
       }
-    }
+    },
   }
 }
-
 /**
  * run action and return a normalized result ([State, CmdType<>]),
  * this is useful to write High-Order-Action, which take an action and return a wrapped action.
@@ -195,25 +211,24 @@ export function combine<
  * @param state
  * @param actions
  */
-export function runAction<S, A, PS, PA>(
+export function runAction<S, A>(
   result: ActionReturn<S, A> | ((state: S, actions: A) => ActionReturn<S, A>),
-  state: S,
-  actions: A,
-  parentState?: PS,
-  parentActions?: PA,
-): Required<StandardActionReturn<S, A>> {
+): StandardActionReturn<S, A> {
   let res: any = result
+  let {
+    state,
+    actions,
+    parentState,
+    parentActions
+  } = dispatcher.getContext()
   isFn(res) &&
-    (res = res(state, actions, parentState, parentActions)) &&
+    (res = res.call(actions, state, actions, parentState, parentActions)) &&
     isFn(res) &&
-    (res = res(actions))
+    (res = res.call(actions, actions))
   // action can be a function that return a promise or undefined(callback)
-  if (res === undefined || (res.then && isFn(res.then))) {
-    return { state, cmd: Cmd.none }
-  }
   let ret2 = normalize(res as ActionReturn<S, A>, state)
   return {
-    state: ret2.state || state,
+    state: (ret2.state as any) || state,
     cmd: ret2.cmd,
   }
 }
@@ -290,7 +305,7 @@ export function withParents<S, A, PS, PA>(
     return action
   }
   const wrapped = (state: S, actions: A, parentState: PS, parentActions: PA) => {
-    const nactions = (...args) => runAction(action(...args), state, actions)
+    const nactions = (...args) => runAction(action(...args))
     return wrapper(nactions, parentState, parentActions, state, actions)
   }
   return wrapped
@@ -302,11 +317,11 @@ export const wrapActions = withParents
 
 export function overrideAction<PS, PA, S, A, A1>(
   parentActions: PA,
-  getter: (_: PA) => (a1: A1) => (s: S, a: A) => any,
+  getter: (_: PA) => (a1: A1) => any,
   wrapper?: (
     a1: A1,
   ) => (
-    action: (a1: A1) => StandardActionReturn<S, A>,
+    action: <S = any, A = any>(a1: A1) => StandardActionReturn<S, A>,
     parentState: PS,
     parentActions: PA,
     state: S,
@@ -315,12 +330,12 @@ export function overrideAction<PS, PA, S, A, A1>(
 )
 export function overrideAction<S, A, PS, PA, A1, A2>(
   parentActions: PA,
-  getter: (_: PA) => (a1: A1, a2: A2) => (s: S, a: A) => any,
+  getter: (_: PA) => (a1: A1, a2: A2) => any,
   wrapper?: (
     a1: A1,
     a2: A2,
   ) => (
-    action: (a1: A1, a2: A2) => StandardActionReturn<S, A>,
+    action: <S = any, A = any>(a1: A1, a2: A2) => StandardActionReturn<S, A>,
     parentState: PS,
     parentActions: PA,
     state: S,
@@ -329,13 +344,13 @@ export function overrideAction<S, A, PS, PA, A1, A2>(
 )
 export function overrideAction<S, A, PS, PA, A1, A2, A3>(
   parentActions: PA,
-  getter: (_: PA) => (a1: A1, a2: A2, a3: A3) => (s: S, a: A) => any,
+  getter: (_: PA) => (a1: A1, a2: A2, a3: A3) => any,
   wrapper?: (
     a1: A1,
     a2: A2,
     a3: A3,
   ) => (
-    action: (a1: A1, a2: A2, a3: A3) => StandardActionReturn<S, A>,
+    action: <S = any, A = any>(a1: A1, a2: A2, a3: A3) => StandardActionReturn<S, A>,
     parentState: PS,
     parentActions: PA,
     state: S,
@@ -344,14 +359,14 @@ export function overrideAction<S, A, PS, PA, A1, A2, A3>(
 )
 export function overrideAction<S, A, PS, PA, A1, A2, A3, A4>(
   parentActions: PA,
-  getter: (_: PA) => (a1: A1, a2: A2, a3: A3, a4: A4) => (s: S, a: A) => any,
+  getter: (_: PA) => (a1: A1, a2: A2, a3: A3, a4: A4) => any,
   wrapper?: (
     a1: A1,
     a2: A2,
     a3: A3,
     a4: A4,
   ) => (
-    action: (a1: A1, a2: A2, a3: A3, a4: A4) => StandardActionReturn<S, A>,
+    action: <S = any, A = any>(a1: A1, a2: A2, a3: A3, a4: A4) => StandardActionReturn<S, A>,
     parentState: PS,
     parentActions: PA,
     state: S,
@@ -382,9 +397,13 @@ export function overrideAction<S, A, PS, PA>(
     return parentActions
   }
   let action = getter(parentActions)
-  const wrapped = (...args) => (s: S, a: A, ps: PS, pa: PA) => {
-    const normalAction = (...args) => runAction(action(...args), s, a, ps, pa)
-    return wrapper(...args)(normalAction, ps, pa, s, a)
+  const wrapped = (...args) => {
+    const normalAction = (...args) => {
+      let ret = runAction(action(...args))
+      return ret
+    }
+    let ctx = dispatcher.getContext()
+    return wrapper(...args)(normalAction, ctx.parentState, ctx.parentActions, ctx.state, ctx.actions)
   }
   let keys = (getter.toString().match(/((?:[\w_$]+\.)+[\w_$]+)/) || [])[1].split('.').slice(1)
   let cursor = parentActions
