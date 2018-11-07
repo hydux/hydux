@@ -34,7 +34,7 @@ This is an experimental dependency injection API for actions inspired by react-h
 > Note: please don't use it in production, it's not stable yet, if you want to live on the bleeding edge, you can try with the alpha release:
 
 ```sh
-yarn add hydux@^v0.5.8-beta0
+yarn add hydux@^v0.5.8-alpha0
 ```
 
 ```ts
@@ -57,8 +57,7 @@ export default {
       console.log(msg)
     }
   },
-  view: () => {
-    let [state, actions] = inject<State, Actions>()
+  view: (state, actions) => {
     return (
       <div>
         <h1>{state.count}</h1>
