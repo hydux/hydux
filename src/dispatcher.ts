@@ -22,9 +22,7 @@ export namespace dispatcher {
     let ctx = contextStack[contextStack.length - 1]
     if (!ctx) return
     return {
-      state: {
-        ...ctx.state, ...ctx.newState
-      },
+      state: ctx.newState,
       cmd: ctx.cmd,
     }
   }
