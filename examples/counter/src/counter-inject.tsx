@@ -33,7 +33,13 @@ export const actions = {
   },
   upLater() {
     let { state, actions, setState, Cmd } = inject<State, Actions>()
-    Cmd.addSub(_ => setTimeout(_.up, 3000))
+    Cmd.addPromise(
+      n => {
+        return new Promise(resolve =>
+          setTimeout(() => resolve(n), 1000))
+      },
+      10,
+      actions.upN)
   }
 }
 
