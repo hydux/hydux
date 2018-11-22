@@ -34,7 +34,7 @@ This is an experimental dependency injection API for actions inspired by react-h
 > Note: please don't use it in production, it's not stable yet, if you want to live on the bleeding edge, you can try with the alpha release:
 
 ```sh
-yarn add hydux@^v0.5.8-alpha0
+yarn add hydux@^v0.5.8-alpha1
 ```
 
 ```ts

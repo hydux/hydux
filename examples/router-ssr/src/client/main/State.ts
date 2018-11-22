@@ -11,6 +11,10 @@ import * as Utils from '../utils'
 // const history = new HashHistory()
 export const history = new BrowserHistory()
 
+if (module.hot && module.hot.dispose) {
+  module.hot.dispose(() => history.dispose())
+}
+
 export const subComps = Hydux.combine({
   counter2: [Counter2, Counter2.init(`Counter2`)],
   counter3: [Counter2, Counter2.init(`Counter3`)],

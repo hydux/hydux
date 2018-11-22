@@ -8,11 +8,21 @@ import withRouter, {
 } from '../../../src/enhancers/router'
 import Counter, { State as CounterState } from './counter'
 import './polyfill.js'
-const history = new HashHistory()
+
+export const history = new HashHistory()
+
 // const history = new BrowserHistory()
 // let app = withPersist<State, Actions>({
 //   key: 'time-game/v1'
 // })(_app)
+/**
+ * Dispose history instance when hot reload, this can avoid lots of hmr bugs caused be memory leak.
+ */
+if (module['hot'] && module['hot'].dispose) {
+  module['hot'].dispose(() => {
+    history.dispose()
+  })
+}
 
 const routes: Routes<State, Actions> = {
   '/': loc => state => ({
@@ -36,13 +46,13 @@ const routes: Routes<State, Actions> = {
   })
 }
 
-let app = withRouter<State, Actions>({ history, routes })(_app)
-app = withPicodom<State, Actions>()(app)
+let app = withPicodom<State, Actions>()(_app)
+app = withRouter<State, Actions>({ history, routes })(app)
 
 if (process.env.NODE_ENV === 'development') {
-  const devTools = require('hydux/lib/enhancers/devtools').default
-  const logger = require('hydux/lib/enhancers/logger').default
-  const hmr = require('hydux/lib/enhancers/hmr').default
+  const devTools = require('../../../src/enhancers/devtools').default
+  const logger = require('../../../src/enhancers/logger').default
+  const hmr = require('../../../src/enhancers/hmr').default
   app = logger()(app)
   app = devTools()(app)
   app = hmr()(app)
@@ -59,6 +69,7 @@ type Page =
 | 'Counter'
 | { page: 'User', id: number }
 | '404'
+| 'Account'
 
 type State = {
   counter: CounterState,
@@ -79,13 +90,16 @@ const renderRoutes = (state: State, actions: Actions) => {
       return <div>Home</div>
     case 'Counter':
       return Counter.view(state.counter, actions.counter)
+    case 'Account':
+      return 'account'
     case '404':
-      return <NoMatch />
+      return '404'
     default:
       switch (state.page.page) {
         case 'User':
           return <div>User: {state.page.id}</div>
       }
+      return <NoMatch />
   }
 }
 const view = (state: State, actions: RouterActions<Actions>) => (

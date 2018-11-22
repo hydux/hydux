@@ -90,6 +90,9 @@ export abstract class BaseHistory {
   listen(listener: ((path: string) => void)) {
     this._listeners.push(listener)
   }
+  unlisten(listener: ((path: string) => void)) {
+    this._listeners = this._listeners.filter(l => l !== listener)
+  }
   go(delta: number) {
     history.go(delta)
   }
@@ -101,6 +104,12 @@ export abstract class BaseHistory {
   }
   parsePath(path: string): Location<any, any> {
     return parsePath(path, this._routesTpls)
+  }
+  /**
+   * Dispose a history instance, its useful in HMR
+   */
+  dispose() {
+    this._listeners = []
   }
   /* @internal */
   public _setRoutes(routes: Routes<any, any>, routesMeta: RoutesMeta<any, any>) {
@@ -126,6 +135,7 @@ export interface HashHistoryProps extends HistoryProps {
 export class HashHistory extends BaseHistory {
   protected _props: HashHistoryProps
   constructor(props: Partial<HashHistoryProps> = {}) {
+    super(props)
     if (!isBrowser) {
       return new MemoryHistory() as any
     }
@@ -135,9 +145,7 @@ export class HashHistory extends BaseHistory {
       ...this._props,
     }
     this._last = [this.current]
-    window.addEventListener('hashchange', e => {
-      this._fireChange()
-    })
+    window.addEventListener('hashchange', this._handleHashChange)
   }
   realPath(path: string) {
     return this._props.hash + this._props.basePath + path
@@ -154,18 +162,26 @@ export class HashHistory extends BaseHistory {
   replace(path: string) {
     location.replace(this.realPath(path))
   }
+
+  dispose() {
+    super.dispose()
+    window.removeEventListener('hashchange', this._handleHashChange)
+  }
+
+  private _handleHashChange = () => {
+    this._fireChange()
+  }
 }
 
 export class BrowserHistory extends BaseHistory {
   constructor(props: Partial<HistoryProps> = {}) {
+    super(props)
     if (!isBrowser) {
-      return new MemoryHistory(props)
+      return new MemoryHistory(props) as any
     }
     super(props)
     this._last = [this.current]
-    window.addEventListener('popstate', e => {
-      this._fireChange()
-    })
+    window.addEventListener('popstate', this._handlePopState)
   }
   realPath(path: string) {
     return this._props.basePath + path
@@ -184,6 +200,14 @@ export class BrowserHistory extends BaseHistory {
   replace(path: string) {
     history.replaceState(null, '', this.realPath(path))
     this._fireChange(path)
+  }
+  dispose() {
+    super.dispose()
+    window.removeEventListener('popstate', this._handlePopState)
+  }
+
+  private _handlePopState = () => {
+    this._fireChange()
   }
 }
 export interface MemoryHistoryProps extends HistoryProps {

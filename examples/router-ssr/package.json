@@ -25,6 +25,8 @@
     "@types/lodash": "^4.14.106",
     "@types/node": "^8.0.55",
     "@types/react-dom": "^16.0.4",
+    "@types/webpack": "^4.4.19",
+    "@types/webpack-env": "^1.13.6",
     "clean-webpack-plugin": "^0.1.17",
     "cross-env": "^5.1.1",
     "debug": "^3.1.0",

@@ -146,14 +146,16 @@ export type Options<S, A> = {
   /** Whether is running in the server side, if `ssr` is true, used for code-splitting */
   isServer?: boolean,
   routes: Routes<S, A> | NestedRoutes<S, A>,
+  hot?: boolean
 }
-
+let _hotListener = null as any
 export default function withRouter<State, Actions>(props: Options<State, Actions> = { routes: {} }) {
   const {
     history = new HashHistory(),
     routes,
     ssr = false,
     isServer = typeof window === 'undefined' || (typeof self !== undefined && window !== self),
+    hot = module['hot'],
   } = props
   let timer
   return (app: App<State, Actions>) => (props: RouterAppProps<State, Actions>) => {
@@ -237,17 +239,26 @@ export default function withRouter<State, Actions>(props: Options<State, Actions
       },
       subscribe: state => Cmd.batch(
         Cmd.ofSub<RouterActions<Actions>>(actions => {
-          history.listen(path => {
+          let _listener = path => {
             const loc = history.location
             const meta = routesMeta[loc.template!]
             let comp = getRouteComp(meta, false)
             runRoute(comp, actions, loc)
-            if (meta.redirect) {
+            if (meta && meta.redirect) {
               setTimeout(() => {
                 history.replace(meta.redirect!)
               })
             }
-          })
+            console.log('router change')
+          }
+          if (hot) {
+            const key = '@hydux-router/listener'
+            if (_hotListener) {
+              history.unlisten(_hotListener)
+            }
+            _hotListener = _listener
+          }
+          history.listen(_listener)
         }),
         props.subscribe ? props.subscribe(state) : Cmd.none
       ),
