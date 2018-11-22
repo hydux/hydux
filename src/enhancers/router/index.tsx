@@ -242,6 +242,11 @@ export default function withRouter<State, Actions>(props: Options<State, Actions
             const meta = routesMeta[loc.template!]
             let comp = getRouteComp(meta, false)
             runRoute(comp, actions, loc)
+            if (meta.redirect) {
+              setTimeout(() => {
+                history.replace(meta.redirect!)
+              })
+            }
           })
         }),
         props.subscribe ? props.subscribe(state) : Cmd.none
@@ -320,6 +325,7 @@ export interface RouteInfo<State, Actions> {
 }
 export interface RouteMeta<State, Actions> {
   path: string,
+  redirect?: string
   label?: string,
   action?: ActionType<Location<any, any>, State, Actions>,
   getComponent?: GetComp<State, Actions>

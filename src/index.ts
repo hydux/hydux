@@ -96,6 +96,13 @@ export function normalize<S, A>(initResult: InitReturn<S, A> | ActionReturn<S, A
         state: initResult[0],
         cmd: initResult[1] || Cmd.none
       }
+      let dispatcherResult = dispatcher.getResult()
+      if (dispatcherResult) {
+        if (state !== dispatcherResult.state) {
+          set(state, dispatcherResult.state)
+        }
+        ret.cmd.push(...dispatcherResult.cmd)
+      }
     }
   } else if (isObjReturn(initResult)) {
     ret = {

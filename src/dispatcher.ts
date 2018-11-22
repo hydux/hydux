@@ -40,10 +40,11 @@ export namespace dispatcher {
     none = Cmd.none
 
     constructor(
-      private _mapper?: Mapper<any, A>
+      public readonly setState: (s: S) => void,
+      private readonly _mapper?: Mapper<any, A>,
     ) {}
     map<SubA>(mapper: Mapper<A, SubA>) {
-      return new CmdHelper(mapper)
+      return new CmdHelper(this.setState, mapper)
     }
 
     addSub(...subs: Sub<A>[]): void {
@@ -104,16 +105,16 @@ export namespace dispatcher {
     setState: (s) => void
   }
   function makeContext(props: ActiveProps) {
+    let setState = (state) => {
+      ctx.newState = state
+      return props.setState(state)
+    }
     let ctx = {
       ...props,
       newState: props.state,
-      setState: (state) => {
-        ctx.newState = state
-        return props.setState(state)
-      },
-      Cmd: new CmdHelper(),
+      setState,
+      Cmd: new CmdHelper(setState),
       cmd: [] as CmdType<any>,
-      mapper: null as any,
     }
     return ctx
   }
