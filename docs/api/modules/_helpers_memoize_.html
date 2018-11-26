@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>&quot;helpers&quot; | hydux</title>
+	<title>&quot;helpers/memoize&quot; | hydux</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<style type="text/css">/*! normalize.css v1.1.3 | MIT License | git.io/normalize */
@@ -910,13 +910,13 @@ img { max-width: 100%; }
 <nav class="tsd-navigation secondary">
 	<ul>
 		<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter">
-			<a href="_helpers_.html#dt" class="tsd-kind-icon">dt</a>
+			<a href="_helpers_memoize_.html#memoizebind" class="tsd-kind-icon">memoize<wbr>Bind</a>
 		</li>
 		<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter">
-			<a href="_helpers_.html#mkinit" class="tsd-kind-icon">mk<wbr>Init</a>
+			<a href="_helpers_memoize_.html#memoizeone" class="tsd-kind-icon">memoize<wbr>One</a>
 		</li>
 		<li class=" tsd-kind-function tsd-parent-kind-external-module">
-			<a href="_helpers_.html#never" class="tsd-kind-icon">never</a>
+			<a href="_helpers_memoize_.html#setcacheoptions" class="tsd-kind-icon">set<wbr>Cache<wbr>Options</a>
 		</li>
 	</ul>
 </nav>
@@ -929,9 +929,9 @@ img { max-width: 100%; }
 					<section class="tsd-index-section ">
 						<h3>Functions</h3>
 						<ul class="tsd-index-list">
-							<li class="tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter"><a href="_helpers_.html#dt" class="tsd-kind-icon">dt</a></li>
-							<li class="tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter"><a href="_helpers_.html#mkinit" class="tsd-kind-icon">mk<wbr>Init</a></li>
-							<li class="tsd-kind-function tsd-parent-kind-external-module"><a href="_helpers_.html#never" class="tsd-kind-icon">never</a></li>
+							<li class="tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter"><a href="_helpers_memoize_.html#memoizebind" class="tsd-kind-icon">memoize<wbr>Bind</a></li>
+							<li class="tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter"><a href="_helpers_memoize_.html#memoizeone" class="tsd-kind-icon">memoize<wbr>One</a></li>
+							<li class="tsd-kind-function tsd-parent-kind-external-module"><a href="_helpers_memoize_.html#setcacheoptions" class="tsd-kind-icon">set<wbr>Cache<wbr>Options</a></li>
 						</ul>
 					</section>
 				</div>
@@ -940,106 +940,595 @@ img { max-width: 100%; }
 		<section class="tsd-panel-group tsd-member-group ">
 			<h2>Functions</h2>
 			<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter">
-				<a name="dt" class="tsd-anchor"></a>
-				<h3>dt</h3>
+				<a name="memoizebind" class="tsd-anchor"></a>
+				<h3>memoize<wbr>Bind</h3>
 				<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter">
-					<li class="tsd-signature tsd-kind-icon">dt&lt;T, D&gt;<span class="tsd-signature-symbol">(</span>tag<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span>, data<span class="tsd-signature-symbol">?: </span><a href="" class="tsd-signature-type">D</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">object</span></li>
+					<li class="tsd-signature tsd-kind-icon">memoize<wbr>Bind&lt;A, Res&gt;<span class="tsd-signature-symbol">(</span>callback<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span>, a<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span></li>
+					<li class="tsd-signature tsd-kind-icon">memoize<wbr>Bind&lt;A, B, Res&gt;<span class="tsd-signature-symbol">(</span>callback<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span>, a<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">A</span>, b<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">B</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Res</span></li>
+					<li class="tsd-signature tsd-kind-icon">memoize<wbr>Bind&lt;A, B, C, Res&gt;<span class="tsd-signature-symbol">(</span>callback<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span>, a<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">A</span>, b<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">B</span>, c<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">C</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span></li>
+					<li class="tsd-signature tsd-kind-icon">memoize<wbr>Bind&lt;A, B, C, D, Res&gt;<span class="tsd-signature-symbol">(</span>callback<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span>, a<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">A</span>, b<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">B</span>, c<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">C</span>, d<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">D</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span></li>
+					<li class="tsd-signature tsd-kind-icon">memoize<wbr>Bind&lt;A, B, C, D, E, Res&gt;<span class="tsd-signature-symbol">(</span>callback<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span>, a<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">A</span>, b<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">B</span>, c<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">C</span>, d<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">D</span>, e<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">E</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span></li>
+					<li class="tsd-signature tsd-kind-icon">memoize<wbr>Bind&lt;A, B, C, D, E, F, Res&gt;<span class="tsd-signature-symbol">(</span>callback<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span>, a<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">A</span>, b<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">B</span>, c<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">C</span>, d<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">D</span>, e<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">E</span>, f<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">F</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span></li>
 				</ul>
 				<ul class="tsd-descriptions">
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/hydux/hydux/blob/0cede50/src/helpers.ts#L33">helpers.ts:33</a></li>
-							</ul>
-						</aside>
-						<div class="tsd-comment tsd-typography">
-							<div class="lead">
-								<p>ADT Helper for TS
-									e.g.
-									```ts
-									type Msg =
-									| Dt&lt;&#39;fetchBook&#39;, number&gt;
-								| Dt&lt;&#39;updateBook&#39;, Book&gt;</p>
-							</div>
-							<p>let msg = dt(&#39;fetchBook&#39;, 1)
-								switch(msg.tag) {
-								case &#39;fetchBook&#39;:
-								//...
-								break
-								case &#39;updateBook&#39;:
-								//...
-								break
-								default:
-								never(msg.tag) // incomplete check from TS
-								break
-								}
-							```</p>
-						</div>
-						<h4 class="tsd-type-parameters-title">Type parameters</h4>
-						<ul class="tsd-type-parameters">
-							<li>
-								<h4>T<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h4>
-							</li>
-							<li>
-								<h4>D</h4>
-							</li>
-						</ul>
-						<h4 class="tsd-parameters-title">Parameters</h4>
-						<ul class="tsd-parameters">
-							<li>
-								<h5>tag: <span class="tsd-signature-type">T</span></h5>
-							</li>
-							<li>
-								<h5><span class="tsd-flag ts-flagOptional">Optional</span> data: <a href="" class="tsd-signature-type">D</a></h5>
-							</li>
-						</ul>
-						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">object</span>
-							<span class="tsd-signature-symbol"> &amp; </span>
-							<span class="tsd-signature-type">object</span>
-						</h4>
-					</li>
-				</ul>
-			</section>
-			<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter">
-				<a name="mkinit" class="tsd-anchor"></a>
-				<h3>mk<wbr>Init</h3>
-				<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter">
-					<li class="tsd-signature tsd-kind-icon">mk<wbr>Init&lt;S, A&gt;<span class="tsd-signature-symbol">(</span>state<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">S</span>, cmd<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Cmd.CmdType</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span></li>
-				</ul>
-				<ul class="tsd-descriptions">
-					<li class="tsd-description">
-						<aside class="tsd-sources">
-							<ul>
-								<li>Defined in <a href="https://github.com/hydux/hydux/blob/0cede50/src/helpers.ts#L39">helpers.ts:39</a></li>
+								<li>Defined in <a href="https://github.com/hydux/hydux/blob/c849e50/src/helpers/memoize.ts#L10">helpers/memoize.ts:10</a></li>
 							</ul>
 						</aside>
 						<h4 class="tsd-type-parameters-title">Type parameters</h4>
 						<ul class="tsd-type-parameters">
-							<li>
-								<h4>S</h4>
-							</li>
 							<li>
 								<h4>A</h4>
 							</li>
+							<li>
+								<h4>Res</h4>
+							</li>
 						</ul>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
-								<h5>state: <span class="tsd-signature-type">S</span></h5>
+								<h5>callback: <span class="tsd-signature-type">function</span></h5>
+								<ul class="tsd-parameters">
+									<li class="tsd-parameter-siganture">
+										<ul class="tsd-signatures tsd-kind-type-literal tsd-is-not-exported">
+											<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>a<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">A</span>, <span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Res</span></li>
+										</ul>
+										<ul class="tsd-descriptions">
+											<li class="tsd-description">
+												<h4 class="tsd-parameters-title">Parameters</h4>
+												<ul class="tsd-parameters">
+													<li>
+														<h5>a: <span class="tsd-signature-type">A</span></h5>
+													</li>
+													<li>
+														<h5><span class="tsd-flag ts-flagRest">Rest</span> <span class="tsd-signature-symbol">...</span>args: <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span></h5>
+													</li>
+												</ul>
+												<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Res</span></h4>
+											</li>
+										</ul>
+									</li>
+								</ul>
 							</li>
 							<li>
-								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> cmd: <span class="tsd-signature-type">Cmd.CmdType</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> =&nbsp;Cmd.none</span></h5>
+								<h5>a: <span class="tsd-signature-type">A</span></h5>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">function</span></h4>
 						<ul class="tsd-parameters">
 							<li class="tsd-parameter-siganture">
 								<ul class="tsd-signatures tsd-kind-type-literal tsd-is-not-exported">
-									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_types_.html#actioncmdresult" class="tsd-signature-type">ActionCmdResult</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">S</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol">&gt;</span></li>
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Res</span></li>
 								</ul>
 								<ul class="tsd-descriptions">
 									<li class="tsd-description">
-										<h4 class="tsd-returns-title">Returns <a href="_types_.html#actioncmdresult" class="tsd-signature-type">ActionCmdResult</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">S</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol">&gt;</span></h4>
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5><span class="tsd-flag ts-flagRest">Rest</span> <span class="tsd-signature-symbol">...</span>args: <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span></h5>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Res</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</li>
+					<li class="tsd-description">
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/hydux/hydux/blob/c849e50/src/helpers/memoize.ts#L14">helpers/memoize.ts:14</a></li>
+							</ul>
+						</aside>
+						<h4 class="tsd-type-parameters-title">Type parameters</h4>
+						<ul class="tsd-type-parameters">
+							<li>
+								<h4>A</h4>
+							</li>
+							<li>
+								<h4>B</h4>
+							</li>
+							<li>
+								<h4>Res</h4>
+							</li>
+						</ul>
+						<h4 class="tsd-parameters-title">Parameters</h4>
+						<ul class="tsd-parameters">
+							<li>
+								<h5>callback: <span class="tsd-signature-type">function</span></h5>
+								<ul class="tsd-parameters">
+									<li class="tsd-parameter-siganture">
+										<ul class="tsd-signatures tsd-kind-type-literal tsd-is-not-exported">
+											<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>a<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">A</span>, b<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">B</span>, <span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Res</span></li>
+										</ul>
+										<ul class="tsd-descriptions">
+											<li class="tsd-description">
+												<h4 class="tsd-parameters-title">Parameters</h4>
+												<ul class="tsd-parameters">
+													<li>
+														<h5>a: <span class="tsd-signature-type">A</span></h5>
+													</li>
+													<li>
+														<h5>b: <span class="tsd-signature-type">B</span></h5>
+													</li>
+													<li>
+														<h5><span class="tsd-flag ts-flagRest">Rest</span> <span class="tsd-signature-symbol">...</span>args: <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span></h5>
+													</li>
+												</ul>
+												<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Res</span></h4>
+											</li>
+										</ul>
+									</li>
+								</ul>
+							</li>
+							<li>
+								<h5>a: <span class="tsd-signature-type">A</span></h5>
+							</li>
+							<li>
+								<h5>b: <span class="tsd-signature-type">B</span></h5>
+							</li>
+						</ul>
+						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Res</span></h4>
+					</li>
+					<li class="tsd-description">
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/hydux/hydux/blob/c849e50/src/helpers/memoize.ts#L18">helpers/memoize.ts:18</a></li>
+							</ul>
+						</aside>
+						<h4 class="tsd-type-parameters-title">Type parameters</h4>
+						<ul class="tsd-type-parameters">
+							<li>
+								<h4>A</h4>
+							</li>
+							<li>
+								<h4>B</h4>
+							</li>
+							<li>
+								<h4>C</h4>
+							</li>
+							<li>
+								<h4>Res</h4>
+							</li>
+						</ul>
+						<h4 class="tsd-parameters-title">Parameters</h4>
+						<ul class="tsd-parameters">
+							<li>
+								<h5>callback: <span class="tsd-signature-type">function</span></h5>
+								<ul class="tsd-parameters">
+									<li class="tsd-parameter-siganture">
+										<ul class="tsd-signatures tsd-kind-type-literal tsd-is-not-exported">
+											<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>a<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">A</span>, b<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">B</span>, c<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">C</span>, <span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Res</span></li>
+										</ul>
+										<ul class="tsd-descriptions">
+											<li class="tsd-description">
+												<h4 class="tsd-parameters-title">Parameters</h4>
+												<ul class="tsd-parameters">
+													<li>
+														<h5>a: <span class="tsd-signature-type">A</span></h5>
+													</li>
+													<li>
+														<h5>b: <span class="tsd-signature-type">B</span></h5>
+													</li>
+													<li>
+														<h5>c: <span class="tsd-signature-type">C</span></h5>
+													</li>
+													<li>
+														<h5><span class="tsd-flag ts-flagRest">Rest</span> <span class="tsd-signature-symbol">...</span>args: <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span></h5>
+													</li>
+												</ul>
+												<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Res</span></h4>
+											</li>
+										</ul>
+									</li>
+								</ul>
+							</li>
+							<li>
+								<h5>a: <span class="tsd-signature-type">A</span></h5>
+							</li>
+							<li>
+								<h5>b: <span class="tsd-signature-type">B</span></h5>
+							</li>
+							<li>
+								<h5>c: <span class="tsd-signature-type">C</span></h5>
+							</li>
+						</ul>
+						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">function</span></h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-siganture">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-is-not-exported">
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Res</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5><span class="tsd-flag ts-flagRest">Rest</span> <span class="tsd-signature-symbol">...</span>args: <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span></h5>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Res</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</li>
+					<li class="tsd-description">
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/hydux/hydux/blob/c849e50/src/helpers/memoize.ts#L22">helpers/memoize.ts:22</a></li>
+							</ul>
+						</aside>
+						<h4 class="tsd-type-parameters-title">Type parameters</h4>
+						<ul class="tsd-type-parameters">
+							<li>
+								<h4>A</h4>
+							</li>
+							<li>
+								<h4>B</h4>
+							</li>
+							<li>
+								<h4>C</h4>
+							</li>
+							<li>
+								<h4>D</h4>
+							</li>
+							<li>
+								<h4>Res</h4>
+							</li>
+						</ul>
+						<h4 class="tsd-parameters-title">Parameters</h4>
+						<ul class="tsd-parameters">
+							<li>
+								<h5>callback: <span class="tsd-signature-type">function</span></h5>
+								<ul class="tsd-parameters">
+									<li class="tsd-parameter-siganture">
+										<ul class="tsd-signatures tsd-kind-type-literal tsd-is-not-exported">
+											<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>a<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">A</span>, b<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">B</span>, c<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">C</span>, d<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">D</span>, <span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Res</span></li>
+										</ul>
+										<ul class="tsd-descriptions">
+											<li class="tsd-description">
+												<h4 class="tsd-parameters-title">Parameters</h4>
+												<ul class="tsd-parameters">
+													<li>
+														<h5>a: <span class="tsd-signature-type">A</span></h5>
+													</li>
+													<li>
+														<h5>b: <span class="tsd-signature-type">B</span></h5>
+													</li>
+													<li>
+														<h5>c: <span class="tsd-signature-type">C</span></h5>
+													</li>
+													<li>
+														<h5>d: <span class="tsd-signature-type">D</span></h5>
+													</li>
+													<li>
+														<h5><span class="tsd-flag ts-flagRest">Rest</span> <span class="tsd-signature-symbol">...</span>args: <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span></h5>
+													</li>
+												</ul>
+												<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Res</span></h4>
+											</li>
+										</ul>
+									</li>
+								</ul>
+							</li>
+							<li>
+								<h5>a: <span class="tsd-signature-type">A</span></h5>
+							</li>
+							<li>
+								<h5>b: <span class="tsd-signature-type">B</span></h5>
+							</li>
+							<li>
+								<h5>c: <span class="tsd-signature-type">C</span></h5>
+							</li>
+							<li>
+								<h5>d: <span class="tsd-signature-type">D</span></h5>
+							</li>
+						</ul>
+						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">function</span></h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-siganture">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-is-not-exported">
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Res</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5><span class="tsd-flag ts-flagRest">Rest</span> <span class="tsd-signature-symbol">...</span>args: <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span></h5>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Res</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</li>
+					<li class="tsd-description">
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/hydux/hydux/blob/c849e50/src/helpers/memoize.ts#L26">helpers/memoize.ts:26</a></li>
+							</ul>
+						</aside>
+						<h4 class="tsd-type-parameters-title">Type parameters</h4>
+						<ul class="tsd-type-parameters">
+							<li>
+								<h4>A</h4>
+							</li>
+							<li>
+								<h4>B</h4>
+							</li>
+							<li>
+								<h4>C</h4>
+							</li>
+							<li>
+								<h4>D</h4>
+							</li>
+							<li>
+								<h4>E</h4>
+							</li>
+							<li>
+								<h4>Res</h4>
+							</li>
+						</ul>
+						<h4 class="tsd-parameters-title">Parameters</h4>
+						<ul class="tsd-parameters">
+							<li>
+								<h5>callback: <span class="tsd-signature-type">function</span></h5>
+								<ul class="tsd-parameters">
+									<li class="tsd-parameter-siganture">
+										<ul class="tsd-signatures tsd-kind-type-literal tsd-is-not-exported">
+											<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>a<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">A</span>, b<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">B</span>, c<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">C</span>, d<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">D</span>, e<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">E</span>, <span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Res</span></li>
+										</ul>
+										<ul class="tsd-descriptions">
+											<li class="tsd-description">
+												<h4 class="tsd-parameters-title">Parameters</h4>
+												<ul class="tsd-parameters">
+													<li>
+														<h5>a: <span class="tsd-signature-type">A</span></h5>
+													</li>
+													<li>
+														<h5>b: <span class="tsd-signature-type">B</span></h5>
+													</li>
+													<li>
+														<h5>c: <span class="tsd-signature-type">C</span></h5>
+													</li>
+													<li>
+														<h5>d: <span class="tsd-signature-type">D</span></h5>
+													</li>
+													<li>
+														<h5>e: <span class="tsd-signature-type">E</span></h5>
+													</li>
+													<li>
+														<h5><span class="tsd-flag ts-flagRest">Rest</span> <span class="tsd-signature-symbol">...</span>args: <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span></h5>
+													</li>
+												</ul>
+												<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Res</span></h4>
+											</li>
+										</ul>
+									</li>
+								</ul>
+							</li>
+							<li>
+								<h5>a: <span class="tsd-signature-type">A</span></h5>
+							</li>
+							<li>
+								<h5>b: <span class="tsd-signature-type">B</span></h5>
+							</li>
+							<li>
+								<h5>c: <span class="tsd-signature-type">C</span></h5>
+							</li>
+							<li>
+								<h5>d: <span class="tsd-signature-type">D</span></h5>
+							</li>
+							<li>
+								<h5>e: <span class="tsd-signature-type">E</span></h5>
+							</li>
+						</ul>
+						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">function</span></h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-siganture">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-is-not-exported">
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Res</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5><span class="tsd-flag ts-flagRest">Rest</span> <span class="tsd-signature-symbol">...</span>args: <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span></h5>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Res</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</li>
+					<li class="tsd-description">
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/hydux/hydux/blob/c849e50/src/helpers/memoize.ts#L30">helpers/memoize.ts:30</a></li>
+							</ul>
+						</aside>
+						<h4 class="tsd-type-parameters-title">Type parameters</h4>
+						<ul class="tsd-type-parameters">
+							<li>
+								<h4>A</h4>
+							</li>
+							<li>
+								<h4>B</h4>
+							</li>
+							<li>
+								<h4>C</h4>
+							</li>
+							<li>
+								<h4>D</h4>
+							</li>
+							<li>
+								<h4>E</h4>
+							</li>
+							<li>
+								<h4>F</h4>
+							</li>
+							<li>
+								<h4>Res</h4>
+							</li>
+						</ul>
+						<h4 class="tsd-parameters-title">Parameters</h4>
+						<ul class="tsd-parameters">
+							<li>
+								<h5>callback: <span class="tsd-signature-type">function</span></h5>
+								<ul class="tsd-parameters">
+									<li class="tsd-parameter-siganture">
+										<ul class="tsd-signatures tsd-kind-type-literal tsd-is-not-exported">
+											<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>a<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">A</span>, b<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">B</span>, c<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">C</span>, d<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">D</span>, e<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">E</span>, f<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">F</span>, <span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Res</span></li>
+										</ul>
+										<ul class="tsd-descriptions">
+											<li class="tsd-description">
+												<h4 class="tsd-parameters-title">Parameters</h4>
+												<ul class="tsd-parameters">
+													<li>
+														<h5>a: <span class="tsd-signature-type">A</span></h5>
+													</li>
+													<li>
+														<h5>b: <span class="tsd-signature-type">B</span></h5>
+													</li>
+													<li>
+														<h5>c: <span class="tsd-signature-type">C</span></h5>
+													</li>
+													<li>
+														<h5>d: <span class="tsd-signature-type">D</span></h5>
+													</li>
+													<li>
+														<h5>e: <span class="tsd-signature-type">E</span></h5>
+													</li>
+													<li>
+														<h5>f: <span class="tsd-signature-type">F</span></h5>
+													</li>
+													<li>
+														<h5><span class="tsd-flag ts-flagRest">Rest</span> <span class="tsd-signature-symbol">...</span>args: <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span></h5>
+													</li>
+												</ul>
+												<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Res</span></h4>
+											</li>
+										</ul>
+									</li>
+								</ul>
+							</li>
+							<li>
+								<h5>a: <span class="tsd-signature-type">A</span></h5>
+							</li>
+							<li>
+								<h5>b: <span class="tsd-signature-type">B</span></h5>
+							</li>
+							<li>
+								<h5>c: <span class="tsd-signature-type">C</span></h5>
+							</li>
+							<li>
+								<h5>d: <span class="tsd-signature-type">D</span></h5>
+							</li>
+							<li>
+								<h5>e: <span class="tsd-signature-type">E</span></h5>
+							</li>
+							<li>
+								<h5>f: <span class="tsd-signature-type">F</span></h5>
+							</li>
+						</ul>
+						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">function</span></h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-siganture">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-is-not-exported">
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Res</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5><span class="tsd-flag ts-flagRest">Rest</span> <span class="tsd-signature-symbol">...</span>args: <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span></h5>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Res</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter">
+				<a name="memoizeone" class="tsd-anchor"></a>
+				<h3>memoize<wbr>One</h3>
+				<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter">
+					<li class="tsd-signature tsd-kind-icon">memoize<wbr>One&lt;P, R&gt;<span class="tsd-signature-symbol">(</span>fn<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span>, excludes<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span></li>
+				</ul>
+				<ul class="tsd-descriptions">
+					<li class="tsd-description">
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/hydux/hydux/blob/c849e50/src/helpers/memoize.ts#L46">helpers/memoize.ts:46</a></li>
+							</ul>
+						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>memoize stateless component (function component) via only one cache, it works like pure component.</p>
+							</div>
+						</div>
+						<h4 class="tsd-type-parameters-title">Type parameters</h4>
+						<ul class="tsd-type-parameters">
+							<li>
+								<h4>P<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span></h4>
+							</li>
+							<li>
+								<h4>R</h4>
+							</li>
+						</ul>
+						<h4 class="tsd-parameters-title">Parameters</h4>
+						<ul class="tsd-parameters">
+							<li>
+								<h5>fn: <span class="tsd-signature-type">function</span></h5>
+								<ul class="tsd-parameters">
+									<li class="tsd-parameter-siganture">
+										<ul class="tsd-signatures tsd-kind-type-literal tsd-is-not-exported">
+											<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>props<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">P</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">R</span></li>
+										</ul>
+										<ul class="tsd-descriptions">
+											<li class="tsd-description">
+												<h4 class="tsd-parameters-title">Parameters</h4>
+												<ul class="tsd-parameters">
+													<li>
+														<h5>props: <span class="tsd-signature-type">P</span></h5>
+													</li>
+												</ul>
+												<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">R</span></h4>
+											</li>
+										</ul>
+									</li>
+								</ul>
+							</li>
+							<li>
+								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> excludes: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> =&nbsp;[&#x27;children&#x27;]</span></h5>
+							</li>
+						</ul>
+						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">function</span></h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-siganture">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-is-not-exported">
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>props<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">P</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">R</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5>props: <span class="tsd-signature-type">P</span></h5>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">R</span></h4>
 									</li>
 								</ul>
 							</li>
@@ -1048,25 +1537,25 @@ img { max-width: 100%; }
 				</ul>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-external-module">
-				<a name="never" class="tsd-anchor"></a>
-				<h3>never</h3>
+				<a name="setcacheoptions" class="tsd-anchor"></a>
+				<h3>set<wbr>Cache<wbr>Options</h3>
 				<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module">
-					<li class="tsd-signature tsd-kind-icon">never<span class="tsd-signature-symbol">(</span>f<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">never</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">never</span></li>
+					<li class="tsd-signature tsd-kind-icon">set<wbr>Cache<wbr>Options<span class="tsd-signature-symbol">(</span>opts<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">LRUCache.Options</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 				</ul>
 				<ul class="tsd-descriptions">
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/hydux/hydux/blob/0cede50/src/helpers.ts#L37">helpers.ts:37</a></li>
+								<li>Defined in <a href="https://github.com/hydux/hydux/blob/c849e50/src/helpers/memoize.ts#L64">helpers/memoize.ts:64</a></li>
 							</ul>
 						</aside>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
-								<h5>f: <span class="tsd-signature-type">never</span></h5>
+								<h5>opts: <span class="tsd-signature-type">LRUCache.Options</span></h5>
 							</li>
 						</ul>
-						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">never</span></h4>
+						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 					</li>
 				</ul>
 			</section>

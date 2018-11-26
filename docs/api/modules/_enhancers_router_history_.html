@@ -930,6 +930,12 @@ img { max-width: 100%; }
 		<li class=" tsd-kind-type-alias tsd-parent-kind-external-module">
 			<a href="_enhancers_router_history_.html#historyprops" class="tsd-kind-icon">History<wbr>Props</a>
 		</li>
+		<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter">
+			<a href="_enhancers_router_history_.html#matchpath" class="tsd-kind-icon">match<wbr>Path</a>
+		</li>
+		<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter">
+			<a href="_enhancers_router_history_.html#parsepath" class="tsd-kind-icon">parse<wbr>Path</a>
+		</li>
 	</ul>
 </nav>
 <div class="container container-main">
@@ -960,6 +966,13 @@ img { max-width: 100%; }
 							<li class="tsd-kind-type-alias tsd-parent-kind-external-module"><a href="_enhancers_router_history_.html#historyprops" class="tsd-kind-icon">History<wbr>Props</a></li>
 						</ul>
 					</section>
+					<section class="tsd-index-section ">
+						<h3>Functions</h3>
+						<ul class="tsd-index-list">
+							<li class="tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter"><a href="_enhancers_router_history_.html#matchpath" class="tsd-kind-icon">match<wbr>Path</a></li>
+							<li class="tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter"><a href="_enhancers_router_history_.html#parsepath" class="tsd-kind-icon">parse<wbr>Path</a></li>
+						</ul>
+					</section>
 				</div>
 			</section>
 		</section>
@@ -971,7 +984,7 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">History<wbr>Props<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/hydux/hydux/blob/0cede50/src/enhancers/router/history.ts#L3">enhancers/router/history.ts:3</a></li>
+						<li>Defined in <a href="https://github.com/hydux/hydux/blob/c849e50/src/enhancers/router/history.ts#L4">enhancers/router/history.ts:4</a></li>
 					</ul>
 				</aside>
 				<div class="tsd-type-declaration">
@@ -979,6 +992,79 @@ img { max-width: 100%; }
 					<ul class="tsd-parameters">
 					</ul>
 				</div>
+			</section>
+		</section>
+		<section class="tsd-panel-group tsd-member-group ">
+			<h2>Functions</h2>
+			<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter">
+				<a name="matchpath" class="tsd-anchor"></a>
+				<h3>match<wbr>Path</h3>
+				<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter">
+					<li class="tsd-signature tsd-kind-icon">match<wbr>Path&lt;P&gt;<span class="tsd-signature-symbol">(</span>pathname<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, fmt<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">P</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></li>
+				</ul>
+				<ul class="tsd-descriptions">
+					<li class="tsd-description">
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/hydux/hydux/blob/c849e50/src/enhancers/router/history.ts#L44">enhancers/router/history.ts:44</a></li>
+							</ul>
+						</aside>
+						<h4 class="tsd-type-parameters-title">Type parameters</h4>
+						<ul class="tsd-type-parameters">
+							<li>
+								<h4>P</h4>
+							</li>
+						</ul>
+						<h4 class="tsd-parameters-title">Parameters</h4>
+						<ul class="tsd-parameters">
+							<li>
+								<h5>pathname: <span class="tsd-signature-type">string</span></h5>
+							</li>
+							<li>
+								<h5>fmt: <span class="tsd-signature-type">string</span></h5>
+							</li>
+						</ul>
+						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">P</span>
+							<span class="tsd-signature-symbol"> | </span>
+							<span class="tsd-signature-type">null</span>
+						</h4>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter">
+				<a name="parsepath" class="tsd-anchor"></a>
+				<h3>parse<wbr>Path</h3>
+				<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter">
+					<li class="tsd-signature tsd-kind-icon">parse<wbr>Path&lt;P, Q&gt;<span class="tsd-signature-symbol">(</span>path<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, tpls<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/_enhancers_router_index_.location.html" class="tsd-signature-type">Location</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">P</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">Q</span><span class="tsd-signature-symbol">&gt;</span></li>
+				</ul>
+				<ul class="tsd-descriptions">
+					<li class="tsd-description">
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/hydux/hydux/blob/c849e50/src/enhancers/router/history.ts#L11">enhancers/router/history.ts:11</a></li>
+							</ul>
+						</aside>
+						<h4 class="tsd-type-parameters-title">Type parameters</h4>
+						<ul class="tsd-type-parameters">
+							<li>
+								<h4>P<span class="tsd-signature-symbol">: </span><a href="../interfaces/_enhancers_router_index_.param.html" class="tsd-signature-type">Param</a></h4>
+							</li>
+							<li>
+								<h4>Q<span class="tsd-signature-symbol">: </span><a href="../interfaces/_enhancers_router_index_.query.html" class="tsd-signature-type">Query</a></h4>
+							</li>
+						</ul>
+						<h4 class="tsd-parameters-title">Parameters</h4>
+						<ul class="tsd-parameters">
+							<li>
+								<h5>path: <span class="tsd-signature-type">string</span></h5>
+							</li>
+							<li>
+								<h5>tpls: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
+							</li>
+						</ul>
+						<h4 class="tsd-returns-title">Returns <a href="../interfaces/_enhancers_router_index_.location.html" class="tsd-signature-type">Location</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">P</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">Q</span><span class="tsd-signature-symbol">&gt;</span></h4>
+					</li>
+				</ul>
 			</section>
 		</section>
 		<footer class="with-border-bottom">

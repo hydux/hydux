@@ -930,13 +930,22 @@ img { max-width: 100%; }
 				<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
 					<a href="_enhancers_router_history_.memoryhistoryprops.html#basepath" class="tsd-kind-icon">base<wbr>Path</a>
 				</li>
-				<li class=" tsd-kind-property tsd-parent-kind-interface">
+				<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-overwrite">
 					<a href="_enhancers_router_history_.memoryhistoryprops.html#initpath" class="tsd-kind-icon">init<wbr>Path</a>
+				</li>
+				<li class=" tsd-kind-property tsd-parent-kind-interface">
+					<a href="_enhancers_router_history_.memoryhistoryprops.html#store" class="tsd-kind-icon">store</a>
 				</li>
 			</ul>
 		</li>
 		<li class=" tsd-kind-type-alias tsd-parent-kind-external-module">
 			<a href="../modules/_enhancers_router_history_.html#historyprops" class="tsd-kind-icon">History<wbr>Props</a>
+		</li>
+		<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter">
+			<a href="../modules/_enhancers_router_history_.html#matchpath" class="tsd-kind-icon">match<wbr>Path</a>
+		</li>
+		<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter">
+			<a href="../modules/_enhancers_router_history_.html#parsepath" class="tsd-kind-icon">parse<wbr>Path</a>
 		</li>
 	</ul>
 </nav>
@@ -963,7 +972,8 @@ img { max-width: 100%; }
 						<h3>Properties</h3>
 						<ul class="tsd-index-list">
 							<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="_enhancers_router_history_.memoryhistoryprops.html#basepath" class="tsd-kind-icon">base<wbr>Path</a></li>
-							<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_enhancers_router_history_.memoryhistoryprops.html#initpath" class="tsd-kind-icon">init<wbr>Path</a></li>
+							<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-overwrite"><a href="_enhancers_router_history_.memoryhistoryprops.html#initpath" class="tsd-kind-icon">init<wbr>Path</a></li>
+							<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_enhancers_router_history_.memoryhistoryprops.html#store" class="tsd-kind-icon">store</a></li>
 						</ul>
 					</section>
 				</div>
@@ -978,17 +988,28 @@ img { max-width: 100%; }
 				<aside class="tsd-sources">
 					<p>Inherited from __type.basePath</p>
 					<ul>
-						<li>Defined in <a href="https://github.com/hydux/hydux/blob/0cede50/src/enhancers/router/history.ts#L3">enhancers/router/history.ts:3</a></li>
+						<li>Defined in <a href="https://github.com/hydux/hydux/blob/c849e50/src/enhancers/router/history.ts#L4">enhancers/router/history.ts:4</a></li>
 					</ul>
 				</aside>
 			</section>
-			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-overwrite">
 				<a name="initpath" class="tsd-anchor"></a>
 				<h3>init<wbr>Path</h3>
 				<div class="tsd-signature tsd-kind-icon">init<wbr>Path<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 				<aside class="tsd-sources">
+					<p>Overrides __type.initPath</p>
 					<ul>
-						<li>Defined in <a href="https://github.com/hydux/hydux/blob/0cede50/src/enhancers/router/history.ts#L96">enhancers/router/history.ts:96</a></li>
+						<li>Defined in <a href="https://github.com/hydux/hydux/blob/c849e50/src/enhancers/router/history.ts#L214">enhancers/router/history.ts:214</a></li>
+					</ul>
+				</aside>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+				<a name="store" class="tsd-anchor"></a>
+				<h3><span class="tsd-flag ts-flagOptional">Optional</span> store</h3>
+				<div class="tsd-signature tsd-kind-icon">store<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Storage</span></div>
+				<aside class="tsd-sources">
+					<ul>
+						<li>Defined in <a href="https://github.com/hydux/hydux/blob/c849e50/src/enhancers/router/history.ts#L215">enhancers/router/history.ts:215</a></li>
 					</ul>
 				</aside>
 			</section>

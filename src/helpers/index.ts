@@ -39,6 +39,7 @@ declare global {
 }
 
 /**
+ * @internal
  * ADT Helper for TS
  * e.g.
  * ```ts
@@ -64,14 +65,17 @@ export function dt<T extends string, D = null>(tag: T, data: D = null as any) {
   return { tag, data } as Dt<T, D>
 }
 
+/** @public */
 export const never = (f: never) => f
 
+/** @public */
 export function mkInit<S, A>(state: S, cmd: Cmd.CmdType<A> = Cmd.none): ActionCmdReturn<S, A> {
   return { state, cmd }
 }
 
 export type Fn1<T1, R> = (a1: T1) => R
 
+/** @public */
 export function compose<T1, T2, R>(fn1: Fn1<T1, T2>, fn2: Fn1<T2, R>): Fn1<T1, R>
 export function compose<T1, T2, T3, R>(
   fn1: Fn1<T1, T2>,
@@ -133,6 +137,7 @@ export function compose<R>(...fns: Function[]): Fn1<any, R> {
   return arg => fns.reduce((arg, fn) => fn(arg), arg)
 }
 
+/** @public */
 export function defaults<T>(value: T | null | undefined, defaults: T): T {
   return value == null ? defaults : value
 }
@@ -205,6 +210,7 @@ export function combine<
   }
 }
 /**
+ * @internal
  * run action and return a normalized result ([State, CmdType<>]),
  * this is useful to write High-Order-Action, which take an action and return a wrapped action.
  * @param result result of `action(msg: Data)`
@@ -233,6 +239,7 @@ export function runAction<S, A>(
   }
 }
 
+/** @internal */
 export function withParents<S, A, PS, PA, A1>(
   action: (a1: A1) => (s: S, a: A) => any,
   wrapper?: (
@@ -285,6 +292,7 @@ export function withParents<S, A, PS, PA, A1, A2, A3, A4, A5>(
 )
 /**
  * Wrap a child action with parentState, parentActions.
+ * @internal
  * @deprecated Deprecated for `overrideAction`
  * @param action The action to be wrapped
  * @param wrapper
@@ -312,6 +320,7 @@ export function withParents<S, A, PS, PA>(
 }
 /**
  * @deprecated Deprecated for `overrideAction`
+ * @internal
  */
 export const wrapActions = withParents
 
@@ -375,6 +384,7 @@ export function overrideAction<S, A, PS, PA, A1, A2, A3, A4>(
 )
 /**
  * Wrap a child action with parentState, parentActions.
+ * @internal
  * @param action The action to be wrapped
  * @param wrapper
  * @param parentState

@@ -66,15 +66,13 @@
     "puppeteer": "^1.5.0",
     "serve": "^9.4.0",
     "source-map-loader": "^0.2.3",
-    "timekeeper": "^2.0.0",
     "ts-node": "^6.1.1",
     "tsconfig-paths": "^3.4.0",
     "tslint": "^5.8.0",
     "tslint-config-standard": "^7.0.0",
-    "typedoc": "^0.11.1",
+    "typedoc": "^0.13.0",
     "typescript": "^2.9.2",
-    "webpack": "^3.10.0",
-    "webpack-blocks": "^1.0.0"
+    "webpack": "^3.10.0"
   },
   "dependencies": {
     "lru-cache": "^4.1.3",
