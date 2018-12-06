@@ -28,6 +28,11 @@
     "type": "git",
     "url": "git+https://github.com/hydux/hydux.git"
   },
+  "files": [
+    "lib",
+    "es",
+    "dist"
+  ],
   "keywords": [
     "elm",
     "hyperapp",
