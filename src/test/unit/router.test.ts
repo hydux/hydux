@@ -58,6 +58,9 @@ describe('router', () => {
     assert.deepEqual(params, null, 'match')
 
     params = matchPath('/aa/bb/cc', '/aa/*')
+    assert.deepEqual(params, {}, 'match')
+
+    params = matchPath('/aa/bb/cc', '/aa/:param')
     assert.deepEqual(params, null, 'match')
   })
 

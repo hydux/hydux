@@ -9,17 +9,9 @@
   "module": "./es/index.js",
   "sideEffects": false,
   "scripts": {
-    "build": "del lib && tsc -d && cpy '**/*.js.flow' '../lib/' --cwd=src --parents",
-    "build:es": "del es && tsc -d -m es6 --outDir ./es",
-    "build:dist": "webpack -p --progress --profile",
-    "test:all": "ts-node ./src/test/e2e/prepare.ts && npm run mocha \"src/test/**/*.test.ts\"",
-    "test": "npm run mocha -- \"src/test/unit/*.test.ts\"",
-    "mocha": "mocha --exit -r tsconfig-paths/register -r ts-node/register",
-    "test:watch": "npm run test -- -w --watch-extensions ts,tsx",
-    "doc": "typedoc --theme minimal --exclude \"**/test/**/*.ts\"  --excludeNotExported --excludePrivate --out ./docs/api ./src && touch ./docs/.nojekyll",
-    "build:all": "run-p build build:dist build:es",
-    "flow": "flow check",
-    "preversion": "run-p flow test build:all && git add -A"
+    "test": "foy test",
+    "test:e2e": "foy test:e2e",
+    "test:all": "foy test:all"
   },
   "pre-commit": [],
   "repository": {
@@ -60,6 +52,8 @@
     "del-cli": "^1.1.0",
     "espower-typescript": "^8.1.2",
     "flow-bin": "^0.71.0",
+    "foy": "^0.1.6",
+    "generate-changelog": "^1.7.1",
     "get-chrome": "^0.0.2",
     "get-port": "^3.2.0",
     "mocha": "^4.0.1",
@@ -70,6 +64,7 @@
     "puppeteer": "^1.5.0",
     "serve": "^9.4.0",
     "source-map-loader": "^0.2.3",
+    "standard-version": "^4.4.0",
     "ts-node": "^7.0.1",
     "tsconfig-paths": "^3.4.0",
     "tslint": "^5.12.0",
