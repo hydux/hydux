@@ -21,9 +21,7 @@
     "flow": "flow check",
     "preversion": "run-p flow test build:all && git add -A"
   },
-  "pre-commit": [
-    "test"
-  ],
+  "pre-commit": [],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/hydux/hydux.git"
@@ -53,6 +51,7 @@
     "@types/mocha": "^5.1.0",
     "@types/node": "^9.6.2",
     "@types/puppeteer": "^1.2.3",
+    "awesome-typescript-loader": "^5.2.1",
     "axios": "^0.18.0",
     "clean-webpack-plugin": "^0.1.17",
     "cpy-cli": "^1.0.1",
@@ -71,13 +70,14 @@
     "puppeteer": "^1.5.0",
     "serve": "^9.4.0",
     "source-map-loader": "^0.2.3",
-    "ts-node": "^6.1.1",
+    "ts-node": "^7.0.1",
     "tsconfig-paths": "^3.4.0",
-    "tslint": "^5.8.0",
-    "tslint-config-standard": "^7.0.0",
+    "tslint": "^5.12.0",
+    "tslint-config-standard": "^8.0.1",
     "typedoc": "^0.13.0",
-    "typescript": "^2.9.2",
-    "webpack": "^3.10.0"
+    "typescript": "^3.2.2",
+    "webpack": "^4.28.2",
+    "webpack-cli": "^3.1.2"
   },
   "dependencies": {
     "lru-cache": "^4.1.3",

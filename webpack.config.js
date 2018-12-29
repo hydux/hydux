@@ -7,7 +7,8 @@ const IS_DEV = process.env.NODE_ENV === 'development'
 
 const DIST = `${__dirname}/static/dist`
 
-module.exports = module.exports = {
+module.exports = {
+  mode: process.env.NODE_ENV,
   entry: {
     core: "./src/index.ts",
     picodom: './src/enhancers/picodom-render.ts',

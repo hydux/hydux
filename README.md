@@ -31,10 +31,8 @@ yarn add hydux # or npm i hydux
 
 This is an experimental dependency injection API for actions inspired by react-hooks, totally downward compatible, with this we don't need curring to inject state and actions or manually markup types for the return value any more!
 
-> Note: please don't use it in production, it's not stable yet, if you want to live on the bleeding edge, you can try with the alpha release:
-
 ```sh
-yarn add hydux@^v0.5.8-alpha1
+yarn add hydux@^v0.5.8
 ```
 
 ```ts
