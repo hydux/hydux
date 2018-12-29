@@ -43,7 +43,7 @@ export function parsePath<P extends Param, Q extends Query>(path: string, tpls: 
 
 export function matchPath<P>(pathname: string, fmt: string): P | null {
   let paramKeys: string[] = []
-  let re = '^' + fmt.replace(/\/$/, '').replace(/([.%|(){}\[\]])/g, '\\$1').replace('*', '.*').replace(/\/\:([\w]+)/g, (m, name) => {
+  let re = '^' + fmt.replace(/\/$/, '').replace(/([.%|(){}\[\]])/g, '\\$1').replace(/\*/g, '.*').replace(/\/\:([\w]+)/g, (m, name) => {
     paramKeys.push(name)
     return '/([^/]+)'
   }) + '\/?$'

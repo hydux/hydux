@@ -47,6 +47,18 @@ describe('router', () => {
 
     params = matchPath('/aa/bb/', '/aa/bb/cc/')
     assert.deepEqual(params, null, 'match')
+
+    params = matchPath('/aa/bb/cc', '/aa/*/cc')
+    assert.deepEqual(params, {}, 'match')
+
+    params = matchPath('/aa/bb/cc', '/aa/*/*')
+    assert.deepEqual(params, {}, 'match')
+
+    params = matchPath('/aa/bb', '/aa/*/*')
+    assert.deepEqual(params, null, 'match')
+
+    params = matchPath('/aa/bb/cc', '/aa/*')
+    assert.deepEqual(params, null, 'match')
   })
 
   it('nestedRoutes', () => {
