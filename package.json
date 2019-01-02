@@ -10,8 +10,8 @@
   "sideEffects": false,
   "scripts": {
     "test": "foy test",
-    "test:e2e": "foy test:e2e",
-    "test:all": "foy test:all"
+    "test:all": "foy test:all",
+    "flow": "foy flow"
   },
   "pre-commit": [],
   "repository": {
