@@ -55,7 +55,7 @@ task<{ version: string }>(
   ],
   async ctx => {
     await ctx.exec([
-      `changelog --${ctx.options.version} -X chore`,
+      `changelog --${ctx.options.version} -x chore`,
       `git add -A`,
       `git commit -m 'updated CHANGELOG.md'`,
     ])
@@ -71,9 +71,8 @@ task(
 )
 
 option('-t, --type', 'Semver versions, patch | major | minor')
-task<{ type: 'patch' | 'major' | 'minor' }>('version', [
-  'preversion'
-], async ctx => {
+task<{ type: 'patch' | 'major' | 'minor' }>('version', async ctx => {
+  await ctx.run('preversion', { options: { version: ctx.options.type } })
   await ctx.exec(`npm version ${ctx.options.type}`)
 })
 
