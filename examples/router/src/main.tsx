@@ -1,4 +1,4 @@
-import _app from '../../../src/index'
+import _app, { inject, dt } from '../../../src/index'
 import withPersist from '../../../src/enhancers/persist'
 import withPicodom, { React } from '../../../src/enhancers/picodom-render'
 import { ActionsType } from '../../../src/types'
@@ -25,25 +25,41 @@ if (module['hot'] && module['hot'].dispose) {
 }
 
 const routes: Routes<State, Actions> = {
-  '/': loc => state => ({
-    ...state,
-    page: 'Home'
-  }),
-  '/user/:id': loc => state => ({
-    ...state,
-    page: {
-      page: 'User',
-      id: loc.params.id,
-    }
-  }),
-  '/counter': loc => state => ({
-    ...state,
-    page: 'Counter'
-  }),
-  '*': loc => state => ({
-    ...state,
-    page: '404'
-  })
+  '/': loc => {
+    let ctx = inject<State, Actions>()
+    ctx.setState({
+      ...state,
+      page: dt('Home', null),
+    })
+  },
+  '/user/:id': loc => {
+    let ctx = inject<State, Actions>()
+    ctx.setState({
+      ...state,
+      page: dt('User', Number(loc.params.id))
+    })
+  },
+  '/counter': loc => {
+    let ctx = inject<State, Actions>()
+    ctx.setState({
+      ...state,
+      page: dt('Counter', null)
+    })
+  },
+  '/accounts': loc => {
+    let ctx = inject<State, Actions>()
+    ctx.setState({
+      ...state,
+      page: dt('Accounts', null)
+    })
+  },
+  '*': loc => {
+    let ctx = inject<State, Actions>()
+    ctx.setState({
+      ...state,
+      page: dt('404', null),
+    })
+  }
 }
 
 let app = withPicodom<State, Actions>()(_app)
@@ -65,11 +81,11 @@ const actions = {
 }
 
 type Page =
-| 'Home'
-| 'Counter'
-| { page: 'User', id: number }
-| '404'
-| 'Account'
+| Dt<'Home'>
+| Dt<'Counter'>
+| Dt<'User', number>
+| Dt<'404'>
+| Dt<'Accounts'>
 
 type State = {
   counter: CounterState,
@@ -78,27 +94,25 @@ type State = {
 
 const state: State = {
   counter: Counter.init(),
-  page: 'Home',
+  page: dt('Home', null),
 }
 
 type Actions = typeof actions
 const NoMatch = () => <div class="main">404</div>
 
 const renderRoutes = (state: State, actions: Actions) => {
-  switch (state.page) {
+  switch (state.page.tag) {
     case 'Home':
       return <div>Home</div>
     case 'Counter':
       return Counter.view(state.counter, actions.counter)
-    case 'Account':
-      return 'account'
+    case 'Accounts':
+      return 'accounts'
     case '404':
       return '404'
+    case 'User':
+      return <div>User: {state.page.data}</div>
     default:
-      switch (state.page.page) {
-        case 'User':
-          return <div>User: {state.page.id}</div>
-      }
       return <NoMatch />
   }
 }

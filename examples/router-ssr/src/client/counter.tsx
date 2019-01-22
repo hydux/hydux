@@ -2,6 +2,7 @@ import { React } from 'hydux-react'
 import * as Hydux from '../../../../src/index'
 import * as Utils from './utils'
 const Cmd = Hydux.Cmd
+const inject = Hydux.inject
 
 export const init = (title = 'Counter1') => ({
   state: { count: 0, title },
@@ -13,19 +14,32 @@ export const init = (title = 'Counter1') => ({
   )
 })
 export const actions = {
-  setCount: (count): any => (state: State) => ({ count }),
-  down: (): any => (state: State) => ({ count: state.count - 1 }),
-  up: (): any => (state: State) => ({ count: state.count + 1 }),
-  upN: (n): any => (state: State): Hydux.AR<State, Actions> => ({ count: state.count + n }),
-  upLater: (): any => (state: State, actions: Actions) =>
-    [ state,
-      Cmd.ofPromise(
-        n => {
-          return new Promise(resolve =>
-            setTimeout(() => resolve(n), 1000))
-        },
-        10,
-        actions.upN) ]
+  setCount(count: number) {
+    let ctx = inject<State, Actions>()
+    ctx.setState({ count })
+  },
+  down() {
+    let ctx = inject<State, Actions>()
+    ctx.setState(({ count: ctx.state.count - 1 }))
+  },
+  up() {
+    let ctx = inject<State, Actions>()
+    ctx.setState(({ count: ctx.state.count + 1 }))
+  },
+  upN(n: number) {
+    let ctx = inject<State, Actions>()
+    ctx.setState({ count: ctx.state.count + n })
+  },
+  upLater() {
+    let ctx = inject<State, Actions>()
+    ctx.addPromise(
+      n => {
+        return new Promise(resolve =>
+          setTimeout(() => resolve(n), 1000))
+      },
+      10,
+      ctx.actions.upN)
+  }
 }
 
 export const view = (state: State, actions: Actions) => (

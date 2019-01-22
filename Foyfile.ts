@@ -49,11 +49,12 @@ task('flow', async ctx => {
 setOption({ loading: false })
 task<{ version: string }>(
   'preversion', [
-    { name: 'flow', async: true },
+    // { name: 'flow', async: true },
     { name: 'test', async: true },
     { name: 'build:all', async: true },
   ],
   async ctx => {
+    console.log('ctx.options', ctx.options)
     await ctx.exec([
       `changelog --${ctx.options.version} -x chore`,
       `git add -A`,
@@ -70,7 +71,7 @@ task(
   ],
 )
 
-option('-t, --type', 'Semver versions, patch | major | minor')
+option('-t, --type <ver>', 'Semver versions, patch | major | minor')
 task<{ type: 'patch' | 'major' | 'minor' }>('publish', async ctx => {
   await ctx.run('preversion', { options: { version: ctx.options.type } })
   await ctx.exec(`npm version ${ctx.options.type}`)

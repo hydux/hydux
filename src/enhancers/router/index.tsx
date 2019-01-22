@@ -12,6 +12,7 @@ import {
   BrowserHistory, MemoryHistory, MemoryHistoryProps,
   parsePath, matchPath
 } from './history'
+import { inject } from '../../dispatcher';
 
 export { parsePath, matchPath }
 
@@ -272,12 +273,20 @@ export default function withRouter<State, Actions>(props: Options<State, Actions
           forward: () => setTimeout(() => history.forward()),
         } as History),
         [CHANGE_LOCATION]: (loc: Location<any, any>, resolve?: Function) => (state: State, actions: Actions) => {
+          let ctx = inject()
           if (loc.template) {
             let action = routesMap[loc.template]
             let { state: nextState, cmd } = runAction(action(loc))
-            return [{ ...(nextState as any as object), location: loc }, cmd]
+            ctx.setState({
+              ...nextState as any,
+              location: loc
+            })
+            ctx.addSub(...cmd)
           } else {
-            return { ...(state as any), location: loc }
+            ctx.setState({
+              ...state as any,
+              location: loc
+            })
           }
         },
       },
@@ -314,10 +323,6 @@ export interface NestedRoutes<State, Actions> {
   label?: string,
   // key?: keyof Actions
   // component?: Component<any, any>
-  update?: (loc: Location, state: State, actions: Actions) => ActionReturn<State, Actions>
-  /**
-   * @deprecated Deprecated for `update`
-   */
   action?: ActionType<Location<any, any>, State, Actions>,
   children?: NestedRoutes<State, Actions>[],
   /**
@@ -369,11 +374,6 @@ export function parseNestedRoutes<State, Actions>(routes: NestedRoutes<State, Ac
     children
       .map(r => {
         let action = r.action
-        if (!action && r.update) {
-          action = loc => (state, actions) => {
-            return r.update!(loc, state, actions)
-          }
-        }
         return {
           ...r,
           path: join(routes.path, r.path),

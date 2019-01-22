@@ -29,9 +29,13 @@ const Counter = {
       actions.upN(12)
     },
     upLaterByPromise: n => {
-      let { actions } = inject<State, Actions>()
-      return new Promise(resolve =>
-        setTimeout(() => (actions.upN(n), resolve()), 10))
+      let { actions, Cmd } = inject<State, Actions>()
+      Cmd.addPromise(() => new Promise(
+        res => setTimeout(
+            () => (actions.upN(n), res),
+            10
+          )
+      ))
     },
     upLater: () => {
       let { actions, Cmd } = inject<State, Actions>()
@@ -122,8 +126,8 @@ describe('inject api', () => {
           setState({ count: state.count + 1 })
         },
         down: _ => {
-          let { state } = inject()
-          return { count: state.count - 1 }
+          let { state, setState } = inject()
+          setState({ count: state.count - 1 })
         },
         reset: _ => ({ count: 1 }),
       },
@@ -142,8 +146,8 @@ describe('inject api', () => {
         this._inc = inc
       }
       up = () => {
-        let { state } = inject()
-        return ({ count: state.count + this._inc })
+        let { state, setState } = inject()
+        setState({ count: state.count + this._inc })
       }
     }
     let ctx = app<any, any>({
@@ -240,15 +244,9 @@ describe('inject api', () => {
     ) => {
       const { state, cmd } = action<State['counter1'], Actions['counter1']>(n + 1)
       assert.equal(state.count, parentState.counter1.count + n + 1, 'call child action work')
-      return [
-        state,
-        Cmd.batch(
-          cmd,
-          Cmd.ofFn(
-            () => parentActions.counter2.up()
-          ),
-        )
-      ]
+      let ctx = inject<State['counter1'], Actions['counter1']>()
+      ctx.setState(state)
+      ctx.addSub(...cmd).addFn(() => parentActions.counter2.up())
     })
     Hydux.overrideAction(actions, _ => _.counter3.child.upN, n => (
       action,
@@ -257,15 +255,10 @@ describe('inject api', () => {
     ) => {
       const { state, cmd } = action<State['counter1'], Actions['counter1']>(n + 1)
       assert.equal(state.count, parentState.counter3.child.count + n + 1, 'call nested child action work')
-      return [
-        state,
-        Cmd.batch(
-          cmd,
-          Cmd.ofFn(
-            () => parentActions.counter2.up()
-          ),
-        )
-      ]
+      let ctx = inject<State['counter1'], Actions['counter1']>()
+      ctx
+      .setState(state)
+      .addSub(...cmd).addFn(() => parentActions.counter2.up())
     })
     type State = typeof initState
     type Actions = typeof actions

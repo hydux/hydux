@@ -35,7 +35,7 @@ export interface AppProps<State, Actions> {
   actions: ActionsType<State, Actions>
   subscribe?: Subscribe<State, Actions>
   // middlewares: ((action: MyAction<any, State, Actions>, key: string, path: string[]) => MyAction<any, State, Actions>)[],
-  onRender?: (view: any) => void
+  onRender?: (view: any, callback?: () => void) => void
   onUpdated?: OnUpdate<State, Actions>
   onUpdateStart?: OnUpdateStart<State, Actions>
   /**
@@ -56,7 +56,7 @@ export interface Context<State, Actions, RenderReturn = any> {
   init: Init<State, Actions>
   view: View<State, Actions>
   subscribe?: Subscribe<State, Actions>
-  onRender?: ((view: any) => RenderReturn)
+  onRender?: ((view: any, callback?: () => void) => RenderReturn)
   onUpdated?: OnUpdate<State, Actions>
   onUpdateStart?: OnUpdateStart<State, Actions>
   /** Patch a component in runtime, used for code-splitting */
@@ -128,7 +128,7 @@ export function app<State, Actions>(props: AppProps<State, Actions>): Context<St
   // const appEvents = props.events || {}
   let appActions = {} as Actions
   const appSubscribe = props.subscribe || (_ => Cmd.none)
-  const render = props.onRender || noop
+  const render = props.onRender || (noop as any)
   // const appMiddlewares = props.middlewares || []
   let { state: appState, cmd: initCmd } = normalize(props.init())
   init(appState, appActions, props.actions, [])
@@ -166,7 +166,7 @@ export function app<State, Actions>(props: AppProps<State, Actions>): Context<St
 
   return appContext
 
-  function appRender(state = appState) {
+  function appRender(state = appState, callback?: () => void) {
     if (state !== appState) {
       appState = state
     }
@@ -174,7 +174,7 @@ export function app<State, Actions>(props: AppProps<State, Actions>): Context<St
     if (isFn(view)) {
       view = view(appActions)
     }
-    return render(view)
+    return render(view, callback)
   }
 
   function init(
@@ -195,7 +195,12 @@ export function app<State, Actions>(props: AppProps<State, Actions>): Context<St
           let parentState
           let parentActions
           let prevAppState = appState
-          let setState = nextState => {
+          let batchingState = 'start' as 'start' | 'updating' | 'end'
+          let setState = (nextState, callback?: () => void) => {
+            if (batchingState === 'start') {
+              batchingState = 'updating'
+            }
+            let isBatching = batchingState === 'updating'
             if (props.mutable) {
               appState = setDeepMutable(
                 path,
@@ -204,11 +209,16 @@ export function app<State, Actions>(props: AppProps<State, Actions>): Context<St
                   : state,
                 appState,
               )
-              appRender(appState)
+              if (!isBatching) {
+                appRender(appState, callback)
+              }
             } else if (nextState !== state) {
               appState = setDeep(path, merge(state, nextState), appState)
-              appRender(appState)
+              if (!isBatching) {
+                appRender(appState, callback)
+              }
             }
+            callback && callback()
           }
           let actionName = path.join('.') + '.' + key
           if (props.onUpdateStart) {
@@ -232,7 +242,7 @@ export function app<State, Actions>(props: AppProps<State, Actions>): Context<St
             setState,
           })
           const actionResult = subFrom(...msgData)
-          let cmd = dispatcher.getContext().cmd
+          let cmd = dispatcher.getContext()._internals.cmd
           if (actionResult) {
             let ret = runAction(actionResult)
             setState(ret.state)
@@ -252,6 +262,10 @@ export function app<State, Actions>(props: AppProps<State, Actions>): Context<St
               action: actionName,
             })
           }
+          if (batchingState === 'updating') {
+            appRender(appState)
+          }
+          batchingState = 'end'
           dispatcher.deactive()
           return runCmd(cmd, actions)
         }

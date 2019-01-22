@@ -4,6 +4,26 @@
 
 A light-weight Elm-like alternative for Redux ecosystem, inspired by [Hyperapp](https://github.com/hyperapp/hyperapp) and [Elmish](https://github.com/fable-elmish/elmish).
 
+## Contents
+
+- [Hydux](#hydux)
+  - [Contents](#contents)
+  - [Features](#features)
+  - [Try it online!](#try-it-online)
+  - [Install](#install)
+  - [React-hooks like dependency injection for state/actions<sup style="color: red;">New!</sup>](#react-hooks-like-dependency-injection-for-stateactionssup-style%22color-red%22newsup)
+  - [Quick Example](#quick-example)
+  - [Init with Command](#init-with-command)
+  - [Actions with Command](#actions-with-command)
+  - [Parent-Child Components Communication](#parent-child-components-communication)
+  - [Documentation](#documentation)
+  - [Ecosystem](#ecosystem)
+    - [Libraries](#libraries)
+    - [Samples](#samples)
+  - [Counter App](#counter-app)
+  - [Why](#why)
+  - [License](#license)
+
 ## Features
 
 * Elm Architecture, split your whole app with **init**, **state**, **actions**.

@@ -68,40 +68,48 @@ export const routes: NestedRoutes<State, Actions> = {
   }),
   children: [{
     path: '/user/:id',
-    action: loc => state => ({
-      ...state,
-      page: {
-        page: 'user',
-        id: loc.params.id,
-      }
-    })
+    action(loc) {
+      let ctx = Hydux.inject<State, Actions>()
+      ctx.setState({
+        ...ctx.state,
+        page: {
+          page: 'user',
+          id: loc.params.id,
+        }
+      })
+    }
   }, {
     path: '/counter',
     getComponent: () => ['counter', import('../counter')],
-    action: (loc) => state => ({
-      page: 'counter'
-    }),
+    action(loc) {
+      let ctx = Hydux.inject<State, Actions>()
+      ctx.setState({
+        page: 'counter'
+      })
+    },
   }, {
     path: '/counter2',
-    update: (loc) => ({
-      state: {
+    action(loc) {
+      let ctx = Hydux.inject<State, Actions>()
+      ctx.setState({
         page: 'counter2'
-      },
-      cmd: subComps.cmds.counter2,
-    }),
+      })
+      .addSub(...subComps.cmds.counter2)
+    },
   }, {
     path: '/counter3',
-    update: (loc) => ({
-      state: {
+    action(loc) {
+      let ctx = Hydux.inject<State, Actions>()
+      ctx.setState({
         page: 'counter3'
-      },
-      cmd: subComps.cmds.counter3,
-    }),
+      })
+      .addSub(...subComps.cmds.counter3)
+    },
   }, {
     path: '*',
-    action: loc => state => ({
-      ...state,
-      page: '404'
-    }),
+    action(loc) {
+      let ctx = Hydux.inject<State, Actions>()
+      ctx.setState({ page: '404' })
+    },
   }]
 }

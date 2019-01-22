@@ -52,7 +52,7 @@
     "del-cli": "^1.1.0",
     "espower-typescript": "^8.1.2",
     "flow-bin": "^0.71.0",
-    "foy": "^0.1.6",
+    "foy": "^0.1.12",
     "generate-changelog": "^1.7.1",
     "get-chrome": "^0.0.2",
     "get-port": "^3.2.0",

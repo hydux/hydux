@@ -225,17 +225,24 @@ export function runAction<S, A>(
     state,
     actions,
     parentState,
-    parentActions
+    parentActions,
+    _internals,
   } = dispatcher.getContext()
   isFn(res) &&
     (res = res.call(actions, state, actions, parentState, parentActions)) &&
     isFn(res) &&
     (res = res.call(actions, actions))
+  if (res && (_internals.newState !== state || _internals.cmd.length)) {
+    console.error(result)
+    throw new Error(`Actions with new inject api cannot return anything!`)
+  }
   // action can be a function that return a promise or undefined(callback)
-  let ret2 = normalize(res as ActionReturn<S, A>, state)
+  if (res) {
+    return normalize<S, A>(res, state)
+  }
   return {
-    state: (ret2.state as any) || state,
-    cmd: ret2.cmd,
+    state: _internals.newState,
+    cmd: _internals.cmd,
   }
 }
 
