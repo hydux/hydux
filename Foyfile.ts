@@ -84,3 +84,5 @@ task<{ type: 'patch' | 'major' | 'minor' }>('publish', async ctx => {
 task('test', async ctx => {
   await ctx.exec(`${MochaCli} \"src/test/unit/*.test.ts\"`)
 })
+
+task('test:all', ['test'.async(), 'test:e2e'.async()])
