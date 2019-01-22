@@ -1,3 +1,9 @@
+#### 0.5.9 (2019-01-22)
+
+##### New Features
+
+* **actions:**  Improve inject API ([6aa36ac3](https://github.com/hydux/hydux/commit/6aa36ac3177c48f1fc41b7b38e64947bdb141faf))
+
 #### 0.5.8 (2019-01-02)
 
 ##### New Features
