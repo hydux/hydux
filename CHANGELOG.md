@@ -1,3 +1,13 @@
+#### 0.5.10 (2019-01-24)
+
+##### New Features
+
+* **router:**  Support parse hash ([776c89ff](https://github.com/hydux/hydux/commit/776c89ff02b04c5e50744533fdf1ef62a030319c))
+
+##### Bug Fixes
+
+* **misc:**  export dt, merge action\'s return and inject, better error for inject ([45980aae](https://github.com/hydux/hydux/commit/45980aae7f811dac57df4dd99536a7c66e2c8157))
+
 #### 0.5.9 (2019-01-22)
 
 ##### New Features

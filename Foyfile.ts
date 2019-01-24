@@ -1,7 +1,7 @@
 import { task, fs, option, setOption, setGlobalOptions } from 'foy'
 import * as pathLib from 'path'
 
-setGlobalOptions({ loading: false })
+setGlobalOptions({ loading: false, strict: true })
 
 task('build', async ctx => {
   await ctx.fs.rmrf('./lib')
