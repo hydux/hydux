@@ -12,7 +12,7 @@ import {
 } from './types'
 import Cmd, { CmdType, Sub } from './cmd'
 import { set, merge, setDeep, setDeepMutable, get, isFn, noop, isPojo, clone, OverrideLength, weakVal } from './utils'
-import { runAction } from './helpers'
+import { runActionResult } from './helpers'
 import { dispatcher, inject } from './dispatcher'
 export * from './helpers'
 export * from './types'
@@ -55,6 +55,7 @@ export interface Context<State, Actions, RenderReturn = any> {
   state: State
   init: Init<State, Actions>
   view: View<State, Actions>
+  mutable?: boolean
   subscribe?: Subscribe<State, Actions>
   onRender?: ((view: any, callback?: () => void) => RenderReturn)
   onUpdated?: OnUpdate<State, Actions>
@@ -99,9 +100,9 @@ export function normalize<S, A>(initResult: InitReturn<S, A> | ActionReturn<S, A
       let dispatcherResult = dispatcher.getResult()
       if (dispatcherResult) {
         if (state !== dispatcherResult.state) {
-          set(state, dispatcherResult.state)
+          ret.state = set({}, set(state, dispatcherResult.state))
         }
-        ret.cmd.push(...dispatcherResult.cmd)
+        ret.cmd.push(...dispatcherResult.cmd.filter(c => ret.cmd.indexOf(c) < 0))
       }
     }
   } else if (isObjReturn(initResult)) {
@@ -124,6 +125,12 @@ export function runCmd<A>(cmd: CmdType<A>, actions: A) {
   return cmd.map(sub => sub(actions))
 }
 
+export async function resolveCmdResults(results: any[]) {
+  results = await Promise.all(
+    results.map(r => r instanceof Array ? resolveCmdResults(r) : r)
+  )
+}
+
 export function app<State, Actions>(props: AppProps<State, Actions>): Context<State, Actions> {
   // const appEvents = props.events || {}
   let appActions = {} as Actions
@@ -136,7 +143,7 @@ export function app<State, Actions>(props: AppProps<State, Actions>): Context<St
   appRender(appState)
   appSubscribe(appState).forEach(sub => sub(appActions))
 
-  const appContext = {
+  const appContext: Context<State, Actions> = {
     // getter should before spread operator,
     // otherwise it would be copied and becomes normal property
     get state() {
@@ -160,7 +167,7 @@ export function app<State, Actions>(props: AppProps<State, Actions>): Context<St
       appRender(appState)
       return reuseState
         ? Promise.resolve()
-        : Promise.all(runCmd(cmd, actions))
+        : resolveCmdResults(runCmd(cmd, actions))
     }
   }
 
@@ -244,15 +251,9 @@ export function app<State, Actions>(props: AppProps<State, Actions>): Context<St
           const actionResult = subFrom(...msgData)
           let cmd = dispatcher.getContext()._internals.cmd
           if (actionResult) {
-            let ret = runAction(actionResult)
+            let ret = runActionResult(actionResult)
             setState(ret.state)
-            if (cmd.length === 0) {
-              cmd = ret.cmd
-            } else {
-              cmd = cmd
-                .filter(c => ret.cmd.indexOf(c) < 0)
-                .concat(ret.cmd)
-            }
+            cmd = ret.cmd
           }
           if (props.onUpdated) {
             props.onUpdated({

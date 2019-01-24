@@ -1,4 +1,4 @@
-import { AppProps, App, CmdType, Context, normalize } from './../index'
+import { AppProps, App, CmdType, Context, normalize, resolveCmdResults } from './../index'
 import Cmd from './../cmd'
 import { get } from '../utils'
 export type Options = {
@@ -25,11 +25,11 @@ export default function withSSR<State, Actions>(
       }
     })
     ctx.render = async (state?: State) => {
-      await Promise.all(
-        initCmd.map(
-          sub => sub(ctx.actions)
-        )
+      let results = initCmd.map(
+        sub => sub(ctx.actions)
       )
+      await resolveCmdResults(results)
+      // await new Promise(res => setTimeout(res, 1000))
       state = state || ctx.state
       const view = ctx.view(state, ctx.actions)
       return options.renderToString(view)

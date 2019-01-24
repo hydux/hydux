@@ -1,4 +1,4 @@
-import _app, { inject, dt } from '../../../src/index'
+import _app, { inject, dt, Dt } from '../../../src/index'
 import withPersist from '../../../src/enhancers/persist'
 import withPicodom, { React } from '../../../src/enhancers/picodom-render'
 import { ActionsType } from '../../../src/types'

@@ -210,7 +210,7 @@ export function combine<
  * @param state
  * @param actions
  */
-export function runAction<S, A>(
+export function runActionResult<S, A>(
   result: ActionReturn<S, A> | ((state: S, actions: A) => ActionReturn<S, A>),
 ): StandardActionReturn<S, A> {
   let res: any = result
@@ -219,29 +219,13 @@ export function runAction<S, A>(
     actions,
     parentState,
     parentActions,
-    _internals,
   } = dispatcher.getContext()
   isFn(res) &&
     (res = res.call(actions, state, actions, parentState, parentActions)) &&
     isFn(res) &&
     (res = res.call(actions, actions))
-  if (res && (_internals.newState !== state || _internals.cmd.length)) {
-    console.error(result)
-    // throw new Error(`Actions with new inject api cannot return anything!`)
-    let nres = normalize<S, A>(res, state)
-    return {
-      state: { ..._internals.newState, ...nres.state },
-      cmd: _internals.cmd.concat(nres.cmd),
-    }
-  }
   // action can be a function that return a promise or undefined(callback)
-  if (res) {
-    return normalize<S, A>(res, state)
-  }
-  return {
-    state: _internals.newState,
-    cmd: _internals.cmd,
-  }
+  return normalize<S, A>(res, state)
 }
 
 /** @internal */
@@ -318,7 +302,7 @@ export function withParents<S, A, PS, PA>(
     return action
   }
   const wrapped = (state: S, actions: A, parentState: PS, parentActions: PA) => {
-    const nactions = (...args) => runAction(action(...args))
+    const nactions = (...args) => runActionResult(action(...args))
     return wrapper(nactions, parentState, parentActions, state, actions)
   }
   return wrapped
@@ -414,7 +398,7 @@ export function overrideAction<S, A, PS, PA>(
   let action = getter(parentActions)
   const wrapped = (...args) => {
     const normalAction = (...args) => {
-      let ret = runAction(action(...args))
+      let ret = runActionResult(action(...args))
       return ret
     }
     let ctx = dispatcher.getContext()

@@ -1,7 +1,7 @@
 import { ActionType, ActionsType, ActionType2 } from './../../types'
 import {
   AppProps, App, Init, View, Subscribe,
-  OnUpdate, runAction, Context, Patch,
+  OnUpdate, runActionResult, Context, Patch,
   Component, normalize, ActionReturn
 } from './../../index'
 import { Dt, dt, never, CombinedComps } from '../../helpers'
@@ -62,10 +62,11 @@ export interface LinkProps {
   className?: string
   onTouchEnd?: (e: any) => void
   onTouchMove?: (e: any) => void
+  [k: string]: any
   // Feel free to add more...
 }
 
-export function mkLink(history: History, h, opts: {
+export function mkLink(history: BaseHistory, h, opts: {
   comp?: string
 } = {}) {
   const React = { createElement: h }
@@ -114,7 +115,7 @@ export function mkLink(history: History, h, opts: {
     }
     return (
       <Comp
-        href={to}
+        href={history.realPath(to)}
         {...props}
         onMouseOver={e => {
           handlePrefetch(e)
@@ -251,7 +252,6 @@ export default function withRouter<State, Actions>(props: Options<State, Actions
                 history.replace(meta.redirect!)
               })
             }
-            console.log('router change')
           }
           if (hot) {
             const key = '@hydux-router/listener'
@@ -277,12 +277,12 @@ export default function withRouter<State, Actions>(props: Options<State, Actions
           let ctx = inject()
           if (loc.template) {
             let action = routesMap[loc.template]
-            let { state: nextState, cmd } = runAction(action(loc))
+            let { state: nextState, cmd } = runActionResult(action(loc))
             ctx.setState({
               ...nextState as any,
               location: loc
             })
-            ctx.addSub(...cmd)
+            ctx._internals.cmd = cmd
           } else {
             ctx.setState({
               ...state as any,

@@ -1,4 +1,4 @@
-import _app, { Cmd } from '../../../src/index'
+import _app, { Cmd, Dt, dt, never } from '../../../src/index'
 import withPersist from '../../../src/enhancers/persist'
 import withPicodom, { React } from '../../../src/enhancers/picodom-render'
 import { ActionsType } from '../../../src/types'
@@ -19,29 +19,26 @@ const routes: NestedRoutes<State, Actions> = {
   path: '/',
   action: loc => state => ({
     ...state,
-    page: 'Home'
+    page: dt('Home', null)
   }),
   children: [{
     path: '/user/:id',
     action: loc => state => ({
       ...state,
-      page: {
-        page: 'User',
-        id: loc.params.id,
-      }
+      page: dt('User', Number(loc.params.id)),
     }),
   }, {
     path: '/counter',
     getComponent: () => ['counter', import('./counter')],
     action: loc => state => ({
       ...state,
-      page: 'Counter'
+      page: dt('Counter', null)
     }),
   }, {
     path: '*',
     action: loc => state => ({
       ...state,
-      page: '404'
+      page: dt('404', null)
     })
   }]
 }
@@ -65,14 +62,14 @@ const actions = {
 }
 
 type Page =
-| 'Home'
-| 'Counter'
-| { page: 'User', id: number }
-| '404'
+| Dt<'Home'>
+| Dt<'Counter'>
+| Dt<'User', number>
+| Dt<'404'>
 
 const state = {
   counter: null as any as _Counter.State,
-  page: 'Home' as Page,
+  page: dt('Home') as Page,
   // Auto injected field from router enhancer, for code-splitting components.
   lazyComps: {
     counter: null as typeof _Counter | null,
@@ -88,7 +85,7 @@ const Users = () => <div>Users</div>
 
 const renderRoutes = (state: State, actions: Actions) => {
   const Counter = state.lazyComps.counter
-  switch (state.page) {
+  switch (state.page.tag) {
     case 'Home':
       return <div>Home</div>
     case 'Counter':
@@ -98,11 +95,10 @@ const renderRoutes = (state: State, actions: Actions) => {
       return <div>Loading...</div>
     case '404':
       return <NoMatch />
+    case 'User':
+      return <div>User: {state.page.data}</div>
     default:
-      switch (state.page.page) {
-        case 'User':
-          return <div>User: {state.page.id}</div>
-      }
+      never(state.page)
   }
 }
 const view = (state: State, actions: RouterActions<Actions>) => (

@@ -7,13 +7,22 @@ const inject = Hydux.inject
 export const init = (title = 'Counter1') => ({
   state: { count: 0, title },
   cmd: Cmd.ofSub(
-    (_: Actions) =>
-      Utils.fetch(`/api/initcount`)
-      .then(res => res.json())
-      .then(data => _.setCount(data.count)),
+    (_: Actions) => {
+      return _.init()
+    }
+
   )
 })
 export const actions = {
+  init() {
+    const { state, actions, setState, Cmd } = inject<State, Actions>()
+    Cmd.addSub(_ => {
+      return Utils.fetch(`/api/initcount`)
+      .then(res => res.json())
+      .then(data => _.setCount(state.count + data.count)) // use incr to test cmd executed count
+      .then(data => { console.log('end fetch');return data })
+    })
+  },
   setCount(count: number) {
     let ctx = inject<State, Actions>()
     ctx.setState({ count })

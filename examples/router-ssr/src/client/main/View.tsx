@@ -1,5 +1,5 @@
 import withReact, { React } from 'hydux-react'
-import { Context } from '../../../../../src/index'
+import { Context, never } from '../../../../../src/index'
 import withRouter, {
   mkLink,
   History,
@@ -20,7 +20,7 @@ let Link = mkLink(history, React.createElement)
 
 const renderRoutes = (state: State, actions: Actions) => {
   const Counter = state.lazyComps.counter
-  switch (state.page) {
+  switch (state.page.tag) {
     case 'home':
       return <div>Home</div>
     case 'counter':
@@ -35,11 +35,10 @@ const renderRoutes = (state: State, actions: Actions) => {
       return subComps.render('counter2', state, actions)
     case 'counter3':
       return subComps.render('counter3', state, actions)
+    case 'user':
+      return <div>User: {state.page.data}</div>
     default:
-      switch (state.page.page) {
-        case 'user':
-          return <div>User: {state.page.id}</div>
-      }
+      never(state.page)
   }
 }
 export const root = (state: State, actions: RouterActions<Actions>) => (
