@@ -10,8 +10,11 @@ const isBrowser =
 
 export function parsePath<P extends Param, Q extends Query>(path: string, tpls: string[]): Location<P, Q> {
   const splits = path.split('?')
+  const hasQuery = !!splits[1];
+  [splits[hasQuery ? 1 : 0], splits[2]] = (hasQuery ? splits[1] : splits[0]).split('#')
   const pathname = decodeURI(splits[0])
   const search = splits[1] ? '?' + splits[1] : ''
+  const hash = splits[2] ? '#' + splits[2] : ''
   const query = search.slice(1).split('&').filter(Boolean)
     .reduce((query, kv) => {
       const [key, value] = kv.split('=').map(decodeURIComponent)
@@ -38,6 +41,7 @@ export function parsePath<P extends Param, Q extends Query>(path: string, tpls: 
     query,
     search,
     template,
+    hash,
   }
 }
 

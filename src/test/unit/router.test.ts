@@ -22,6 +22,33 @@ describe('router', () => {
     assert.deepEqual(loc.query.aa, ['vv', '小明', 'badas'])
     assert.deepEqual(loc.template, null)
   })
+  it('parsePath hash', () => {
+    let loc = parsePath('/aa/bb/123?aa=bb#dd=323', [])
+    assert.deepEqual(loc.params, {}, '1')
+    assert.deepEqual(loc.query, { aa: 'bb' }, '1')
+    assert.deepEqual(loc.hash, '#dd=323', '1')
+    assert.deepEqual(loc.pathname, '/aa/bb/123', '1')
+
+
+    loc = parsePath('/aa/bb/123?aa=bb', [])
+    assert.deepEqual(loc.params, {}, '2')
+    assert.deepEqual(loc.query, { aa: 'bb' }, '2')
+    assert.deepEqual(loc.hash, '', '2')
+    assert.deepEqual(loc.pathname, '/aa/bb/123', '2')
+
+
+    loc = parsePath('/aa/bb/123#aa', [])
+    assert.deepEqual(loc.params, {}, '3')
+    assert.deepEqual(loc.query, { }, '3')
+    assert.deepEqual(loc.hash, '#aa', '3')
+    assert.deepEqual(loc.pathname, '/aa/bb/123', '3')
+
+    loc = parsePath('/aa/bb/123?#aa', [])
+    assert.deepEqual(loc.params, {}, '3')
+    assert.deepEqual(loc.query, {}, '3')
+    assert.deepEqual(loc.hash, '#aa', '3')
+    assert.deepEqual(loc.pathname, '/aa/bb/123', '3')
+  })
 
   it('matchPath simple', () => {
     let params = matchPath('/aa/bb/cc', '/aa/bb/cc')
@@ -63,6 +90,7 @@ describe('router', () => {
     params = matchPath('/aa/bb/cc', '/aa/:param')
     assert.deepEqual(params, null, 'match')
   })
+
 
   it('nestedRoutes', () => {
     const routes: NestedRoutes<any, any> = {

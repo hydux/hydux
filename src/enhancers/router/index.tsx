@@ -30,6 +30,7 @@ export interface Location<P extends Param = Param, Q extends Query = Query> {
   params: P
   query: Q
   search: string
+  hash: string
 }
 
 export interface History {

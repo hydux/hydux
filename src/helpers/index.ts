@@ -27,12 +27,10 @@ import {
 } from '../types'
 import { dispatcher } from '../dispatcher'
 
-declare global {
-  type Dt<T extends string, D = null> = {
-    tag: T
-    data: D
-  } & { __tsTag: 'DateType' }
-}
+export type Dt<T extends string, D = null> = {
+  tag: T
+  data: D
+} & { __tsTag: 'DateType' }
 
 /**
  * ADT Helper for TS
