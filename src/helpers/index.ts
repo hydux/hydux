@@ -26,10 +26,6 @@ import {
   GeneralActionType,
 } from '../types'
 import { dispatcher } from '../dispatcher'
-export type Dt<T extends string, D = null> = {
-  tag: T
-  data: D
-} & { __tsTag: 'DateType' }
 
 declare global {
   type Dt<T extends string, D = null> = {
@@ -39,7 +35,6 @@ declare global {
 }
 
 /**
- * @internal
  * ADT Helper for TS
  * e.g.
  * ```ts
@@ -234,7 +229,12 @@ export function runAction<S, A>(
     (res = res.call(actions, actions))
   if (res && (_internals.newState !== state || _internals.cmd.length)) {
     console.error(result)
-    throw new Error(`Actions with new inject api cannot return anything!`)
+    // throw new Error(`Actions with new inject api cannot return anything!`)
+    let nres = normalize<S, A>(res, state)
+    return {
+      state: { ..._internals.newState, ...nres.state },
+      cmd: _internals.cmd.concat(nres.cmd),
+    }
   }
   // action can be a function that return a promise or undefined(callback)
   if (res) {

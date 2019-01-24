@@ -22,7 +22,7 @@ export namespace dispatcher {
   }
   let checkActive = () => {
     if (!contextStack.length) {
-      throw new RangeError(`addCmd is called out of scope, please ensure it is called in a synchronized action.`)
+      throw new RangeError(`inject is called out of scope, please ensure it is called in a synchronized action.`)
     }
   }
   export type Mapper<A, SubA> = ((a: A) => SubA) | null
@@ -38,6 +38,10 @@ export namespace dispatcher {
     }
 
     addSub(...subs: Sub<A>[]) {
+      return this.addBatch(subs)
+    }
+
+    addBatch(subs: Sub<A>[]) {
       this._addCmd(Cmd.ofSub, subs)
       return this
     }
@@ -89,7 +93,7 @@ export namespace dispatcher {
     }
   }
 
-  let contextStack = [] as (ReturnType<typeof makeContext>)[]
+  let contextStack: InjectContext<any>[] = []
   export interface ActiveProps {
     state: any
     actions: any
