@@ -129,6 +129,7 @@ export async function resolveCmdResults(results: any[]) {
   results = await Promise.all(
     results.map(r => r instanceof Array ? resolveCmdResults(r) : r)
   )
+  return results
 }
 
 export function app<State, Actions>(props: AppProps<State, Actions>): Context<State, Actions> {

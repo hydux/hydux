@@ -77,6 +77,8 @@ option('-t, --type <ver>', 'Semver versions, patch | major | minor')
 task<{ type: 'patch' | 'major' | 'minor' }>('publish', async ctx => {
   await ctx.run('preversion', { options: { version: ctx.options.type } })
   await ctx.exec(`npm version ${ctx.options.type}`)
+  await fs.rmrf('./lib/test')
+  await fs.rmrf('./es/test')
   await Promise.all([
     ctx.exec(`git push origin master --tags`),
     ctx.exec(`npm --registry https://registry.npmjs.org/ publish`),
