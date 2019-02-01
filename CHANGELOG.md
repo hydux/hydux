@@ -1,3 +1,13 @@
+#### 0.5.11 (2019-02-01)
+
+##### Bug Fixes
+
+* **inject:**  Fix duplicated dispatch cmds ([60fcdd16](https://github.com/hydux/hydux/commit/60fcdd168f80bada83370bd5ea5a3b0e9bf08999))
+
+##### Refactors
+
+* **router:**  Refactor parsePath ([6cf824de](https://github.com/hydux/hydux/commit/6cf824de6a92d5e77f0751d8f2f71e7b7a01356d))
+
 #### 0.5.10 (2019-01-24)
 
 ##### New Features
